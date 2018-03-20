@@ -3,14 +3,23 @@ body {
     text-align: center;
 }
 
+div {
+    font-family: monospace, monospace;
+}
+
 div.screen {
     position: absolute;
-    font-family: monospace, monospace;
     white-space: pre;
     width: 98%;
     text-align: center;
+    cursor: pointer;
 }
 
-div.overlay {
+span {
     font-family: monospace, monospace;
+    white-space: pre;
+}
+
+span.button {
+    cursor: pointer;
 }

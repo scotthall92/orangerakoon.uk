@@ -19,13 +19,14 @@
 </head>
 <body>
 
-<div id="nerDiv" class="screen"></div>
-<div id="midDiv" class="screen"></div>
-<div id="farDiv" class="screen"></div>
+<div id="nerDiv" class="screen" onclick="interact()"></div>
+<div id="midDiv" class="screen" onclick="moveForward()"></div>
+<div id="farDiv" class="screen" onclick="moveForward()"></div>
 
-<div class="overlay"><br/><br/><br/><br/><br/><br/><br/><br/><br/></div>
+<div><br/><br/><br/><br/><br/><br/><br/><br/><br/></div>
 
-<div id="controlsDiv">wasd or arrows to move, z or space to interact</div>
+<span class="button" onclick="turnLeft()">///</span><span class="controls">  wasd or arrows to move  </span><span class="button" onclick="turnRight()">\\\</span><br/>
+<span class="button" onclick="turnLeft()">\\\</span><span class="controls">  z or space to interact  </span><span class="button" onclick="turnRight()">///</span>
 
 <script type="text/javascript">
 
@@ -174,9 +175,7 @@ function startNextLevel() {
   level += 1;
   document.title = 'Procii - Level ' + level;
 
-  if (level > 1) {
-    document.getElementById('controlsDiv').innerText = '';
-  }
+  removeControlsText();
 
   islandSize = 30;
   if (level < 10) {
@@ -189,6 +188,7 @@ function startNextLevel() {
 
   palette = getPalette();
   recolorScreen(palette);
+  recolorControls();
   updateScreen();
 }
 
@@ -320,6 +320,27 @@ function recolorScreen(palette) {
   farDiv.style.color = palette.far;
 }
 
+function removeControlsText() {
+  if (level == 2) {
+    var controls = document.getElementsByClassName('controls');
+    for (i = 0; i < controls.length; i++) {
+      controls[i].innerText = '                          ';
+    }
+  }
+}
+
+function recolorControls() {
+  var newColor = '#000000';
+  if (document.body.style.backgroundColor == 'rgb(0, 0, 0)') {
+    newColor = '#FFFFFF';
+  }
+
+  var buttons = document.getElementsByClassName('button');
+  for (i = 0; i < buttons.length; i++) {
+    buttons[i].style.color = newColor;
+  }
+}
+
 /* INTERACTION METHODS */
 
 function foundHouse() {
@@ -417,6 +438,7 @@ function advanceTime() {
       document.body.style.background = '#000000';
     }
   }
+  recolorControls();
 }
 
 function lightFire() {
