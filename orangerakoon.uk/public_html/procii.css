@@ -1,8 +1,9 @@
 body {
-	background: white;
+    background: white;
+    text-align: center;
 }
 
-div {
+div.screen {
     position: absolute;
     font-family: monospace, monospace;
     white-space: pre;
@@ -10,15 +11,6 @@ div {
     text-align: center;
 }
 
-div.ner {
-	color: black;
+div.overlay {
+    font-family: monospace, monospace;
 }
-
-div.mid {
-	color: black;
-}
-
-div.far {
-	color: black;
-}
-

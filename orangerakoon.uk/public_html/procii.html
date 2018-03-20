@@ -19,9 +19,13 @@
 </head>
 <body>
 
-<div id="nerDiv" class="ner"></div>
-<div id="midDiv" class="mid"></div>
-<div id="farDiv" class="far"></div>
+<div id="nerDiv" class="screen"></div>
+<div id="midDiv" class="screen"></div>
+<div id="farDiv" class="screen"></div>
+
+<div class="overlay"><br/><br/><br/><br/><br/><br/><br/><br/><br/></div>
+
+<div id="controlsDiv">wasd or arrows to move, z or space to interact</div>
 
 <script type="text/javascript">
 
@@ -169,6 +173,10 @@ function generateIsland(size, envNames) {
 function startNextLevel() {
   level += 1;
   document.title = 'Procii - Level ' + level;
+
+  if (level > 1) {
+    document.getElementById('controlsDiv').innerText = '';
+  }
 
   islandSize = 30;
   if (level < 10) {
@@ -1013,6 +1021,7 @@ document.addEventListener("keypress", function onPress(event) {
     case "d":
       turnRight();
       break;
+    case " ":
     case "z":
       interact();
       break;
