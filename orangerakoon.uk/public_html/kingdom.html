@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Fantasy Kingdom Generator - Medieval demographics for fantasy worlds</title>
+    <link rel="stylesheet" type="text/css" href="kingdom.css" title="Simple">
+
+    <!--
+      ____                             _____       _
+     / __ \                           |  __ \     | |
+    | |  | |_ __ __ _ _ __   __ _  ___| |__) |__ _| | _____   ___  _ __
+    | |  | | '__/ _` | '_ \ / _` |/ _ \  _  // _` | |/ / _ \ / _ \| '_ \
+    | |__| | | | (_| | | | | (_| |  __/ | \ \ (_| |   < (_) | (_) | | | |
+     \____/|_|  \__,_|_| |_|\__, |\___|_|  \_\__,_|_|\_\___/ \___/|_| |_|.uk
+    =========================__/ |==========================================
+                            |___/  Author: Scott Hall   github: scotthall92
+    -->
+
+</head>
+<body>
+
+<div class='main'>
+<h1>Fantasy Kingdom Generator</h1>
+<h3>Medieval demographics for fantasy worlds</h3>
+
+<p class='attribution'>Based on <a href='http://www222.pair.com/sjohn/blueroom/demog.htm'>Medieval Demographics Made Easy: Numbers for Fantasy Worlds</a> by S. John Ross</p>
+
+<noscript><h2>* This page requires JavaScript *</h2></noscript>
+
+<br>
+
+<form onsubmit='return generateKingdom();'>
+<table class='input'>
+    <tr>
+        <th>Area:</th>
+        <td><input id='area' type='text' value='80000'> square miles</td>
+    </tr>
+    <tr>
+        <th><span class='tooltip' title='Number of years populated by castle-building people.'>Age</span>:</th>
+        <td><input id='age' type='text' value='300'> years <span class='subscript'>(affects number of ruins)</span></td>
+    </tr>
+    <tr>
+        <th><span class='tooltip' title="A kingdom's health is a measure of the combination of its climate, geography, political environment, and impact from events such as war or disease.">Health</span>:</th>
+        <td>
+        <select id='health'>
+            <option value='1'>1 - Undeveloped; Depopulated by invasions, plagues or other calamities</option>
+            <option value='2'>2 - Underdeveloped; Depopulated; Low arability</option>
+            <option value='3' selected='selected'>3 - Developing; Variable arability</option>
+            <option value='4'>4 - Well developed; Plentiful arable countryside</option>
+            <option value='5'>5 - Highly developed; Abundant arable countryside; Idyllic</option>
+        </select>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><span class='superscript'>(affects population and population density)</span></td>
+    </tr>
+    <tr>
+        <th>Era:</th>
+        <td>
+        <select id='era'>
+            <option value='1'>Pre-Crusades (limited and local trade)</option>
+            <option value='2' selected='selected'>Post-Crusades (notable and thriving mercantile community)</option>
+            <option value='3'>Verge of Renaissance (robust mercantile economy)</option>
+        </select>
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td><span class='superscript'>(affects number of towns)</span></td>
+    </tr>
+</table>
+<span class='center'><input type="submit" value="Generate!"></span>
+</form>
+
+<hr>
+
+<span class='title'>Demographics</span>
+<table class='result'>
+    <tr>
+        <td><b>Population</b></td>
+        <td id='populationId' class='value'>0</td>
+        <td>people</td>
+    </tr>
+    <tr>
+        <td><b>Population Density</b></td>
+        <td id='populationDensityId' class='value'>0</td>
+        <td>people per square mile</td>
+    </tr>
+    <tr>
+        <td><b>Urban Population</b></td>
+        <td id='urbanPopulationId' class='value'>0</td>
+        <td>people</td>
+    </tr>
+    <tr>
+        <td><b>Cities</b></td>
+        <td id='citiesId' class='value'>0</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>Towns</b></td>
+        <td id='townsId' class='value'>0</td>
+        <td></td>
+    </tr>
+    <tr>
+        <td><b>Villages</b></td>
+        <td id='villagesId' class='value'>0</td>
+        <td></td>
+    <tr>
+        <td><b>Developed Land Area</b></td>
+        <td id='developedLandAreaId' class='value'>0</td>
+        <td>square miles</td>
+    </tr>
+    <tr>
+        <td><b>Wilderness Area</b></td>
+        <td id='wildernessAreaId' class='value'>0</td>
+        <td>square miles</td>
+    </tr>
+</table>
+
+<span class='title'>Infrastructure</span>
+<table class='result'>
+    <tr>
+        <td><b>Castles</b></td>
+        <td id='castlesId' class='value'>0</td>
+    </tr>
+    <tr>
+        <td><b>Frontier Castles</b></td>
+        <td id='frontierCastlesId' class='value'>0</td>
+    </tr>
+    <tr>
+        <td><b>Civil Castles</b></td>
+        <td id='civilisedCastlesId' class='value'>0</td>
+    </tr>
+    <tr>
+        <td><b>Ruins</b></td>
+        <td id='ruinedCastlesId' class='value'>0</td>
+    </tr>
+    <tr>
+        <td><b>Universities</b></td>
+        <td id='universitiesId' class='value'>0</td>
+    </tr>
+</table>
+
+<span class='title'>Livestock</span>
+<table class='result'>
+    <tr>
+        <td><b>Livestock</b></td>
+        <td id='livestockId' class='value'>0</td>
+        <td>animals</td>
+    </tr>
+    <tr>
+        <td><b>Fowl</b></td>
+        <td id='fowlLivestockId' class='value'>0</td>
+        <td>chickens, geese, ducks</td>
+    </tr>
+    <tr>
+        <td><b>Meat Animals</b></td>
+        <td id='otherLivestockId' class='value'>0</td>
+        <td>cattle, pigs, sheep</td>
+    </tr>
+</table>
+
+<span class='title'>City Demographics</span>
+<table id='citiesTableId' class='centered'>
+    <thead>
+        <tr>
+            <th>City Type</th>
+            <th>Population</th>
+            <th>Noble Households</th>
+            <th><span class='tooltip' title='Lawyers; Legal representatives'>Advocates</span></th>
+            <th>Clergymen</th>
+            <th>Priests</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<span class='title'>Town Populations</span>
+<table id='townsTableId' class='result'>
+    <tbody>
+        <tr>
+            <td>0</td>
+        </tr>
+    </tbody>
+</table>
+
+<p class='attribution'><a href='/'><<< back to orangerakoon.uk</a></p>
+
+<script type="text/javascript">
+// Returns a random integer between min (included) and max (excluded)
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+// Returns a random integer in range biased towards bias value
+function getRandomBiasInt(min, max, bias, influence) {
+    var random = Math.random() * (max - min) + min;     // random in range
+    var mix = Math.random() * influence;                // random mixer
+    return Math.floor(random * (1 - mix) + bias * mix); // mix full range and bias
+}
+
+// Roll a set of N dice e.g. 2d4+10
+function roll(number, sides, modifier=0) {
+    var result = 0;
+    for (var i=0; i < number; i++) {
+        result += getRandomInt(1, sides+1);
+    }
+    result += modifier;
+    return result
+}
+
+// Rounds a float downwards with a random chance of
+// being rounded up matching the decimal remainder.
+// e.g. 5.4 means 5 with a 40% chance of being rounded up to 6
+function chancedRound(float) {
+    var int = Math.floor(float);
+    var remainder = float - int;
+    if (Math.random() <= remainder) {
+        int += 1;
+    }
+    return int
+}
+
+function getCityPopulations(population) {
+    var cityPops = [Math.floor(Math.sqrt(population) * roll(2, 4, 10))];
+    var secondCity = Math.floor(roll(2, 4) * 0.1 * cityPops[0]);
+    if (secondCity > 8000) {
+        cityPops.push(secondCity);
+    }
+    while (true) {
+        var cityPop = Math.floor((1 - (roll(2, 4) * 0.05)) * cityPops[cityPops.length-1]);
+        if (cityPop < 8000) {
+            break;
+        }
+        cityPops.push(cityPop);
+    }
+    return cityPops
+}
+
+function getPreCrusadesTownPopulations(smallestCityPopulation) {
+    var townPops = [Math.floor(roll(2, 4) * 0.05 * smallestCityPopulation)]
+    while (true) {
+        var townPop = Math.floor((1 - (roll(2, 4) * 0.05)) * townPops[townPops.length-1]);
+        if (townPop < 1000) {
+            break;
+        }
+        townPops.push(townPop);
+    }
+    return townPops
+}
+
+function getTownPopulations(era, cityNumber, smallestCityPopulation) {
+    switch (era) {
+        case '1':
+            // Pre-Crusades (limited and local trade)
+            return getPreCrusadesTownPopulations(smallestCityPopulation);
+        case '2':
+            // Post-Crusades (notable and thriving mercantile community)
+            var townNumber = cityNumber * roll(2, 8);
+            var townPops = [];
+            for (var i=0; i < townNumber; i++)
+                townPops.push(getRandomBiasInt(1000, 8000, 2500, 1.00));
+            return townPops
+        case '3':
+            // Verge of Renaissance (robust mercantile economy)
+            var townNumber = cityNumber * roll(2, 8) * 1.5;
+            var townPops = [];
+            for (var i=0; i < townNumber; i++)
+                townPops.push(getRandomBiasInt(1000, 8000, 2500, 1.00));
+            return townPops
+    }
+}
+
+function buildCitiesTable(cityPopulations) {
+    citiesTable = document.getElementById('citiesTableId');
+    var new_tbody = document.createElement('tbody');
+    for (var i=0; i < cityPopulations.length; i++) {
+        var pop = cityPopulations[i];
+        var nobleHouseholds = chancedRound(pop/200);
+        var advocates = chancedRound(pop/650);
+        var clergy = chancedRound(pop/40);
+        var priests = chancedRound(clergy/25);
+
+        var row = new_tbody.insertRow();
+        var cell0 = row.insertCell(0);
+        var cell1 = row.insertCell(1);
+        var cell2 = row.insertCell(2);
+        var cell3 = row.insertCell(3);
+        var cell4 = row.insertCell(4);
+        var cell5 = row.insertCell(5);
+
+        if (cityPopulations[i] > 12000) {
+            cell0.innerHTML = "Big City";
+        } else {
+            cell0.innerHTML = "City";
+        }
+        cell1.innerHTML = pop;
+        cell2.innerHTML = nobleHouseholds;
+        cell3.innerHTML = advocates;
+        cell4.innerHTML = clergy;
+        cell5.innerHTML = priests;
+    }
+    citiesTable.replaceChild(new_tbody, citiesTable.tBodies[0]);
+}
+
+function buildTownsTable(townPopulations) {
+    var townPops = townPopulations.sort(function(a, b){return b-a}).toString();
+    townPops = townPops.replace(/,/g, ', ');
+    townsTable = document.getElementById('townsTableId');
+    var new_tbody = document.createElement('tbody');
+    var row = new_tbody.insertRow();
+    var cell0 = row.insertCell(0);
+
+    cell0.innerHTML = townPops;
+
+    townsTable.replaceChild(new_tbody, townsTable.tBodies[0]);
+}
+
+function generateKingdom() {
+    var area = document.getElementById('area').value
+    var health = document.getElementById('health').value
+    var era = document.getElementById('era').value
+    var age = document.getElementById('age').value
+
+    if (isNaN(area)) {
+        alert("Area must be a number.");
+        document.getElementById('area').value = 80000;
+        area = 80000;
+    } else if (area < 5000) {
+        alert("Area must be at least 5000 square miles.");
+        document.getElementById('area').value = 5000;
+        area = 5000;
+    }
+
+    if (isNaN(age)) {
+        alert("Age must be a number.");
+        document.getElementById('age').value = 300;
+        age = 300;
+    } else if (age < 0) {
+        alert("Age must be a positive number.");
+        document.getElementById('age').value = 300;
+        age = 300;
+    }
+
+    // var populationDensity = roll(6, 4) * health; // This tends to get low population densities
+    var populationDensity = 12 + (health * 18) + getRandomInt(0, 18);
+    var population = populationDensity * area;
+    var cityPopulations = getCityPopulations(population);
+    var cities = cityPopulations.length;
+    var townPopulations = getTownPopulations(era, cities, cityPopulations[cityPopulations.length-1]);
+    var towns = townPopulations.length;
+    var urbanPopulation = cityPopulations.reduce(function(a,b){return a + b}) + townPopulations.reduce(function(a,b){return a + b});
+    var villages = Math.floor((population - urbanPopulation) / 450);
+
+    var developedLandArea = Math.floor(population / 180);       // in square miles
+    var wildernessArea = area - developedLandArea;  // in square miles  
+
+    var castles = chancedRound(population / 50000);
+    var frontierCastles = chancedRound(castles * 0.25);
+    var civilisedCastles = castles - frontierCastles;
+    var ruinedCastles = chancedRound((population / 5000000) * Math.sqrt(age));
+
+    var universities = chancedRound(population / 27300000); 
+
+    var livestock = Math.floor(population * 2.2);
+    var fowlLivestock = Math.floor(livestock * 0.68);
+    var otherLivestock = livestock - fowlLivestock;
+
+    // Populate Tables
+    document.getElementById('populationId').innerText = population;
+    document.getElementById('populationDensityId').innerText = populationDensity;
+    document.getElementById('urbanPopulationId').innerText = urbanPopulation;
+    document.getElementById('citiesId').innerText = cities;
+    document.getElementById('townsId').innerText = towns;
+    document.getElementById('villagesId').innerText = villages;
+    document.getElementById('developedLandAreaId').innerText = developedLandArea;
+    document.getElementById('wildernessAreaId').innerText = wildernessArea;
+
+    document.getElementById('castlesId').innerText = castles;
+    document.getElementById('frontierCastlesId').innerText = frontierCastles;
+    document.getElementById('civilisedCastlesId').innerText = civilisedCastles;
+    document.getElementById('ruinedCastlesId').innerText = ruinedCastles;
+    document.getElementById('universitiesId').innerText = universities;
+
+    document.getElementById('livestockId').innerText = livestock;
+    document.getElementById('fowlLivestockId').innerText = fowlLivestock;
+    document.getElementById('otherLivestockId').innerText = otherLivestock;
+
+    buildCitiesTable(cityPopulations);
+    buildTownsTable(townPopulations);
+
+    return false
+}
+</script>
+</div>
+
+</body>
+</html>
+

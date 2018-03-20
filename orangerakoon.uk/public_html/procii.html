@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Procii</title>
+    <link rel="stylesheet" type="text/css" href="procii.css" title="Procii">
+
+    <!--
+      ____                             _____       _
+     / __ \                           |  __ \     | |
+    | |  | |_ __ __ _ _ __   __ _  ___| |__) |__ _| | _____   ___  _ __
+    | |  | | '__/ _` | '_ \ / _` |/ _ \  _  // _` | |/ / _ \ / _ \| '_ \
+    | |__| | | | (_| | | | | (_| |  __/ | \ \ (_| |   < (_) | (_) | | | |
+     \____/|_|  \__,_|_| |_|\__, |\___|_|  \_\__,_|_|\_\___/ \___/|_| |_|.uk
+    =========================__/ |==========================================
+                            |___/  Author: Scott Hall   github: scotthall92
+    -->
+
+</head>
+<body>
+
+<div id="nerDiv" class="ner"></div>
+<div id="midDiv" class="mid"></div>
+<div id="farDiv" class="far"></div>
+
+<script type="text/javascript">
+
+/* LEVEL CREATION & GENERATION */
+
+function getEnvNames() {
+  var envNames = []
+
+  // Adjust for relative frequency of each env
+  for (i = 0; i < 3; i++) { envNames.push('trees'); }
+  for (i = 0; i < 2; i++) { envNames.push('treesAndGrass'); }
+  for (i = 0; i < 3; i++) { envNames.push('grass'); }
+  for (i = 0; i < 1; i++) { envNames.push('hill'); }
+  for (i = 0; i < 1; i++) { envNames.push('rockyGround'); }
+
+  return envNames
+}
+
+function getRandomEntry(list) {
+  return list[Math.floor(list.length * Math.random())]
+}
+
+function getRandomCoord() {
+  return Math.floor(Math.random() * (islandSize)) + 2;
+}
+
+function getRandomCoords() {
+  return { x: getRandomCoord(), y: getRandomCoord() }
+}
+
+function getUniqueRandomCoords(occupied) {
+  while (true) {
+    var coords = getRandomCoords();
+    var unique = true;
+    for (i = 0; i < occupied.length; i++) {
+      if ((coords.x == occupied[i].x) && (coords.y == occupied[i].y)) {
+        unique = false;
+      }
+    }
+    if (unique) {
+      return coords
+    }
+  }
+}
+
+function generateIsland(size, envNames) {
+  var island = [];
+  for (i = 0; i < size+4; i++) {
+    island[i] = [];
+    for (j = 0; j < size+4; j++) {
+      if ([0,1,size+2,size+3].indexOf(i) >= 0) {
+        island[i][j] = 'sea';
+      } else if ([0,1,size+2,size+3].indexOf(j) >= 0) {
+        island[i][j] = 'sea';
+      } else {
+        island[i][j] = getRandomEntry(envNames);
+      }
+    }
+  }
+
+  if (gameComplete) {
+    return island;
+  }
+
+  // Add unique envs
+  var occupied = [];
+
+  var monolith = getUniqueRandomCoords(occupied);
+  island[monolith.y][monolith.x] = 'monolith';
+  occupied.push(monolith);
+
+  var house = getUniqueRandomCoords(occupied);
+  island[house.y][house.x] = 'house';
+  occupied.push(house);
+
+  if (level >= 2) {
+    var signpost1 = getUniqueRandomCoords(occupied);
+    island[signpost1.y][signpost1.x] = 'signpost';
+    occupied.push(signpost1);
+  }
+
+  if (level >= 3) {
+    var fountain1 = getUniqueRandomCoords(occupied);
+    island[fountain1.y][fountain1.x] = 'fountain';
+    occupied.push(fountain1);
+
+    var fountain2 = getUniqueRandomCoords(occupied);
+    island[fountain2.y][fountain2.x] = 'fountain';
+    occupied.push(fountain2);
+  }
+
+  if (level >=4) {
+    var signpost2 = getUniqueRandomCoords(occupied);
+    island[signpost2.y][signpost2.x] = 'signpost';
+    occupied.push(signpost2);
+  }
+
+  if (level >= 5) {
+    var milestone1 = getUniqueRandomCoords(occupied);
+    island[milestone1.y][milestone1.x] = 'milestone';
+    occupied.push(milestone1);
+  }
+
+  if (level >= 6) {
+    var campfire = getUniqueRandomCoords(occupied);
+    island[campfire.y][campfire.x] = 'campfire';
+    occupied.push(campfire);
+  }
+
+  if (level >= 7) {
+    var campfireUnlit = getUniqueRandomCoords(occupied);
+    island[campfireUnlit.y][campfireUnlit.x] = 'campfireUnlit';
+    occupied.push(campfireUnlit);
+  }
+
+  if (level >= 8) {
+    var milestone2 = getUniqueRandomCoords(occupied);
+    island[milestone2.y][milestone2.x] = 'milestone';
+    occupied.push(milestone2);
+  }
+
+  if (level >= 9) {
+    var warp = getUniqueRandomCoords(occupied);
+    island[warp.y][warp.x] = 'warp';
+    occupied.push(warp);
+  }
+
+  if (level >= 10) {
+    if (!graveBroken) {
+      var grave = getUniqueRandomCoords(occupied);
+      island[grave.y][grave.x] = 'grave';
+      occupied.push(grave);
+    }
+  }
+
+  if (level >= 11) {
+    var stoneCarving = getUniqueRandomCoords(occupied);
+    island[stoneCarving.y][stoneCarving.x] = 'stoneCarving';
+    occupied.push(stoneCarving);
+  }
+
+  return island
+}
+
+function startNextLevel() {
+  level += 1;
+  document.title = 'Procii - Level ' + level;
+
+  islandSize = 30;
+  if (level < 10) {
+    islandSize = 8 + (level * 2);
+  }
+  island = generateIsland(islandSize, envNames);
+
+  coords = getRandomCoords()
+  aim = { x: 1, y: 0 };
+
+  palette = getPalette();
+  recolorScreen(palette);
+  updateScreen();
+}
+
+function startCreditsLevel() {
+  gameComplete = true;
+  level += 1;
+  document.title = 'Procii - Credits';
+
+  islandSize = 1;
+  island = generateIsland(islandSize, ['credits'])
+
+  coords = { x: 2, y: 2 };
+  aim = { x: 1, y: 0 };
+
+  palette = palettes[9];  // Black text on white
+  recolorScreen(palette);
+  updateScreen();
+}
+
+/* VISUALS & DISPLAY */
+
+function buildNerContent() {
+  var nerContent = envs[island[coords.y][coords.x]].ner;
+  return nerContent
+}
+
+function buildMidContent() {
+  var midContent = [];
+  if (aim.x) {
+    var left = envs[island[coords.y+(1*aim.x)][coords.x+(1*aim.x)]].mid;
+    var center = envs[island[coords.y][coords.x+(1*aim.x)]].mid;
+    var right = envs[island[coords.y-(1*aim.x)][coords.x+(1*aim.x)]].mid;
+  }
+  if (aim.y) {
+    var left = envs[island[coords.y+(1*aim.y)][coords.x-(1*aim.y)]].mid;
+    var center = envs[island[coords.y+(1*aim.y)][coords.x]].mid;
+    var right = envs[island[coords.y+(1*aim.y)][coords.x+(1*aim.y)]].mid;
+  }
+
+  for (i = 0; i < 4; i++) {
+    midContent[i] = left[i].slice(8,16) + center[i] + right[i].slice(0,8);
+  }
+  return midContent
+}
+
+function buildFarContent() {
+  var farContent = [];
+  if (aim.x) {
+    var farLeft = envs[island[coords.y+(2*aim.x)][coords.x+(2*aim.x)]].far;
+    var left = envs[island[coords.y+(1*aim.x)][coords.x+(2*aim.x)]].far;
+    var center = envs[island[coords.y][coords.x+(2*aim.x)]].far;
+    var right = envs[island[coords.y-(1*aim.x)][coords.x+(2*aim.x)]].far;
+    var farRight = envs[island[coords.y-(2*aim.x)][coords.x+(2*aim.x)]].far;
+  } else {
+    var farLeft = envs[island[coords.y+(2*aim.y)][coords.x-(2*aim.y)]].far;
+    var left = envs[island[coords.y+(2*aim.y)][coords.x-(1*aim.y)]].far;
+    var center = envs[island[coords.y+(2*aim.y)][coords.x]].far;
+    var right = envs[island[coords.y+(2*aim.y)][coords.x+(1*aim.y)]].far;
+    var farRight = envs[island[coords.y+(2*aim.y)][coords.x+(2*aim.y)]].far;
+  }
+
+  for (i = 0; i < 2; i++) {
+    farContent[i] = farLeft[i].slice(4,8) + left[i] + center[i] + right[i] + farRight[i].slice(0,4);
+  }
+  return farContent
+}
+
+function drawScreen(nerContent, midContent, farContent) {
+  // farDiv
+  var farContentMasked = [[], []];
+  for (i = 0; i < 2; i++) {
+    for (j = 0; j < 32; j++) {
+      if (nerContent[i][j] != '#') {
+        farContentMasked[i] += ' ';
+      } else if (midContent[i][j] != '#') {
+        farContentMasked[i] += ' ';
+      } else if (farContent[i][j] == '#') {
+        farContentMasked[i] += ' ';
+      } else {
+        farContentMasked[i] += farContent[i][j];
+      }
+    }
+  }
+  farDiv.innerHTML = farContentMasked.join('<br/>');
+
+  // midDiv
+  var midContentMasked = [[], [], [], []];
+  for (i = 0; i < 4; i++) {
+    for (j = 0; j < 32; j++) {
+      if (nerContent[i][j] != '#') {
+        midContentMasked[i] += ' ';
+      } else if (midContent[i][j] == '#') {
+        midContentMasked[i] += ' ';
+      } else {
+        midContentMasked[i] += midContent[i][j];
+      }
+    }
+  }
+  midDiv.innerHTML = midContentMasked.join('<br/>');
+
+  // nerDiv
+  nerContentMasked = [[], [], [], [], [], [], [], []]
+  for (i = 0; i < 8; i++) {
+    nerContentMasked[i] = nerContent[i].replace(/#/g, ' ');
+  }
+  nerDiv.innerHTML = nerContentMasked.join('<br/>');
+}
+
+function updateScreen() {
+  var nerContent = buildNerContent();
+  var midContent = buildMidContent();
+  var farContent = buildFarContent();
+
+  drawScreen(nerContent, midContent, farContent);
+}
+
+function getPalette() {
+  if (level <= 10) {
+    return palettes[level]
+  }
+
+  return getRandomEntry(palettes);
+}
+
+function recolorScreen(palette) {
+  document.body.style.background = palette.background;
+  nerDiv.style.color = palette.ner;
+  midDiv.style.color = palette.mid;
+  farDiv.style.color = palette.far;
+}
+
+/* INTERACTION METHODS */
+
+function foundHouse() {
+  housesFound += 1;
+  island[coords.y][coords.x] = 'houseOpen';
+  updateScreen();
+}
+
+function getTargetCoords(targetEnv) {
+  for (i = 0; i < island.length; i++) {
+    var targetIndex = island[i].indexOf(targetEnv);
+    if (targetIndex != -1) {
+      return { x: targetIndex, y: i }
+    }
+  }
+  return false
+}
+
+function aimTowards(targetEnv1, targetEnv2='none') {
+  var targetCoords = getTargetCoords(targetEnv1);
+
+  if (!targetCoords) {
+    // targetEnv1 not found, try targetEnv2
+    targetCoords = getTargetCoords(targetEnv2);
+  }
+
+  if (!targetCoords) {
+    // i.e. target does not exist
+    targetCoords = coords;
+  }
+
+  var xDirection = 1;
+  var xDistance = targetCoords.x - coords.x;
+  if (xDistance < 0) {
+    xDistance = xDistance * -1;
+    xDirection = -1;
+  }
+  var yDirection = 1;
+  var yDistance = targetCoords.y - coords.y;
+  if (yDistance < 0) {
+    yDistance = yDistance * -1;
+    yDirection = -1;
+  }
+
+  if (xDistance > yDistance) {
+    aim = { x: xDirection, y: 0 };
+  } else {
+    aim = { x: 0, y: yDirection };
+  }
+
+  updateScreen();
+}
+
+function fountainWarp() {
+  for (i = 0; i < island.length; i++) {
+    var fountainIndex = island[i].indexOf('fountain');
+    if (fountainIndex != -1) {
+      if ((coords.y == i) && (coords.x == fountainIndex)) {
+        // Already at this fountain, but we must check the rest
+        // of the list as indexOf only returns the first match
+        var rowRemainder = island[i].slice(fountainIndex+1);
+        var remainderIndex = rowRemainder.indexOf('fountain');
+        if (remainderIndex != -1) {
+          var xCoord = fountainIndex + remainderIndex + 1;
+          coords = { x: xCoord, y: i };
+          updateScreen();
+          return;
+        }
+      } else {
+        coords = { x: fountainIndex, y: i };
+        updateScreen();
+        return;
+      }
+    }
+  }
+}
+
+function advanceTime() {
+  if (document.body.style.backgroundColor == 'rgb(0, 0, 0)') {
+    if (palette == palettes[10]) {
+      // Use invert palette
+      palette = palettes[9];
+      recolorScreen(palette);
+    } else {
+      // Just invert background
+      document.body.style.background = '#FFFFFF';
+    }
+  } else {
+    if (palette == palettes[9]) {
+      // Use invert palette
+      palette = palettes[10];
+      recolorScreen(palette);
+    } else {
+      // Just invert background
+      document.body.style.background = '#000000';
+    }
+  }
+}
+
+function lightFire() {
+  island[coords.y][coords.x] = 'campfire';
+  updateScreen();
+}
+
+function warp() {
+  for (i = 0; i < island.length; i++) {
+    var monolithIndex = island[i].indexOf('monolith');
+    if (monolithIndex != -1) {
+      coords = { x: monolithIndex, y: i };
+      updateScreen();
+      return;
+    }
+  }
+}
+
+function breakGrave() {
+  if (housesFound >= 10) {
+    graveBroken = true;
+    island[coords.y][coords.x] = 'graveBroken';
+    updateScreen();
+  }
+}
+
+function showCredits() {
+  if (graveBroken) {
+    startCreditsLevel();
+  }
+}
+
+/* INPUT METHODS */
+
+// Right = +1, Left = -1
+function turn(direction) {
+  var xNew = 0;
+  var yNew = 0;
+
+  if (aim.x) {
+    yNew = -aim.x * direction;
+  }
+  if (aim.y) {
+    xNew = aim.y * direction;
+  }
+
+  aim = { x: xNew, y: yNew };
+  updateScreen();
+}
+
+function turnLeft() {
+  turn(-1);
+}
+
+function turnRight() {
+  turn(1);
+}
+
+// Forward = +1, Back = -1
+function move(direction) {
+  if (aim.x) {
+    coords.x += (aim.x * direction);
+    if (coords.x < 2) {
+      coords.x = 2;
+    }
+    if (coords.x > islandSize+1) {
+      coords.x = islandSize+1;
+    }
+  }
+  if (aim.y) {
+    coords.y += (aim.y * direction);
+    if (coords.y < 2) {
+      coords.y = 2;
+    }
+    if (coords.y > islandSize+1) {
+      coords.y = islandSize+1;
+    }
+  }
+  updateScreen();
+}
+
+function moveForward() {
+  move(1);
+}
+
+function moveBack() {
+  move(-1);
+}
+
+function interact() {
+  switch (island[coords.y][coords.x]) {
+    case 'monolith':
+      startNextLevel();
+      break;
+    case 'house':
+      foundHouse();
+      break;
+    case 'signpost':
+      aimTowards('house', 'houseOpen');
+      break;
+    case 'fountain':
+      fountainWarp();
+      break;
+    case 'milestone':
+      aimTowards('monolith');
+      break;
+    case 'campfire':
+      advanceTime();
+      break;
+    case 'campfireUnlit':
+      lightFire();
+      break;
+    case 'warp':
+      warp();
+      break;
+    case 'grave':
+      breakGrave();
+      break;
+    case 'stoneCarving':
+      showCredits();
+      break;
+    default:
+      return;
+  }
+}
+
+/* GLOBAL VARIABLES */
+
+var palettes = [
+  { background: '#FFFFFF', ner: '#008000', mid: '#306754', far: '#728FCE'},
+  { background: '#FFFFFF', ner: '#008000', mid: '#306754', far: '#728FCE'},
+  { background: '#FFFFFF', ner: '#7F5217', mid: '#F87217', far: '#DC381F'},
+  { background: '#000000', ner: '#254117', mid: '#493D26', far: '#2B1B17'},
+  { background: '#000000', ner: '#254117', mid: '#347235', far: '#4E9258'},
+  { background: '#FFFFFF', ner: '#7D1B7E', mid: '#7F38EC', far: '#9E7BFF'},
+  { background: '#FFFFFF', ner: '#59E817', mid: '#7BCCB5', far: '#1589FF'},
+  { background: '#000000', ner: '#9E7BFF', mid: '#7F38EC', far: '#7D1B7E'},
+  { background: '#000000', ner: '#00FFFF', mid: '#00FF00', far: '#FFD801'},
+  { background: '#FFFFFF', ner: '#000000', mid: '#000000', far: '#000000'},
+  { background: '#000000', ner: '#FFFFFF', mid: '#FFFFFF', far: '#FFFFFF'}
+];
+
+var palette = palettes[0];
+
+var envs = {
+  trees: {
+    ner: [
+      '####/\\####################/\\####',
+      '###/  \\########/\\########/  \\###',
+      '##/    \\######/  \\######/    \\##',
+      '#/_    _\\####/_  _\\####/_    _\\#',
+      '#/      \\####/    \\####/      \\#',
+      '/________\\##/______\\##/________\\',
+      '###|| |#######|  |#######| O|###',
+      '###| ||##################|| |###'
+    ],
+    mid: [
+      '#/\\####/\\####/\\#',
+      '/  \\##/  \\##/  \\',
+      '/  \\##/  \\##/  \\',
+      '#TT####TT####TT#'
+    ],
+    far: [
+      '#^##^##^',
+      '#T##T##T'
+    ]
+  },
+  grass: {
+    ner: [
+      '################################',
+      '################################',
+      '################################',
+      '################################',
+      '################################',
+      '################/############/##',
+      '#/##/#/###/##/#/)/###/#/##/#/)/#',
+      '/)//)/)///)//)///)///)/)//)///)/'
+    ],
+    mid: [
+      '################',
+      '################',
+      '################',
+      '////////////////'
+    ],
+    far: [
+      '########',
+      '........'
+    ]
+  },
+  treesAndGrass: {
+      ner: [
+        '####/\\####################/\\####',
+        '###/  \\##################/  \\###',
+        '##/    \\################/    \\##',
+        '#/_    _\\##############/_    _\\#',
+        '#/      \\##############/      \\#',
+        '/________\\#######/####/________\\',
+        '#/#|| |##/###/##/)/###/##|  |###',
+        '/),|,||,/)/,/)////)/,/)/,||,|,//'
+      ],
+      mid: [
+        '#/\\##########/\\#',
+        '/  \\########/  \\',
+        '/  \\########/  \\',
+        '.TT..///.///.TT.'
+      ],
+      far: [
+        '#^#####^',
+        '.T#.#.#T'
+      ]
+    },
+  hill: {
+    ner: [
+      '################################',
+      '################################',
+      '###########__________###########',
+      '##########/          \\##########',
+      '#########/  . .    \\  \\_########',
+      '#######_/               \\#######',
+      '######/   //      /      \\######',
+      '####////        //)  .   /\\//###'
+    ],
+    mid: [
+      '################',
+      '#####______#####',
+      '####/ . .. \\####',
+      '###/.  . .  \\###'
+    ],
+    far: [
+      '###___##',
+      '##/. .\\#'
+    ]
+  },
+  rockyGround: {
+    ner: [
+      '################################',
+      '################################',
+      '################################',
+      '################################',
+      '################################',
+      '###__###############/####__#####',
+      '##/. \\##/######__##/)/##/ .\\####',
+      '.O\\__/,/)/,.,// .\\///)/,\\__/o./,'
+    ],
+    mid: [
+      '################',
+      '################',
+      '################',
+      '..O//..o//O.o...'
+    ],
+    far: [
+      '########',
+      '.o...o..'
+    ]
+  },
+  monolith: {
+    ner: [
+      '############________############',
+      '###########|   __   |###########',
+      '###########|  /()\\  |###########',
+      '###########|  \\__/  |###########',
+      '###########|        |###########',
+      '###########|        |###########',
+      '###########|        |###########',
+      '###########|________|###########'
+    ],
+    mid: [
+      '######____######',
+      '#####| @) |#####',
+      '#####|    |#####',
+      '#####|____|#####'
+    ],
+    far: [
+      '###|@|##',
+      '###| |##'
+    ]
+  },
+  house: {
+    ner: [
+      '################################',
+      '#####__________________#########',
+      '####/_-_-_-_-_-_-_-_-_-\\########',
+      '###/-__________________-\\#######',
+      '####|   _    __    _   |########',
+      '####|  /-\\  /  \\  /-\\  |########',
+      '####|  |_|  | .|  |_|  |########',
+      '####|_______|__|_______|########'
+    ],
+    mid: [
+      '###________#####',
+      '##/________\\####',
+      '##|[] /\\ []|####',
+      '##|___||___|####'
+    ],
+    far: [
+      '#/---\\##',
+      '#[ono]##'
+    ]
+  },
+  houseOpen: {
+    ner: [
+      '################################',
+      '#####__________________#########',
+      '####/_-_-_-_-_-_-_-_-_-\\########',
+      '###/-__________________-\\#######',
+      '####|   _    __    _   |########',
+      '####|  /-\\  /__\\  /-\\  |########',
+      '####|  |_|  |  |  |_|  |########',
+      '####|_______|/\\|_______|########'
+    ],
+    mid: [
+      '###________#####',
+      '##/________\\####',
+      '##|[] /\\ []|####',
+      '##|___||___|####'
+    ],
+    far: [
+      '#/---\\##',
+      '#[ono]##'
+    ]
+  },
+  signpost: {
+    ner: [
+      '###############__###############',
+      '##############|  |______########',
+      '########______|  |______/#######',
+      '#######\\______|/ | /############',
+      '##############/ /|/#############',
+      '####/########| / |##############',
+      '###/)/########|  |#######/######',
+      ',///)/,,##,##\\|//|/,##,//),##,,#'
+    ],
+    mid: [
+      '################',
+      '#######||==>####',
+      '####<==||/######',
+      '#//###,||,##/###'
+    ],
+    far: [
+      '##<=H=>#',
+      '#.#.H.#.'
+    ]
+  },
+  fountain: {
+    ner: [
+      '###############/\\###############',
+      '############~__][__~############',
+      '###########¦(______)¦###########',
+      '##########~___]__[___~##########',
+      '########/#(__________)#\\########',
+      '###____¦_____]____[_____¦____###',
+      '###)      |          |      (###',
+      '##/_______|__________|_______\\##'
+    ],
+    mid: [
+      '######_~~_######',
+      '#####__][__#####',
+      '##_/__]__[__\\_##',
+      '#)___|____|___(#'
+    ],
+    far: [
+      '##_db_##',
+      '#--][--#'
+    ]
+  },
+  milestone: {
+    ner: [
+      '################################',
+      '################################',
+      '###########__________###########',
+      '##########/    __    \\##########',
+      '#########|    /()\\    |#########',
+      '####/__##|    \\__/    |#########',
+      '###//. \\#|        /   |##/#__###',
+      ',///\\__/,|/,//,,//)/,,|,/)/ .\\,,'
+    ],
+    mid: [
+      '################',
+      '######___#######',
+      '#####/ @)\\######',
+      './/O.|,./|,,/.o.'
+    ],
+    far: [
+      '###_####',
+      '..|@|...'
+    ]
+  },
+  campfire: {
+    ner: [
+      '###############\'#####\'##########',
+      '############\'####\'##############',
+      '###############\'###\'############',
+      '###########\'########\'###########',
+      '############\\x\\ V /x/#\'#########',
+      '#########__\\x \\   / x/__########',
+      '########/. \\ __ x __ /. \\#######',
+      '###..o.o\\__// .\\o/ .\\\\__/O.o..##'
+    ],
+    mid: [
+      '################',
+      '################',
+      '######\\xVx/#####',
+      '###...Oo.oO...##'
+    ],
+    far: [
+      '########',
+      '###oVo##'
+    ]
+  },
+  campfireUnlit: {
+    ner: [
+      '################################',
+      '################################',
+      '################################',
+      '################################',
+      '############__#####__###########',
+      '#########__/. \\OoO/ .\\__########',
+      '########/. \\ __...__ /. \\#######',
+      '###..o.o\\__// .\\o/ .\\\\__/O.o..##'
+    ],
+    mid: [
+      '################',
+      '################',
+      '################',
+      '###...Oo.oO...##'
+    ],
+    far: [
+      '########',
+      '###o.o##'
+    ]
+  },
+  warp: {
+    ner: [
+      '############|      |############',
+      '############|      |############',
+      '############|      |############',
+      '############|      |############',
+      '############|      |############',
+      '##########__n______n__##########',
+      '#########/____________\\#########',
+      '########/______________\\########'
+    ],
+    mid: [
+      '######|  |######',
+      '######|  |######',
+      '######n__n######',
+      '#####/====\\######'
+    ],
+    far: [
+      '###||###',
+      '###==###'
+    ]
+  },
+  grave: {
+    ner: [
+      '############________############',
+      '###########/   __   \\###########',
+      '#########_/   /()\\   \\_#########',
+      '########|     \\__/     |########',
+      '########|              |########',
+      '####/###| HERE LIES SH |########',
+      '###/)/##|         /    |#/######',
+      ',///)/,,|--,/---//)/--,|/),##,,#'
+    ],
+    mid: [
+      '######____######',
+      '####_/ @) \\_####',
+      '####| ~~~~ |####',
+      './/.|_,_//_|/#..'
+    ],
+    far: [
+      '###/@\\##',
+      '#.].~.[#'
+    ]
+  },
+  graveBroken: {
+    ner: [
+      '############_#####__############',
+      '###########/ \\###/  \\###########',
+      '#########_/  /###|   \\_#########',
+      '########|    \\###/     |########',
+      '########|     \\#/      |########',
+      '####/###| HERE \\\\ES SH |########',
+      '###/)/##|      // /    |#/######',
+      ',///)/,,|--,/--\\//)/--,|/),##,,#'
+    ],
+    mid: [
+      '#########_######',
+      '####_/\\#/ \\_####',
+      '####| |#|~ |####',
+      './/.|_,\\//_|/#..'
+    ],
+    far: [
+      '###_#_##',
+      '#.].V.[#'
+    ]
+  },
+  stoneCarving: {
+    ner: [
+      '################################',
+      '################################',
+      '################################',
+      '####________________________####',
+      '###|                        |###',
+      '###|    /@\\         /---\\   |###',
+      '###|   ] ~ [ + 10 x [ono]   |###',
+      '###|                        |###'
+    ],
+    mid: [
+      '################',
+      '###__________###',
+      '##| ~~    ~~ |##',
+      '##| ~~ ~~ ~~ |##'
+    ],
+    far: [
+      '##____##',
+      '#[ ~~ ]#'
+    ]
+  },
+  credits: {
+    ner: [
+      '________________________________',
+      '|                              |',
+      '|            PROCII            |',
+      '|                              |',
+      '|    THANK YOU FOR PLAYING!    |',
+      '|                              |',
+      '|          SCOTT HALL          |',
+      '|______________________________|'
+    ],
+    mid: [
+      '################',
+      '################',
+      '################',
+      '################'
+    ],
+    far: [
+      '########',
+      '########'
+    ]
+  },
+  sea: {
+    ner: [
+      '                     ^ v        ',
+      '                                ',
+      '                                ',
+      '________________________________',
+      '           ~~~~~~~~~            ',
+      '            ~~~~~~~             ',
+      '              ~~~               ',
+      '                                '
+    ],
+    mid: [
+      '________________',
+      '   ~~           ',
+      '           ~~   ',
+      '                '
+    ],
+    far: [
+      '________',
+      '  ~~    '
+    ]
+  }
+}
+
+var envNames = getEnvNames();
+
+var island = [];
+var islandSize = 30;
+
+var coords = { x: 2, y: 2};
+var aim = { x: 1, y: 0 };
+
+var level = 0;
+var housesFound = 0;
+var graveBroken = false;
+var gameComplete = false;
+
+var farDiv = document.getElementById("farDiv");
+var midDiv = document.getElementById("midDiv");
+var nerDiv = document.getElementById("nerDiv");
+
+/* GAME START */
+
+startNextLevel();
+
+document.addEventListener("keypress", function onPress(event) {
+  switch (event.key) {
+    case "ArrowUp":
+    case "w":
+      moveForward();
+      break;
+    case "ArrowDown":
+    case "s":
+      moveBack();
+      break;
+    case "ArrowLeft":
+    case "a":
+      turnLeft();
+      break;
+    case "ArrowRight":
+    case "d":
+      turnRight();
+      break;
+    case "z":
+      interact();
+      break;
+    default:
+      return;
+  }
+});
+
+</script>
+
+</body>
+</html>
+

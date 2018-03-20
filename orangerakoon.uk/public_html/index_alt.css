@@ -1,0 +1,57 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    margin: 20px;
+    background-color: #FC3;
+}
+
+h1 {
+    font-size: 400%;
+    color: #121516;
+    text-align: center;
+    padding-left: 20%;
+    padding-right: 20%;
+}
+
+p {
+    font-size: 120%;
+    color: #121516;
+    text-align: justify;
+    max-width: 1000px;
+    margin: auto;
+    padding-left: 20%;
+    padding-right: 20%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+}
+
+a {
+    color: #337287;
+}
+
+div.main {
+}
+
+div.center {
+    font-size: 120%;
+    text-align: center;
+}
+
+div.rainbow {
+    font-size: 120%;
+    text-align: center;
+    cursor: pointer;
+}
+
+div.rgb {
+    font-size: 80%;
+    text-align: center;
+    opacity: 0.6;
+}
+
+div.styleSwitch {
+    font-size: 80%;
+    text-align: center;
+    opacity: 0.6;
+    cursor: pointer;
+}
+

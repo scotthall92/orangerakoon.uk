@@ -1,0 +1,48 @@
+button.option {
+    width: 116px;
+}
+
+button.importExport {
+    width: 151px;
+}
+
+input.colour {
+    width: 54px;
+    padding: 0px;
+}
+
+input.imageData {
+    width: 300px;
+}
+
+table.palette {
+    border: 1px solid black;
+}
+
+table.canvas {
+    border: 1px solid lightgrey;
+    border-collapse: collapse;
+}
+
+td.pixel {
+    height: 16px;
+    width: 16px;
+}
+
+td.palette {
+    border: 1px solid lightgrey;
+    cursor: pointer;
+    height: 16px;
+    width: 52px;
+}
+
+td.selected {
+    border: 1px solid red;
+    height: 16px;
+    width: 52px;
+}
+
+p.attribution {
+    padding-left: 75px;
+    font-size: 70%;
+}

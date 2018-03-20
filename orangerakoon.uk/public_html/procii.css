@@ -1,0 +1,24 @@
+body {
+	background: white;
+}
+
+div {
+    position: absolute;
+    font-family: monospace, monospace;
+    white-space: pre;
+    width: 98%;
+    text-align: center;
+}
+
+div.ner {
+	color: black;
+}
+
+div.mid {
+	color: black;
+}
+
+div.far {
+	color: black;
+}
+
