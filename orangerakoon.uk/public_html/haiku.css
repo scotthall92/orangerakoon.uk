@@ -1,0 +1,19 @@
+body {
+    font-family: serif;
+}
+
+div.center {
+    text-align: center;
+    width: 98%;
+    position: fixed;
+    top: 50%;
+    transform: translate(0%, -100%);
+}
+
+div.line {
+    /* height: 1.5em; */
+}
+
+span.action {
+    cursor: pointer;
+}

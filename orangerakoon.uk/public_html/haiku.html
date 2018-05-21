@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Haiku</title>
+    <link rel="stylesheet" type="text/css" href="haiku.css" title="Haiku">
+
+    <!--
+      ____                             _____       _
+     / __ \                           |  __ \     | |
+    | |  | |_ __ __ _ _ __   __ _  ___| |__) |__ _| | _____   ___  _ __
+    | |  | | '__/ _` | '_ \ / _` |/ _ \  _  // _` | |/ / _ \ / _ \| '_ \
+    | |__| | | | (_| | | | | (_| |  __/ | \ \ (_| |   < (_) | (_) | | | |
+     \____/|_|  \__,_|_| |_|\__, |\___|_|  \_\__,_|_|\_\___/ \___/|_| |_|.uk
+    =========================__/ |==========================================
+                            |___/  Author: Scott Hall   github: scotthall92
+    -->
+
+</head>
+<body>
+
+<div class="center">
+  <div class="line" id="text1"></div>
+  <div class="line" id="text2"></div>
+  <div class="line" id="text3"></div>
+  <br/>
+  <div class="line" id="interactions">Please enable javascript</div>
+  <div class="line" id="actions"></div>
+</div>
+
+<script type="text/javascript">
+
+const weathers = {
+  clear: {
+    lines: [
+      'the dawn chorus sings',
+      'sky resplendent blue',
+      'the sun is shining',
+      'under midday sun',
+      'sun high in the sky',
+      'fading light of day',
+      'reddening sunset',
+      'under the starlight'
+    ],
+    chances: [
+      'cloud', 'cloud', 'cloud',
+      'wind', 'wind', 'wind',
+      'rain', 'rain',
+      'heavyRain',
+      'storm'
+    ]
+  },
+  cloud: {
+    lines: [
+      'the grey light of dawn',
+      'grey overcast sky',
+      'the day is clouded',
+      'clouds sail midday sky',
+      'impressionist clouds',
+      'shadowed by the clouds',
+      'a dark clouded dusk',
+      'stars hidden by cloud'
+    ],
+    chances: [
+      'clear', 'clear',
+      'wind',
+      'rain', 'rain', 'rain', 'rain',
+      'heavyRain', 'heavyRain',
+      'storm'
+    ]
+  },
+  wind: {
+    lines: [
+      'dawn blows from the east',
+      'a gusty morning',
+      'clouds race in the wind',
+      'howling winds at noon',
+      'battered by the wind',
+      'a chill evening wind',
+      'dusk caught in the wind',
+      'winds howl in the night'
+    ],
+    chances: [
+      'clear', 'clear', 'clear',
+      'cloud', 'cloud',
+      'rain', 'rain',
+      'heavyRain',
+      'storm', 'storm'
+    ]
+  },
+  rain: {
+    lines: [
+      'a dawn rain shower',
+      'rain in the morning',
+      'caught beneath the rain',
+      'muted midday rain',
+      'under falling rain',
+      'rain in the evening',
+      'sunset in the rain',
+      'raining in the night'
+    ],
+    chances: [
+      'clear', 'clear',
+      'cloud', 'cloud', 'cloud',
+      'wind',
+      'heavyRain', 'heavyRain', 'heavyRain',
+      'storm'
+    ]
+  },
+  heavyRain: {
+    lines: [
+      'sunrise brings a flood',
+      'a deluge of rain',
+      'unrelenting rain',
+      'a midday downpour',
+      'drowned in pouring rain',
+      'never ending rain',
+      'a washed out sunset',
+      'downpour in the night'
+    ],
+    chances: [
+      'clear',
+      'cloud', 'cloud',
+      'wind', 'wind',
+      'rain', 'rain', 'rain',
+      'storm', 'storm'
+    ]
+  },
+  storm: {
+    lines: [
+      'thunder breaks the dawn',
+      'stormclouds bring the rain',
+      'thunder and lightning',
+      'thunder sounds out noon',
+      'a storm clouds the sky',
+      'lightning in the rain',
+      'thunderous twilight',
+      'lightning in the dark'
+    ],
+    chances: [
+      'clear', 'clear', 'clear', 'clear',
+      'cloud', 'cloud',
+      'wind',
+      'rain', 'rain',
+      'heavyRain'
+    ]
+  },
+  mist: {
+    lines: [
+      'sunrise through the mist',
+      'a misty morning',
+      'softened by the mist',
+      'misty midday sun',
+      'mist under the sun',
+      'a reddening mist',
+      'in misty twilight',
+      'stars lost in the mist'
+    ],
+    chances: [
+      'clear',
+      'cloud',
+      'wind',
+      'rain',
+      'heavyRain'
+    ]
+  },
+  fog: {
+    lines: [
+      'dawn hidden by fog',
+      'a thick morning fog',
+      'thick tendrils of fog',
+      'noon lost in the fog',
+      'a pervasive fog',
+      'hidden in the fog',
+      'sun sinks through the fog',
+      'a dark foggy night'
+    ],
+    chances: [
+      'mist'
+    ]
+  }
+}
+
+const locations = {
+  Ship: {
+    lines: ['A small trading ship', 'sails upon the Albon sea'],
+    interactions: {
+      available: ['captainIntro'],
+      captainIntro: {
+        optionText: 'Talk to captain',
+        lines: [
+          ['It/s good to see that you/re awake', 'The white cliffs soon we/ll overtake'],
+          ['It won/t be long before we land', 'upon Albon/s sacred sand']
+        ],
+        choices: ['captainAlbon'],
+        canReturn: true,
+        toAdd: [
+          ['locations.Ship.interactions.available', 'captainTalk']
+        ],
+        toRemove: [
+          ['locations.Ship.interactions.available', 'captainIntro']
+        ],
+        interact: () => {
+          const here = locations.Ship;
+          const index = here.methods.unavailable.indexOf('wait');
+          here.methods.unavailable.splice(index, 1);
+        }
+      },
+      captainTalk: {
+        optionText: 'Talk to captain',
+        lines: [
+          ['It won/t be long before we land', 'upon Albon/s sacred sand']
+        ],
+        choices: ['captainAlbon'],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      captainAlbon: {
+        optionText: 'About Albon',
+        lines: [
+          ['An island kingdom with no heir', 'Ruled by regent most unfair']
+        ],
+        choices: ['captainHeir', 'captainRegent'],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      captainHeir: {
+        optionText: 'I am the heir',
+        lines: [
+          ['Be careful who you tell that lie', 'The regent Wren would see you die']
+        ],
+        choices: ['captainRegent'],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      captainRegent: {
+        optionText: 'About the regent',
+        lines: [
+          ['The regent Wren was once a lord', 'He served amongst the old king/s court']
+        ],
+        choices: ['captainKing'],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      captainKing: {
+        optionText: 'About the king',
+        lines: [
+          ['Murdered so the rumour goes', 'Lord Wren then the queen deposed']
+        ],
+        choices: ['captainQueen'],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      captainQueen: {
+        optionText: 'About the queen',
+        lines: [
+          ['Across the sea the queen did flee', 'To Wren she would not bend her knee']
+        ],
+        choices: [],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      captainChalkfall: {
+        optionText: 'About Chalkfall',
+        lines: [
+          ['Chalkfall is a thriving port', 'The crossing here is safe and short']
+        ],
+        choices: [],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      }
+    // end interactions
+    },
+    locales: {},
+    travel: {},
+    methods: {
+      unavailable: ['wait'],
+      wait: () => {
+        const here = locations.Ship;
+        here.travel.Chalkfall = 1;
+        here.lines[1] = 'nearing the port of Chalkfall';
+        here.interactions.captainTalk.choices.push('captainChalkfall');
+        here.methods.unavailable.push('wait');
+        return true;
+      }
+    }
+  // end Ship
+  },
+  Chalkfall: {
+    lines: ['The port of Chalkfall', 'Busy with ships and traders'],
+    interactions: {
+      available: ['arrival'],
+      arrival: {
+        optionText: 'Step off the ship',
+        lines: [
+          ['A stranger steps out from the fray', 'My liege a word please if I may'],
+          ['Despite Lord Wren/s sincere insistence', 'Word is out of your existence'],
+          ['The regent/s spies now watch the port', 'Here is not safe for us to talk'],
+          ['When the day/s sun begins to dim', 'Meet me at the old boat inn']
+        ],
+        choices: [],
+        canReturn: true,
+        toAdd: [
+          ['locations.Chalkfall.interactions.available', 'captain'],
+          ['locations.Chalkfall.interactions.available', 'fisherman']
+        ],
+        toRemove: [
+          ['locations.Chalkfall.interactions.available', 'arrival']
+        ],
+        interact: () => {
+          locations.Chalkfall.methods.unavailable = [];
+        }
+      },
+      captain: {
+        optionText: 'Talk to captain',
+        lines: [
+          ['On Albon shores we have arrived', 'The crossing of the sea survived'],
+          ['I/ve goods to sell and coin to make', 'before the voyage home I take']
+        ],
+        choices: ['captainChalkfall'],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      captainChalkfall: {
+        optionText: 'About Chalkfall',
+        lines: [
+          ['Chalkfall is a thriving port', 'The crossing here is safe and short']
+        ],
+        choices: ['captainInn'],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      captainInn: {
+        optionText: 'About the Old Boat Inn',
+        lines: [
+          ['The old boat/s where the sailors berth', 'Just listen for their drunken mirth']
+        ],
+        choices: [],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      fisherman: {
+        optionText: 'Talk to fisherman',
+        lines: [
+          ['A fisherman sits on the pier', 'Around his nets the small boats steer']
+        ],
+        choices: ['fishermanChalkfall'],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      fishermanChalkfall: {
+        optionText: 'About Chalkfall',
+        lines: [
+          ['My nets are cast and here I sit', 'I sell my catch at the market']
+        ],
+        choices: [],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      fishermanSuspect: {
+        optionText: 'About the other visitor',
+        lines: [
+          ['A visitor at the old boat inn?', 'How/d you think I would know him?']
+        ],
+        choices: [],
+        canReturn: true,
+        toAdd: [],
+        toRemove: [],
+        interact: () => {}
+      },
+      fishermanWesterner: {
+        optionText: 'A westerner in a cloak',
+        lines: [
+          ['I think I might know who you mean', 'At the market he was seen']
+        ],
+        choices: [],
+        canReturn: true,
+        toAdd: [
+          ['locations.Chalkfall.locales.market.interactions.vendor.choices', 'vendorSuspect']
+        ],
+        toRemove: [],
+        interact: () => {}
+      }
+    },
+    locales: {
+      inn: {
+        lines: ['Merchants and sailors', 'packed inside the old boat inn', 'sing songs of the sea'],
+        interactions: {
+          available: ['drinkersTalk', 'merchantTalk', 'innkeeperIntro'],
+          innkeeperIntro: {
+            optionText: 'Talk to innkeeper',
+            lines: [
+              ['Welcome to the old boat inn', 'The finest ales and cheapest gin'],
+              ['We/ve food to eat and beds to rent', 'As long as you have coin that/s spent']
+            ],
+            choices: ['innkeeperStranger', 'innkeeperDrink', 'innkeeperRound'],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.inn.interactions.available', 'innkeeperTalk']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.available', 'innkeeperIntro']
+            ],
+            interact: () => {}
+          },
+          innkeeperTalk: {
+            optionText: 'Talk to innkeeper',
+            lines: [
+              ['Welcome back to the old boat inn', 'The finest ales and cheapest gin'],
+            ],
+            choices: ['innkeeperStranger', 'innkeeperDrink', 'innkeeperRound'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          innkeeperContinue: {
+            optionText: 'Keep talking',
+            lines: [
+              ['Is there something else you need?', 'Perhaps an ale or horn of mead?'],
+            ],
+            choices: ['innkeeperStranger', 'innkeeperDrink', 'innkeeperRound'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          innkeeperStranger: {
+            optionText: 'About stranger',
+            lines: [
+              ['Our guests only by night reside', 'Until then you can wait outside']
+            ],
+            choices: ['innkeeperContinue'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {
+              const here = locations.Chalkfall.locales.inn;
+              const interaction = here.interactions.innkeeperStranger;
+              if (currentDay > 1) {
+                interaction.toRemove = ['innkeeperStranger'];
+                interaction.lines = [
+                  ['You missed a grisly scene that night', 'The murdered guest gave me a fright'],
+                  ['I found their body at the door', 'A bloodied knife on the floor']
+                ];
+              } else if (currentTime >= 6) {
+                interaction.toAdd = [
+                  ['locations.Chalkfall.locales.inn.interactions.available', 'upstairsRoom']
+                ];
+                interaction.lines = [
+                  ['Another visitor tonight?', 'I was told just one was right'],
+                  ['Through the door and up the stairs', 'The first room on the right is theirs']
+                ];
+              }
+            }
+          },
+          innkeeperMurderIntro: {
+            optionText: 'About the murder',
+            lines: [
+              ['Murders here are not unknown', 'They are no business of my own'],
+              ['You do not seem the murderous kind', 'But your guilt a judge might find'],
+              ['I am afraid, with all respect', 'you are the only known suspect'],
+              ['When morning comes I/ll call the guard', 'Before then you should depart']
+            ],
+            choices: ['innkeeperContinue', 'innkeeperSuspect'],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperMurder'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperMurder']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperMurderIntro'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperMurderIntro']
+            ],
+            interact: () => {
+              const here = locations.Chalkfall.locales.inn;
+              here.interactions.innkeeperContinue.lines = [
+                ['That murder was a grim affair', 'Have you something else to share?']
+              ]
+
+              if (currentDay > 1) {
+                here.interactions.innkeeperMurderIntro.lines = [
+                  ['Murders here are not unknown', 'They are no business of my own']
+                ]
+              }
+            }
+          },
+          innkeeperMurder: {
+            optionText: 'About the murder',
+            lines: [
+              ['Murders here are not unknown', 'They are no business of my own'],
+            ],
+            choices: ['innkeeperContinue', 'innkeeperSuspect'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          innkeeperSuspect: {
+            optionText: 'About the other visitor',
+            lines: [
+              ['In a dark cloak he was dressed', 'His accent sounded from the West']
+            ],
+            choices: ['innkeeperContinue'],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.interactions.fishermanSuspect.choices', 'fishermanWesterner']
+            ],
+            toRemove: [],
+            interact: () => {}
+          },
+          innkeeperDrink: {
+            optionText: 'Buy a drink',
+            lines: [
+              ['You buy a bitter pint of ale', 'The strong flavours senses assail']
+            ],
+            choices: ['innkeeperContinue'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          innkeeperRound: {
+            optionText: 'Buy a round',
+            lines: [
+              ['A round in here does not come cheap', 'What coins you have you better keep']
+            ],
+            choices: ['innkeeperContinue'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          upstairsRoom: {
+            optionText: 'Go upstairs',
+            lines: [
+              ['You head upstairs and through the door', 'unprepared for what/s in store'],
+              ['The stranger you had come to meet', 'lying murdered at your feet']
+            ],
+            choices: ['upstairsBody', 'upstairsSearch'],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.available', 'upstairsRoom']
+            ],
+            interact: () => {}
+          },
+          upstairsBody: {
+            optionText: 'Check the body',
+            lines: [
+              ['Still warm to touch, slumped at the door', 'A bloodied knife lies on the floor'],
+              ['You check the body for a clue', 'On the arm a crossed tattoo']
+            ],
+            choices: ['upstairsSearch'],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperMurderIntro'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperMurderIntro'],
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantSuspect'],
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantAccuse']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperStranger'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperStranger']
+            ],
+            interact: () => {
+              const here = locations.Chalkfall.locales.inn;
+              here.interactions.upstairsSearch.canReturn = true;
+              here.interactions.upstairsCoins.canReturn = true;
+
+              here.interactions.upstairsBody.interact = () => {};
+            }
+          },
+          upstairsSearch: {
+            optionText: 'Search the room',
+            lines: [
+              ['The room itself is cramped and bare', 'furnished with a bed and chair'],
+              ['You find a purse beneath the bed', 'full of coins weighed down with lead']
+            ],
+            choices: ['upstairsBody', 'upstairsCoins'],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          upstairsCoins: {
+            optionText: 'Take the coins',
+            lines: [
+              ['You take the coins from /neath the bed', 'More use to you than to the dead']
+            ],
+            choices: ['upstairsBody'],
+            canReturn: false,
+            toAdd: [
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperRound.choices', 'roundBought']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.upstairsSearch.choices', 'upstairsCoins']
+            ],
+            interact: () => {
+              const here = locations.Chalkfall.locales.inn;
+              here.interactions.upstairsSearch.lines.pop();
+            }
+          },
+          roundBought: {
+            optionText: 'Spend coins',
+            lines: [
+              ['The innkeeper/s eyes light up bright', 'The weight of coin a clear delight'],
+              ['A cheer goes up as drinks are poured', 'Your generosity adored']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.inn.interactions.available', 'drinkersJoin'],
+              ['locations.Chalkfall.locales.inn.interactions.available', 'merchantTalk'],
+              ['locations.Chalkfall.locales.inn.interactions.available', 'innkeeperTalk']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.available', 'drinkersTalk'],
+              ['locations.Chalkfall.locales.inn.interactions.available', 'merchantTalk'],
+              ['locations.Chalkfall.locales.inn.interactions.available', 'innkeeperTalk'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperRound'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperRound']
+            ],
+            interact: () => {}
+          },
+          drinkersTalk: {
+            optionText: 'Talk to drinkers',
+            lines: [
+              ['Your attempts at small talk are ignored', 'As at the bar more drinks are poured']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          drinkersJoin: {
+            optionText: 'Talk to drinkers',
+            lines: [
+              ['Our friend! Come join us for a drink!', 'Ales flow and tankards clink']
+            ],
+            choices: ['drinkersSuspect'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          drinkersSuspect: {
+            optionText: 'About the other visitor',
+            lines: [
+              ['That westerner with the regent/s writ?', 'He skulks around the fish market']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.interactions.fishermanSuspect.choices', 'fishermanWesterner'],
+              ['locations.Chalkfall.locales.market.interactions.vendor.choices', 'vendorSuspect'],
+            ],
+            toRemove: [],
+            interact: () => {}
+          },
+          merchantTalk: {
+            optionText: 'Talk to merchant',
+            lines: [
+              ['A merchant sits drinking alone', 'mumbling of some deal unknown']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          merchantSuspect: {
+            optionText: 'About the other visitor',
+            lines: [
+              ['Can/t you see I/m busy here?', 'Try the fisherman on the pier']
+            ],
+            choices: ['merchantAccuse'],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.interactions.fisherman.choices', 'fishermanSuspect']
+            ],
+            toRemove: [],
+            interact: () => {}
+          },
+          merchantAccuse: {
+            optionText: 'Accuse of murder',
+            lines: [
+              ['A baseless claim, you stupid fool', 'I haven/t moved from on this stool']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantAccuse'],
+              ['locations.Chalkfall.locales.inn.interactions.merchantSuspect.choices', 'merchantAccuse']
+            ],
+            interact: () => {}
+          }
+        // end interactions
+        }
+      // end inn
+      },
+      market: {
+        lines: ['Chalkfall fish market', 'A warren of streets and stalls', 'Gulls circle above'],
+        interactions: {
+          available: ['vendor'],
+          vendor: {
+            optionText: 'Talk to vendor',
+            lines: [
+              ['Fresh fish from the Albon sea', 'Buy one fish and get one free!']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          vendorSuspect: {
+            optionText: 'About westerner',
+            lines: [
+              ['The vendor points across the street', 'There/s the man you wish to meet']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.market.interactions.available', 'suspect']
+            ],
+            toRemove: [],
+            interact: () => {}
+          },
+          suspect: {
+            optionText: 'Approach suspect',
+            lines: [
+              ['Cloak pulled up against the weather', 'He wears a belt and boots of leather'],
+              ['What do you want? The man does sneer', 'His western accent all too clear']
+            ],
+            choices: ['suspectAccuse'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          suspectAccuse: {
+            optionText: 'Accuse of murder',
+            lines: [
+              ['A murder you would on me blame?', 'What proof have you to make this claim?'],
+              ['Perhaps you/d answer this instead', 'How did you come to find them dead?']
+            ],
+            choices: ['suspectTruth', 'suspectLie'],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [
+              ['locations.Chalkfall.locales.market.interactions.available', 'suspect'],
+              ['locations.Chalkfall.locales.market.interactions.vendor.choices', 'vendorSuspect'],
+              ['locations.Chalkfall.locales.inn.interactions.drinkersJoin.choices', 'drinkersSuspect'],
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantSuspect'],
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantAccuse'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperMurder.choices', 'innkeeperSuspect'],
+              ['locations.Chalkfall.interactions.fisherman.choices', 'fishermanSuspect']
+            ],
+            interact: () => {}
+          },
+          suspectTruth: {
+            optionText: 'Meant to meet',
+            lines: [
+              ['So you/re the heir they speak about', 'You were a fool to seek me out'],
+              ['From on his belt he draws a blade', 'Across the sea you should have stayed']
+            ],
+            choices: ['suspectFight', 'suspectFlee'],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          suspectLie: {
+            optionText: 'Heard a noise',
+            lines: [
+              ['If only that I could believe', 'I might yet show you some reprieve'],
+              ['Alas, I cannot take the risk', 'but I shall try to make this brisk'],
+              ['From on his belt he draws a blade', 'with murderous intent displayed']
+            ],
+            choices: ['suspectFight', 'suspectFlee'],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          suspectFight: {
+            optionText: 'Fight',
+            lines: [
+              ['You have no blade with which to fight', 'yet still you do not turn in flight'],
+              ['In your strength you place your faith', 'but courage does not keep you safe'],
+              ['THE', 'END']
+            ],
+            choices: [],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          suspectFlee: {
+            optionText: 'Flee',
+            lines: [
+              ['Your only option to retreat', 'You turn and run across the street'],
+              ['Through the stalls you are pursued', 'as death you narrowly elude'],
+              ['The chasing footsteps fall away', 'You live to die another day']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          }
+        // end interactions
+        }
+      // end market
+      }
+    },
+    travel: {},
+    methods: {
+      unavailable: ['wait', 'travel', 'locales']
+    }
+  // end Chalkfall
+  }
+}
+
+// Get elements
+const elemText1 = document.getElementById('text1');
+const elemText2 = document.getElementById('text2');
+const elemText3 = document.getElementById('text3');
+const elemInteractions = document.getElementById('interactions');
+const elemActions = document.getElementById('actions');
+
+/* UPDATING SCREEN */
+
+/**
+  * This is messy and needs refactoring
+  */
+function buildActionSpan(text, methodName, methodArgs) {
+  for (j = 0; j < methodArgs.length; j++) {
+    if (typeof(methodArgs[j]) == 'string') {
+      methodArgs[j] = '\'' + methodArgs[j] + '\'';
+    }
+    if (typeof(methodArgs[j]) == 'object') {
+      if (typeof(methodArgs[j][0]) == 'string') {
+        // Assume an array of strings
+        methodArgs[j] = '[\'' + methodArgs[j].join('\',\'') + '\']';
+      } else if (typeof(methodArgs[j][0]) == 'object') {
+        // Assume an array of arrays of strings
+        for (k = 0; k < methodArgs[j].length; k++) {
+          methodArgs[j][k] = '[\'' + methodArgs[j][k].join('\',\'') + '\']';
+        }
+        methodArgs[j] = '[' + methodArgs[j].join(',') + ']';
+      } else {
+        // Assume an empty array
+        methodArgs[j] = '[]';
+      }
+    }
+  }
+  return '<span class="action" onclick="' + methodName + '(' + methodArgs.join(',') + ')">[ ' + text + ' ]</span>';
+}
+
+function updateScreen(text1, text2, text3, interactions, actions) {
+  elemText1.innerText = text1.replace(/\//g, '\'');
+  elemText2.innerText = text2.replace(/\//g, '\'');
+  elemText3.innerText = text3.replace(/\//g, '\'');
+
+  const interactionsHtmls = [];
+  for (i = 0; i < interactions.length; i++) {
+    interactionsHtmls.push(
+      buildActionSpan(interactions[i][0], interactions[i][1], interactions[i][2])
+    )
+  }
+  elemInteractions.innerHTML = interactionsHtmls.join('');
+
+  const actionsHtmls = [];
+  for (i = 0; i < actions.length; i++) {
+    actionsHtmls.push(
+      buildActionSpan(actions[i][0], actions[i][1], actions[i][2])
+    )
+  }
+  elemActions.innerHTML = actionsHtmls.join('');
+}
+
+function updateScreenForCurrentLocation() {
+  const here = locations[currentLocation];
+  const weather = weatherForecast[currentTime];
+  let weatherIndex = currentTime;
+  // Night weather all has the same description, so the same index
+  if (weatherIndex > 7) {
+    weatherIndex = 7;
+  }
+
+  const interactions = [];
+  if (here.methods.unavailable.indexOf('interactions') < 0) {
+    for (i = 0; i < here.interactions.available.length; i++) {
+      const interactionName = here.interactions.available[i];
+      const interaction = here.interactions[interactionName];
+
+      interactions.push([
+        interaction.optionText,
+        'interact',
+        [interactionName, false]
+      ]);
+    }
+  }
+
+  const actions = [];
+  if (here.methods.unavailable.indexOf('locales') < 0) {
+    for (locale in here.locales) {
+      actions.push([
+        'Enter ' + locale,
+        'updateScreenForLocale',
+        [locale]
+      ]);
+    }
+  }
+  if (here.methods.unavailable.indexOf('travel') < 0) {
+    for (destination in here.travel) {
+      actions.push([
+        'Travel to ' + destination,
+        'travel',
+        [destination, here.travel[destination]]
+      ]);
+    }
+  }
+  if (here.methods.unavailable.indexOf('wait') < 0) {
+    actions.push(['Wait', 'wait', []]);
+  }
+
+  updateScreen(
+    here.lines[0],
+    here.lines[1],
+    weathers[weather].lines[weatherIndex],
+    interactions,
+    actions
+  );
+}
+
+function updateScreenForLocale(localeName) {
+  const here = locations[currentLocation].locales[localeName];
+
+  const actions = [[
+    'Return to ' + currentLocation,
+    'updateScreenForCurrentLocation',
+    []
+  ]]
+
+  const interactions = [];
+  for (i = 0; i < here.interactions.available.length; i++) {
+    const interactionName = here.interactions.available[i];
+    const interaction = here.interactions[interactionName];
+
+    interactions.push([
+      interaction.optionText,
+      'interact',
+      [interactionName, localeName]
+    ]);
+  }
+
+  updateScreen(
+    here.lines[0],
+    here.lines[1],
+    here.lines[2],
+    interactions,
+    actions
+  );
+}
+
+function updateScreenForLines(lines, choices, canReturn, localeName) {
+  const nextLines = lines.slice(0,1);
+  const queuedLines = lines.slice(1);
+
+  const interactions = [];
+  if (queuedLines.length) {
+    interactions.push([
+      'continue',
+      'updateScreenForLines',
+      [queuedLines, choices, canReturn, localeName]
+    ])
+  } else {
+    if (choices.length) {
+      let here = locations[currentLocation];
+      if (localeName) {
+        here = here.locales[localeName];
+      }
+      for (i = 0; i < choices.length; i++) {
+        const interaction = here.interactions[choices[i]];
+        interactions.push([
+          interaction.optionText,
+          'interact',
+          [choices[i], localeName]
+        ])
+      }
+    }
+    if (canReturn) {
+      if (localeName) {
+        interactions.push([
+          'Return',
+          'updateScreenForLocale',
+          [localeName]
+        ])
+      } else {
+        interactions.push([
+          'Return',
+          'updateScreenForCurrentLocation',
+          []
+        ])
+      }
+    }
+  }
+
+  updateScreen(
+    nextLines[0][0],
+    nextLines[0][1],
+    '',
+    interactions,
+    []
+  );
+}
+
+/* ACTIONS */
+
+function interact(interactionName, localeName) {
+  let here = locations[currentLocation];
+  let interaction = here.interactions[interactionName];
+  let doInteract = true;
+  if (here.methods.interact) {
+    doInteract = here.methods.interact(interactionName);
+  }
+  if (localeName) {
+    here = here.locales[localeName];
+    interaction = here.interactions[interactionName];
+  }
+  if (doInteract) {
+    interaction.interact();
+
+    for (i = 0; i < interaction.toRemove.length; i++) {
+      const targetArray = eval(interaction.toRemove[i][0]);
+      const toRemove = interaction.toRemove[i][1];
+      const index = targetArray.indexOf(toRemove);
+      if (index >= 0) {
+        targetArray.splice(index, 1);
+      }
+    }
+
+    for (i = 0; i < interaction.toAdd.length; i++) {
+      const targetArray = eval(interaction.toAdd[i][0]);
+      const toAdd = interaction.toAdd[i][1];
+      const index = targetArray.indexOf(toAdd);
+      if (index < 0) {
+        targetArray.push(toAdd);
+      }
+    }
+
+    updateScreenForLines(
+      interaction.lines, interaction.choices,
+      interaction.canReturn, localeName
+    );
+  }
+}
+
+function travel(destination, duration) {
+  const here = locations[currentLocation];
+  let doTravel = true;
+  if (here.methods.travel) {
+    doTravel = here.methods.travel(destination, duration);
+  }
+  if (doTravel) {
+    advanceTime(duration);
+    currentLocation = destination;
+    updateScreenForCurrentLocation();
+  }
+}
+
+function wait() {
+  const here = locations[currentLocation];
+  let doWait = true;
+  if (here.methods.wait) {
+    doWait = here.methods.wait();
+  }
+  if (doWait) {
+    advanceTime(1);
+    updateScreenForCurrentLocation();
+  }
+}
+
+/* TIME */
+
+function advanceTime(interval) {
+  currentTime += interval;
+  while (currentTime >= 12) {
+    advanceDay();
+    currentTime -= 12;
+  }
+}
+
+function advanceDay() {
+  currentDay += 1;
+
+  // Declare common vars
+  let here;
+  let index;
+  let available;
+
+  if (currentDay == 2) {
+    here = locations.Chalkfall;
+    // Captain leaves
+    index = here.interactions.available.indexOf('captain');
+    here.interactions.available.splice(index, 1)
+    // Investigating murder no longer available
+    available = here.locales.inn.interactions.available;
+    index = available.indexOf('upstairsRoom');
+    if (index >= 0) {
+      available.splice(index, 1);
+    }
+  }
+
+  dawnWeatherChances = [
+    'clear', 'clear', 'clear',
+    'cloud', 'cloud', 'cloud', 'cloud',
+    'wind', 'wind', 'wind',
+    'rain', 'rain',
+    'heavyRain',
+    'storm',
+    'mist', 'mist', 'mist',
+    'fog', 'fog', 'fog'
+  ]
+  weatherForecast[0] = dawnWeatherChances[
+    Math.floor(Math.random() * dawnWeatherChances.length)
+  ];
+
+  for (i = 1; i < weatherForecast.length; i++) {
+    const previousWeather = weatherForecast[i-1];
+    if (Math.random() < 0.6) {
+      weatherForecast[i] = previousWeather;
+    } else {
+      const weatherChances = weathers[previousWeather].chances;
+      weatherForecast[i] = weatherChances[
+        Math.floor(Math.random() * weatherChances.length)
+      ];
+    }
+  }
+}
+
+// Initialise game
+
+let currentLocation = 'Ship';
+let currentDay = 0;
+let currentTime = 2;
+const weatherForecast = [
+  'clear', 'clear', 'clear', 'clear', 'clear', 'clear',
+  'clear', 'clear', 'clear', 'clear', 'clear', 'clear'
+];
+
+advanceDay();
+updateScreenForLines([
+  ['A king betrayed, his queen exiled', 'The only heir, their infant child'],
+  ['An orphan raised on distant shores', 'no knowledge that the throne is yours'],
+  ['A ring received; the royal seal', 'It/s proof your lineage is real'],
+  ['Your rightful claim can not stay silent', 'Seek vengeance on the ruling tyrant'],
+  ['Your people you must liberate', 'Away! Your father/s lands await']
+], [], true);
+
+</script>
+
+</body>
+</html>
