@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Haiku</title>
-    <link rel="stylesheet" type="text/css" href="haiku.css" title="Haiku">
+    <title>Wander Lonely As A King</title>
+    <link rel="stylesheet" type="text/css" href="wlaak.css" title="Wander Lonely As A King">
 
     <!--
       ____                             _____       _
@@ -307,10 +307,11 @@ const locations = {
       arrival: {
         optionText: 'Step off the ship',
         lines: [
-          ['A stranger steps out from the fray', 'My liege a word please if I may'],
+          ['My liege, a voice speaks out aloud', 'A stranger steps out from the crowd'],
+          ['Your arrival was expected', 'To meet you here I was directed'],
           ['Despite Lord Wren/s sincere insistence', 'Word is out of your existence'],
-          ['The regent/s spies now watch the port', 'Here is not safe for us to talk'],
-          ['When the day/s sun begins to dim', 'Meet me at the old boat inn']
+          ['The regent/s spies now watch this port', 'Here is not safe for us to talk'],
+          ['When the sun begins to dim', 'Meet me at the old boat inn']
         ],
         choices: [],
         canReturn: true,
@@ -364,7 +365,7 @@ const locations = {
         lines: [
           ['A fisherman sits on the pier', 'Around his nets the small boats steer']
         ],
-        choices: ['fishermanChalkfall'],
+        choices: ['fishermanChalkfall', 'fishermanWork'],
         canReturn: true,
         toAdd: [],
         toRemove: [],
@@ -373,12 +374,29 @@ const locations = {
       fishermanChalkfall: {
         optionText: 'About Chalkfall',
         lines: [
-          ['My nets are cast and here I sit', 'I sell my catch at the market']
+          ['The water here/s my fishing patch', 'The market/s where I sell my catch']
         ],
-        choices: [],
+        choices: ['fishermanWork'],
         canReturn: true,
         toAdd: [],
         toRemove: [],
+        interact: () => {}
+      },
+      fishermanWork: {
+        optionText: 'Ask for work',
+        lines: [
+          ['Perhaps you could instead of me', 'make my next delivery'],
+          ['Take the latest fishing haul', 'and sell it at the market stall']
+        ],
+        choices: [],
+        canReturn: true,
+        toAdd: [
+          ['locations.Chalkfall.locales.market.interactions.vendor.choices', 'vendorDelivery']
+        ],
+        toRemove: [
+          ['locations.Chalkfall.interactions.fisherman.choices', 'fishermanWork'],
+          ['locations.Chalkfall.interactions.fishermanChalkfall.choices', 'fishermanWork']
+        ],
         interact: () => {}
       },
       fishermanSuspect: {
@@ -395,7 +413,7 @@ const locations = {
       fishermanWesterner: {
         optionText: 'A westerner in a cloak',
         lines: [
-          ['I think I might know who you mean', 'At the market he was seen']
+          ['I think I might know who you mean', 'At the market he was last seen']
         ],
         choices: [],
         canReturn: true,
@@ -462,7 +480,10 @@ const locations = {
               const here = locations.Chalkfall.locales.inn;
               const interaction = here.interactions.innkeeperStranger;
               if (currentDay > 1) {
-                interaction.toRemove = ['innkeeperStranger'];
+                interaction.toRemove = [
+                  ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperStranger'],
+                  ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperStranger']
+                ];
                 interaction.lines = [
                   ['You missed a grisly scene that night', 'The murdered guest gave me a fright'],
                   ['I found their body at the door', 'A bloodied knife on the floor']
@@ -533,6 +554,17 @@ const locations = {
             toRemove: [],
             interact: () => {}
           },
+          innkeeperTattoo: {
+            optionText: 'About tattoo',
+            lines: [
+              ['A crossed tattoo upon the arm?', 'Perhaps it is some kind of charm']
+            ],
+            choices: ['innkeeperContinue'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
           innkeeperDrink: {
             optionText: 'Buy a drink',
             lines: [
@@ -580,6 +612,8 @@ const locations = {
             toAdd: [
               ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperMurderIntro'],
               ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperMurderIntro'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperTattoo'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperTattoo'],
               ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantSuspect'],
               ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantAccuse']
             ],
@@ -615,7 +649,8 @@ const locations = {
             choices: ['upstairsBody'],
             canReturn: false,
             toAdd: [
-              ['locations.Chalkfall.locales.inn.interactions.innkeeperRound.choices', 'roundBought']
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperRound.choices', 'roundBought'],
+              ['locations.Chalkfall.locales.inn.interactions.merchantDeal.choices', 'merchantCoins']
             ],
             toRemove: [
               ['locations.Chalkfall.locales.inn.interactions.upstairsSearch.choices', 'upstairsCoins']
@@ -643,7 +678,8 @@ const locations = {
               ['locations.Chalkfall.locales.inn.interactions.available', 'merchantTalk'],
               ['locations.Chalkfall.locales.inn.interactions.available', 'innkeeperTalk'],
               ['locations.Chalkfall.locales.inn.interactions.innkeeperTalk.choices', 'innkeeperRound'],
-              ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperRound']
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperContinue.choices', 'innkeeperRound'],
+              ['locations.Chalkfall.locales.inn.interactions.merchantDeal.choices', 'merchantCoins']
             ],
             interact: () => {}
           },
@@ -694,10 +730,96 @@ const locations = {
             toRemove: [],
             interact: () => {}
           },
+          merchantBoat: {
+            optionText: 'About sunken boat',
+            lines: [
+              ['Another gawker here to laugh', 'on that swindling thief/s behalf?']
+            ],
+            choices: ['merchantHelp'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {
+              const here = locations.Chalkfall.locales.inn;
+              here.interactions.merchantTalk.lines = [
+                ['The merchant drinks another ale', 'mumbling of his sorry tale']
+              ];
+            }
+          },
+          merchantHelp: {
+            optionText: 'Offer help',
+            lines: [
+              ['Would you really help this fool', 'and save me from my ridicule?'],
+              ['If my money you can get', 'I will be deep in your debt']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantDeal'],
+              ['locations.Chalkfall.locales.market.interactions.traderTalk.choices', 'traderDemand']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantBoat']
+            ],
+            interact: () => {}
+          },
+          merchantDeal: {
+            optionText: 'About deal',
+            lines: [
+              ['If my money you can get', 'I will be deep in your debt']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          merchantCoins: {
+            optionText: 'Give coins',
+            lines: [
+              ['The merchant stares in disbelief', 'Sobered by intense relief'],
+              ['I am forever in your debt', 'What you/ve done I won/t forget!']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantDeal'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperRound.choices', 'roundBought'],
+              ['locations.Chalkfall.locales.market.interactions.traderTalk.choices', 'traderDemand']
+            ],
+            interact: () => {
+              const here = locations.Chalkfall.locales.inn;
+              here.interactions.merchantTalk.lines = [
+                ['The merchant drinks in celebration', 'Free from his humiliation']
+              ];
+            }
+          },
+          merchantRepay: {
+            optionText: 'Repay',
+            lines: [
+              ['The merchant stares in disbelief', 'Sobered by intense relief'],
+              ['I am forever in your debt', 'What you/ve done I won/t forget!']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantDeal'],
+              ['locations.Chalkfall.locales.inn.interactions.innkeeperRound.choices', 'roundBought'],
+              ['locations.Chalkfall.locales.market.interactions.traderTalk.choices', 'traderDemand']
+            ],
+            interact: () => {
+              const here = locations.Chalkfall.locales.inn;
+              here.interactions.merchantTalk.lines = [
+                ['The merchant drinks in celebration', 'Free from his humiliation']
+              ];
+            }
+          },
           merchantSuspect: {
             optionText: 'About the other visitor',
             lines: [
-              ['Can/t you see I/m busy here?', 'Try the fisherman on the pier']
+              ['Can/t you see I/m busy here?', 'Try the fisher on the pier']
             ],
             choices: ['merchantAccuse'],
             canReturn: true,
@@ -720,7 +842,33 @@ const locations = {
               ['locations.Chalkfall.locales.inn.interactions.merchantSuspect.choices', 'merchantAccuse']
             ],
             interact: () => {}
-          }
+          },
+          guards: {
+            optionText: 'Talk to guards',
+            lines: [
+              ['In the night there was foul play', 'You better stay out of our way']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          guardsSuspect: {
+            optionText: 'About suspect',
+            lines: [
+              ['At your description the guard grunts', 'We will investigate at once']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.market.interactions.available', 'guards']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.inn.interactions.available', 'guards']
+            ],
+            interact: () => {}
+          },
         // end interactions
         }
       // end inn
@@ -728,16 +876,144 @@ const locations = {
       market: {
         lines: ['Chalkfall fish market', 'A warren of streets and stalls', 'Gulls circle above'],
         interactions: {
-          available: ['vendor'],
-          vendor: {
-            optionText: 'Talk to vendor',
+          available: ['vendor', 'trader'],
+          trader: {
+            optionText: 'Approach trader',
             lines: [
-              ['Fresh fish from the Albon sea', 'Buy one fish and get one free!']
+              ['The trader flits between the stalls', 'On a ledger notes he scrawls']
+            ],
+            choices: ['traderIntro'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          traderIntro: {
+            optionText: 'Talk to trader',
+            lines: [
+              ['Is that man still in denial?', 'Tell him that the deal was final']
+            ],
+            choices: ['traderExplanation'],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          traderExplanation: {
+            optionText: 'Sorry?',
+            lines: [
+              ['Apologies I thought you were', 'another thug sent by that cur'],
+              ['The other day I sold a boat', 'I made no claim that it could float'],
+              ['Now the fiend won/t leave me be', 'As if I owe him sympathy'],
+              ['Why should I pay for his loss?', 'Never have I heard such dross']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.market.interactions.trader.choices', 'traderTalk'],
+              ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantBoat']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.market.interactions.trader.choices', 'traderIntro']
+            ],
+            interact: () => {}
+          },
+          traderTalk: {
+            optionText: 'Talk to trader',
+            lines: [
+              ['Unless there/s something that you need', 'Talking will my work impede']
             ],
             choices: [],
             canReturn: true,
             toAdd: [],
             toRemove: [],
+            interact: () => {}
+          },
+          traderDemand: {
+            optionText: 'Demand money',
+            lines: [
+              ['So he/s sent another stray', 'Well I/m afraid I cannot pay'],
+              ['Even if I did repent', 'that coin I have already spent']
+            ],
+            choices: ['traderThreaten'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          traderThreaten: {
+            optionText: 'Threaten',
+            lines: [
+              ['Your threats do not frighten me', 'Now run along and leave me be']
+            ],
+            choices: ['traderRing'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          traderRing: {
+            optionText: 'Show ring',
+            lines: [
+              ['My lord please forgive my haste', 'It seems the deal was misplaced'],
+              ['This coin should cover what I owe', 'With my compliments please go']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [
+              ['locations.Chalkfall.locales.inn.interactions.merchantDeal.choices', 'merchantRepay']
+            ],
+            toRemove: [
+              ['locations.Chalkfall.locales.market.interactions.traderTalk.choices', 'traderDemand']
+            ],
+            interact: () => {}
+          },
+          traderSuspect: {
+            optionText: 'About suspect',
+            lines: [
+              ['That man covorts with dangerous men', 'He acts on orders of Lord Wren'],
+              ['What grievance you seek to pursue', 'I/d let it go if I were you']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          vendor: {
+            optionText: 'Talk to vendor',
+            lines: [
+              ['Fresh fish from the Albon sea', 'Buy one fish and get one free!']
+            ],
+            choices: ['vendorFish'],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          vendorFish: {
+            optionText: 'About fish',
+            lines: [
+              ['Freshly sourced I buy the brunt', 'from the fisherman on the front']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          vendorDelivery: {
+            optionText: 'Make delivery',
+            lines: [
+              ['Just what I was waiting for', 'Fresh stock for my market store'],
+              ['Now my sales I must redouble', 'Have some coins for your trouble']
+            ],
+            choices: [],
+            canReturn: true,
+            toAdd: [],
+            toRemove: [
+              ['locations.Chalkfall.locales.market.interactions.vendor.choices', 'vendorDelivery']
+            ],
             interact: () => {}
           },
           vendorSuspect: {
@@ -748,7 +1024,9 @@ const locations = {
             choices: [],
             canReturn: true,
             toAdd: [
-              ['locations.Chalkfall.locales.market.interactions.available', 'suspect']
+              ['locations.Chalkfall.locales.market.interactions.available', 'suspect'],
+              ['locations.Chalkfall.locales.market.interactions.traderTalk.choices', 'traderSuspect'],
+              ['locations.Chalkfall.locales.inn.interactions.guards.choices', 'guardsSuspect']
             ],
             toRemove: [],
             interact: () => {}
@@ -777,6 +1055,7 @@ const locations = {
             toRemove: [
               ['locations.Chalkfall.locales.market.interactions.available', 'suspect'],
               ['locations.Chalkfall.locales.market.interactions.vendor.choices', 'vendorSuspect'],
+              ['locations.Chalkfall.locales.market.interactions.trader.choices', 'traderSuspect'],
               ['locations.Chalkfall.locales.inn.interactions.drinkersJoin.choices', 'drinkersSuspect'],
               ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantSuspect'],
               ['locations.Chalkfall.locales.inn.interactions.merchantTalk.choices', 'merchantAccuse'],
@@ -786,7 +1065,7 @@ const locations = {
             interact: () => {}
           },
           suspectTruth: {
-            optionText: 'Meant to meet',
+            optionText: 'Tell truth',
             lines: [
               ['So you/re the heir they speak about', 'You were a fool to seek me out'],
               ['From on his belt he draws a blade', 'Across the sea you should have stayed']
@@ -798,7 +1077,7 @@ const locations = {
             interact: () => {}
           },
           suspectLie: {
-            optionText: 'Heard a noise',
+            optionText: 'Tell lie',
             lines: [
               ['If only that I could believe', 'I might yet show you some reprieve'],
               ['Alas, I cannot take the risk', 'but I shall try to make this brisk'],
@@ -828,14 +1107,40 @@ const locations = {
             lines: [
               ['Your only option to retreat', 'You turn and run across the street'],
               ['Through the stalls you are pursued', 'as death you narrowly elude'],
-              ['The chasing footsteps fall away', 'You live to die another day']
+              ['The chasing footsteps fall away', 'You live to fight another day'],
+              ['END OF DEMO', 'THANKS FOR PLAYING']
+            ],
+            choices: [],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          guards: {
+            optionText: 'Talk to guards',
+            lines: [
+              ['It seems that you were mistaken', 'This here is a man of station']
+            ],
+            choices: ['guardsEyewitness'],
+            canReturn: false,
+            toAdd: [],
+            toRemove: [],
+            interact: () => {}
+          },
+          guardsEyewitness: {
+            optionText: 'There are eyewitnesses',
+            lines: [
+              ['It does not matter, to be blunt', 'He has a writ from the regent'],
+              ['Even if you saw the crime', 'this man here would not do time']
             ],
             choices: [],
             canReturn: true,
             toAdd: [],
-            toRemove: [],
+            toRemove: [
+              ['locations.Chalkfall.locales.market.interactions.available', 'guards']
+            ],
             interact: () => {}
-          }
+          },
         // end interactions
         }
       // end market
@@ -1136,6 +1441,23 @@ function advanceDay() {
     // Investigating murder no longer available
     available = here.locales.inn.interactions.available;
     index = available.indexOf('upstairsRoom');
+    if (index >= 0) {
+      available.splice(index, 1);
+    }
+    // Guards arrive at the inn
+    available.push('guards');
+  }
+
+  if (currentDay == 3) {
+    here = locations.Chalkfall;
+    // Guards leave
+    available = here.locales.inn.interactions.available;
+    index = available.indexOf('guards');
+    if (index >= 0) {
+      available.splice(index, 1);
+    }
+    available = here.locales.market.interactions.available;
+    index = available.indexOf('guards');
     if (index >= 0) {
       available.splice(index, 1);
     }
