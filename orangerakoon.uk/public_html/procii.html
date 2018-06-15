@@ -177,9 +177,9 @@ function startNextLevel() {
 
   removeControlsText();
 
-  islandSize = 30;
+  islandSize = 12;
   if (level < 10) {
-    islandSize = 8 + (level * 2);
+    islandSize = 2 + level;
   }
   island = generateIsland(islandSize, envNames);
 
