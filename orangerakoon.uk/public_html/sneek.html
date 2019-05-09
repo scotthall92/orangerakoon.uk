@@ -22,38 +22,26 @@
 <div class="center">
 <noscript><h2>* This page requires JavaScript *</h2></noscript>
 <p>Instructions go here</p>
+<p>
+  <a href="#_o_____I__$_$_$_#">Level 0</a>
+  <a href="#_s_o__O__I__$_$_$_#">Level 1</a>
+  <a href="#_o___I____O__s_I_$_$_$_#">Level 2</a>
+  <a href="#_@___I_z__O__s_I_$_$_$_#">Level 3</a>
+  <a href="#_s__o__I__z_H_$_$_$_H_s_#">Level 4</a>
+  <a href="#__H__H__H_@_Is_I_zIs_I_$z#">Level 5</a>
+</p>
 </div>
 
 <p class='attribution'><a href='/'><<< back to orangerakoon.uk</a></p>
 
 <script type="text/javascript">
 
-function cascadeRightReverse(i, actorLocations, newState) {
-  var x = i;
-  while (true) {
-    x -= 1;
-    if (actorLocations[x] == 'o') {
-      // Player is caught so we can return out
-      actorLocations[x] = 'x';
-      return actorLocations;
-    }
-    if (actorLocations[x]) {
-      // Keep cascading back with any right-moving guards reversed
-      actorLocations[x] = 'z';
-    } else if (newState[x] == '_') {
-      // Return out as end of stack reached and reversed
-      actorLocations[x] = 'z';
-      return actorLocations;
-    }
-  }
-}
-
 function advanceState(action) {
   var state = location.hash.split('');
-  var sanitisedHash = location.hash;
-  sanitisedHash = sanitisedHash.replace(/o/g, '_').replace(/@/g, 'O');
-  sanitisedHash = sanitisedHash.replace(/s/g, '_').replace(/z/g, '_');
-  var newState = sanitisedHash.split('');
+  var actorlessHash = location.hash;
+  actorlessHash = actorlessHash.replace(/o/g, '_').replace(/@/g, 'O');
+  actorlessHash = actorlessHash.replace(/s/g, '_').replace(/z/g, '_');
+  var newState = actorlessHash.split('');
   var actorLocations = Array.apply(null, Array(state.length));
 
   // Check state validity
@@ -297,6 +285,9 @@ function advanceState(action) {
 }
 
 function isValidState(state) {
+  if (state[state.length-1] != '#') {
+    return false;
+  }
   for (i = 0; i < state.length; i++) {
     // # I H O @ $ cannot appear next to each other
     if (['#', 'I', 'H', 'O', '@', '$'].indexOf(state[i]) != -1) {
@@ -309,6 +300,26 @@ function isValidState(state) {
     }
   }
   return true;
+}
+
+function cascadeRightReverse(i, actorLocations, newState) {
+  var x = i;
+  while (true) {
+    x -= 1;
+    if (actorLocations[x] == 'o') {
+      // Player is caught so we can return out
+      actorLocations[x] = 'x';
+      return actorLocations;
+    }
+    if (actorLocations[x]) {
+      // Keep cascading back with any right-moving guards reversed
+      actorLocations[x] = 'z';
+    } else if (newState[x] == '_') {
+      // Return out as end of stack reached and reversed
+      actorLocations[x] = 'z';
+      return actorLocations;
+    }
+  }
 }
 
 document.addEventListener("keypress", function onPress(event) {
