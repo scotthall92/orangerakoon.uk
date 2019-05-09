@@ -1,0 +1,47 @@
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    text-align: center;
+}
+
+h1 {
+    font-size: 400%;
+    margin: 0;
+}
+
+h3 {
+    letter-spacing: 10px;
+    margin: 0;
+}
+
+h4 {
+    letter-spacing: 5px;
+}
+
+p.levelSelect {
+    font-size: 80%;
+}
+
+p.description {
+    font-family: monospace;
+}
+
+p.attribution {
+    font-size: 70%;
+}
+
+a {
+    color: crimson;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+  color: darkred;
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin: 0 auto;
+  padding-left: 20px;
+  padding-right: 20px;
+}

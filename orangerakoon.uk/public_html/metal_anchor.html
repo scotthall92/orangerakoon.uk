@@ -2,8 +2,8 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>sneek</title>
-    <link rel="stylesheet" type="text/css" href="sneek.css">
+    <title>METAL ANCHOR</title>
+    <link rel="stylesheet" type="text/css" href="metal_anchor.css">
 
     <!--
       ____                             _____       _
@@ -19,18 +19,96 @@
 </head>
 <body>
 
-<div class="center">
+<h3>UNDERCOVER RECONNAISSANCE INFILTRATION</h3>
+<h1>METAL ANCHOR</h1>
+
 <noscript><h2>* This page requires JavaScript *</h2></noscript>
-<p>Instructions go here</p>
-<p>
-  <a href="#_o_____I__$_$_$_#">Level 0</a>
-  <a href="#_s_o__O__I__$_$_$_#">Level 1</a>
-  <a href="#_o___I____O__s_I_$_$_$_#">Level 2</a>
-  <a href="#_@___I_z__O__s_I_$_$_$_#">Level 3</a>
-  <a href="#_s__o__I__z_H_$_$_$_H_s_#">Level 4</a>
-  <a href="#__H__H__H_@_Is_I_zIs_I_$z#">Level 5</a>
+
+<p class='levelSelect'>
+  <a href="#_o_____I__$_$_$_#">LEVEL 0</a> -
+  <a href="#_s_o__O__I__$_$_$_#">LEVEL 1</a> -
+  <a href="#_o___I____O__s_I_$_$_$_#">LEVEL 2</a> -
+  <a href="#_@___I_z__O__s_I_$_$_$_#">LEVEL 3</a> -
+  <a href="#__H_Os_o___H__IzI_$_$_$_#">LEVEL 4</a> -
+  <a href="#_s__o__I__z_H_$_$_$_H_s_#">LEVEL 5</a> -
+  <a href="#__H_Os_o___H__Is_IzI_$_$_$_#">LEVEL 6</a>
 </p>
-</div>
+<p class='levelSelect'>
+  <a href="#__H__H__H_@_Is_I_zIs_I_$z#">BONUS A</a> -
+  BONUS B -
+  BONUS C
+</p>
+
+<p class='description'>
+  <b>Metal Anchor</b> is a stealth-puzzle game in your browser's address bar.<br/>
+  Collect all the <b>$$$</b> in a level without getting caught.
+</p>
+<p class='description'>
+  Use <b>a</b> and <b>d</b> to move <b>left</b> and <b>right</b>.<br/>
+  Press <b>w</b> to <b>open/close</b> doors and <b>s</b> to <b>wait</b>.
+</p>
+<p class='description'>
+  Avoid <b>guards</b> as they <b>patrol</b> back and forth.<br/>
+  <b>Trap</b> them behind <b>closed doors</b> or <b>hide</b> as they pass.
+</p>
+
+<table>
+  <tr>
+    ​<td>o</td>​
+    ​<td>Player</td>
+    ​<td>Don't get caught</td>
+  </tr>
+  <tr>
+    ​<td>$</td>
+    ​<td>Loot</td>
+    ​<td>Collect all the loot in a level</td>
+  </tr>
+  <tr>
+    ​<td>O</td>
+    ​<td>Hiding Spot</td>
+    ​<td>Guards will move past you</td>
+  </tr>
+  <tr>
+    ​<td>I</td>
+    ​<td>Closed Door</td>
+    ​<td>Needs to be opened</td>
+  </tr>
+  <tr>
+    ​<td>H</td>
+    ​<td>Open Door</td>
+    ​<td>Can be moved through</td>
+  </tr>
+  <tr>
+    ​<td>z</td>
+    ​<td>Guard</td>
+    ​<td>Moving to the left</td>
+  </tr>
+  <tr>
+    ​<td>s</td>
+    ​<td>Guard</td>
+    ​<td>Moving to the right</td>
+  </tr>
+</table>
+
+<h4>// PLAY / CREATE / SHARE //</h4>
+
+<p class='description'>
+  <b>Create</b> levels as easily as <b>typing a url</b>.<br/>
+  <b># I H O @</b> and <b>$</b> cannot appear next to each other.<br/>
+  Levels must <b>start</b> and <b>end</b> with <b>#</b>.
+</p>
+<p class='description'>
+  <b>Share</b> your levels by simply <b>sharing the link</b>.<br/>
+  Tweet me <b>@OrangeRakoon</b> with <b>#MetalAnchor</b>.
+</p>
+
+<h4>// THANKS FOR PLAYING //</h4>
+
+<p class='description'>
+  <b>Tip</b> use the back button to undo a mistake.<br/>
+  <b>Tip</b> save your levels with bookmarks.<br/>
+  <b>Tip</b> you can dodge past guards by collecting loot.
+</p>
 
 <p class='attribution'><a href='/'><<< back to orangerakoon.uk</a></p>
 
@@ -218,7 +296,7 @@ function advanceState(action) {
       case 'z':  // Guard left-moving
         // Reverse direction
         if (['s','#','I'].indexOf(state[i-1]) != -1) {
-          if (actorLocations[i] == 'o') {
+          if (['o','x'].indexOf(actorLocations[i]) != -1) {
             actorLocations[i] = 'x';
           } else {
             actorLocations[i] = 's';
@@ -230,7 +308,7 @@ function advanceState(action) {
         if (['H','O', '@', '$'].indexOf(state[i-1]) != -1) {
           // Reverse direction
           if (state[i-2] == 's') {
-            if (actorLocations[i] == 'o') {
+            if (['o','x'].indexOf(actorLocations[i]) != -1) {
               actorLocations[i] = 'x';
             } else {
               actorLocations[i] = 's';
@@ -239,7 +317,7 @@ function advanceState(action) {
             actorLocations[i-2] = 'x';
           } else if (actorLocations[i-2]) {
             // Reverse direction
-            if (actorLocations[i] == 'o') {
+            if (['o','x'].indexOf(actorLocations[i]) != -1) {
               actorLocations[i] = 'x';
             } else {
               actorLocations[i] = 's';
@@ -255,7 +333,7 @@ function advanceState(action) {
           actorLocations[i-1] = 'x';
         } else if (actorLocations[i-1]) {
           // Reverse direction
-          if (actorLocations[i] == 'o') {
+          if (['o','x'].indexOf(actorLocations[i]) != -1) {
             actorLocations[i] = 'x';
           } else {
             actorLocations[i] = 's';
