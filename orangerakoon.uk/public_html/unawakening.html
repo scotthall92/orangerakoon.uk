@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Unawakening: Return to the Island</title>
+    <link rel="stylesheet" type="text/css" href="unawakening.css" title="Unawakening">
+
+    <!--
+      ____                             _____       _
+     / __ \                           |  __ \     | |
+    | |  | |_ __ __ _ _ __   __ _  ___| |__) |__ _| | _____   ___  _ __
+    | |  | | '__/ _` | '_ \ / _` |/ _ \  _  // _` | |/ / _ \ / _ \| '_ \
+    | |__| | | | (_| | | | | (_| |  __/ | \ \ (_| |   < (_) | (_) | | | |
+     \____/|_|  \__,_|_| |_|\__, |\___|_|  \_\__,_|_|\_\___/ \___/|_| |_|.uk
+    =========================__/ |==========================================
+                            |___/  Author: Scott Hall   github: scotthall92
+    -->
+
+</head>
+<body onload="init()">
+
+<div>
+<button onclick="resizeCanvas(1)">+</button>
+<button onclick="resizeCanvas(-1)">-</button>
+</div>
+
+<p><canvas id="screenCanvas" width="192" height="144">Unsupported by browser</canvas></p>
+<img id="tileset" src="tileset.png" width=0 height=0>
+<img id="playerSprite" src="red_square.png" width=0 height=0>
+
+<script type="text/javascript">
+
+var c = document.getElementById("screenCanvas");
+var ctx = c.getContext("2d");
+var scale = 2;
+
+var fps = 60;
+var mspf = 1000 / fps; // ms per frame
+
+var tileset = document.getElementById("tileset");
+var tsize = 12;
+
+var screenTileWidth = 8;
+var screenTileHeight = 6;
+
+var mapXCoord = 0;
+var mapYCoord = 0;
+var locale = [];
+
+var playerSprite = document.getElementById("playerSprite");
+
+var playerPosX = 0;
+var playerPosY = 0;
+
+var maxPosX = (tsize * screenTileWidth) - tsize;
+var maxPosY = (tsize * screenTileHeight) - tsize;
+
+var moveBufferMax = 6;
+var moveXBuffer = 0;
+var moveYBuffer = 0;
+
+var keyMap = {};
+
+function keydown(event) {
+    keyMap[event.key] = true;
+}
+
+function keyup(event) {
+    keyMap[event.key] = false;
+}
+
+document.onkeydown = keydown;
+document.onkeyup = keyup;
+
+var map = {
+    "00": "885967676723380158776767672339985867001013670338586701111303233858670377672323388957676723233799",
+    "10": "110111011101110170808090626262007136369133533301713636849023238771363636911818037282828292181818",
+    "20": "110111011101110110133141414151031113324242425218809033433343330318911334343434341884808080762275",
+    "30": "110111011101110118626262181803180363536318181818180467040318181834340318709703007622758094181801",
+    "40": "110111011101021218031818181301111818030010031300181823011123130110180323230300101118180303180111",
+    "01": "495967676703390090001067672323019101021003672300849001021067001286910012116701023691010210670012",
+    "11": "100010001018181811011101111803181000201018181818110121111800101810031818180111180210181818181818",
+    "21": "188681818181228114031465240324182403246614032418140324242403241824240303031424342424242424241418",
+    "31": "812281819618180034341313180318013431415113343434343040501334180034334333133403013434343434341800",
+    "41": "101818182323001011184418232301113434343434136034101818181813601802102323231300101202102323001211",
+    "02": "369100121167010236910111443423013691879018343434369118848080970336910354615434343691181867183400",
+    "12": "121123232323181811314151231818183432425262180318343343335354232334343464232323181003343434343434",
+    "22": "181818181818181818545454545454180354626262001023185433433301112318545434545454183434343418181818",
+    "32": "181818181818180118133141511370801813304050137136031333533313713618181318131872821803181818232300",
+    "42": "110111232301021090232323232301119123232323560010912323562356011192230010235600101000121123230111",
+    "03": "369118183434340183921818340318009118877622759701911818033418180091181834341818018480762275808080",
+    "13": "110318031818180310626231615123181163633242522318102323335333231811181818181803188080808080808080",
+    "23": "181818181818181803708022902323231871464691232318237282829223181803182323231818038080808080808080",
+    "33": "232323232323230123131313131323002313131313132301231313131313230023232323232323018080808080808090",
+    "43": "110111442323001010440717274401111107790369172700100978441844280111130919191929007080902323232301",
+    "04": "858181228181818191252525252525259125707622759725912571353555353591257135353535357380742626262626",
+    "14": "818181818181818125626262051525252533533306162583352525253535557335353535453535352626262626262683",
+    "24": "818181818181818125252525252525258293353535353583807435354535559135353545353535738293262626262626",
+    "34": "818181818181819135353555353535919305153535051591710616353506169174353535353535842626262626262686",
+    "44": "718191232303180071369162626223017136913353332300713684902323030194368684808080809636368681818181",
+}
+
+var passableTiles = [
+    "22","03","23","04","14","24","34","25","35","45","55","46","07","17","27","67",
+    "77","08","18","28","68","78","88","98","09","19","29","69","79","89","99",
+]
+
+function resizeCanvas(increment) {
+    scale = scale + increment;
+    if (scale < 1) { scale = 1; }
+    c.width = screenTileWidth * tsize * scale;
+    c.height = screenTileHeight * tsize * scale;
+    ctx.imageSmoothingEnabled = false;
+    drawScreen();
+}
+
+function init() {
+    ctx.imageSmoothingEnabled = false;
+    changeLocale("22");
+    mapXCoord = 2;
+    mapYCoord = 2;
+    playerPosX = 3 * tsize;
+    playerPosY = 4 * tsize;
+
+    update();
+}
+
+function update() {
+    var start = Date.now();
+
+    // Do stuff
+    processKeys();
+    drawScreen();
+
+    var delta = Date.now() - start;
+    var delay = mspf - delta;
+    // console.info(delay);
+    if (delay > 0) {
+        setTimeout(update, delay);
+    } else {
+        update();
+    }
+}
+
+function changeLocale(coords) {
+    for (i = 0; i < screenTileWidth; i++) {
+        locale[i] = [];
+        for (j = 0; j < screenTileHeight; j++) {
+            locale[i][j] = map[coords].slice(j*screenTileWidth*2 + i*2, j*screenTileWidth*2 + i*2 + 2)
+        }
+    }
+}
+
+function moveScreen(xincrement, yincrement) {
+    mapXCoord = mapXCoord + xincrement;
+    mapYCoord = mapYCoord + yincrement;
+
+    if (mapYCoord < 0) {
+        mapYCoord = 0;
+    }
+
+    var coords = String(mapXCoord) + String(mapYCoord);
+    changeLocale(coords);
+
+    if (xincrement > 0) {
+        playerPosX = 0;
+    }
+    if (xincrement < 0) {
+        playerPosX = maxPosX;
+    }
+    if (yincrement > 0) {
+        playerPosY = 0;
+    }
+    if (yincrement < 0) {
+        playerPosY = maxPosY;
+    }
+}
+
+function drawScreen() {
+    drawLocale();
+    drawActors();
+}
+
+function drawLocale() {
+    for (i = 0; i < screenTileWidth; i++) {
+        for (j = 0; j < screenTileHeight; j++) {
+            var dx = i * tsize * scale;
+            var dy = j * tsize * scale;
+            var sx = parseInt(locale[i][j][0]) * tsize;
+            var sy = parseInt(locale[i][j][1]) * tsize;
+            ctx.drawImage(tileset, sx, sy, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
+        }
+    }
+}
+
+function drawActors() {
+    // Player
+    ctx.drawImage(playerSprite, 0, 0, tsize, tsize, playerPosX * scale, playerPosY * scale, tsize * scale, tsize * scale);
+}
+
+function processKeys() {
+    // This is very quick poc and needs rethinking!
+    if (keyMap["a"]) {
+        var newPos = playerPosX - 1;
+
+        // Check tile is passable
+        var x = Math.floor(newPos / tsize)
+        var y1 = Math.floor(playerPosY / tsize)
+        var y2 = Math.floor((playerPosY + tsize - 1) / tsize)
+
+        if (x >= 0) {
+            if ((passableTiles.indexOf(locale[x][y1]) < 0) || (passableTiles.indexOf(locale[x][y2]) < 0)) {
+                newPos = playerPosX;
+            }
+        }
+
+        // Edge of screen
+        if (newPos < 0) {
+            newPos = playerPosX;
+            moveXBuffer = moveXBuffer - 1;
+        } else {
+            moveXBuffer = 0;
+        }
+
+        playerPosX = newPos;
+
+        // Move screen
+        if (moveXBuffer < -moveBufferMax) {
+            moveXBuffer = 0;
+            moveScreen(-1, 0);
+            return;
+        }
+    }
+    if (keyMap["d"]) {
+        var newPos = playerPosX + 1;
+
+        // Check tile is passable
+        var x = Math.floor((newPos + tsize - 1) / tsize)
+        var y1 = Math.floor(playerPosY / tsize)
+        var y2 = Math.floor((playerPosY + tsize - 1) / tsize)
+
+        if (x < screenTileWidth) {
+            if ((passableTiles.indexOf(locale[x][y1]) < 0) || (passableTiles.indexOf(locale[x][y2]) < 0)) {
+                newPos = playerPosX;
+            }
+        }
+
+        // Edge of screen
+        if (newPos >= maxPosX) {
+            newPos = maxPosX;
+            moveXBuffer = moveXBuffer + 1;
+        } else {
+            moveXBuffer = 0;
+        }
+
+        playerPosX = newPos;
+
+        // Move screen
+        if (moveXBuffer > moveBufferMax) {
+            moveXBuffer = 0;
+            moveScreen(1, 0);
+            return;
+        }
+    }
+    if (keyMap["w"]) {
+        var newPos = playerPosY - 1;
+
+        // Check tile is passable
+        var x1 = Math.floor(playerPosX / tsize)
+        var x2 = Math.floor((playerPosX + tsize - 1) / tsize)
+        var y = Math.floor(newPos / tsize)
+
+        if (y >= 0) {
+            if ((passableTiles.indexOf(locale[x1][y]) < 0) || (passableTiles.indexOf(locale[x2][y]) < 0)) {
+                newPos = playerPosY;
+            }
+        }
+
+        // Edge of screen
+        if (newPos < 0) {
+            newPos = playerPosY;
+            moveYBuffer = moveYBuffer - 1;
+        } else {
+            moveYBuffer = 0;
+        }
+
+        playerPosY = newPos;
+
+        // Move screen
+        if (moveYBuffer < -moveBufferMax) {
+            moveYBuffer = 0;
+            moveScreen(0, -1);
+            return;
+        }
+    }
+    if (keyMap["s"]) {
+        var newPos = playerPosY + 1;
+
+        // Check tile is passable
+        var x1 = Math.floor(playerPosX / tsize)
+        var x2 = Math.floor((playerPosX + tsize - 1) / tsize)
+        var y = Math.floor((newPos + tsize - 1) / tsize)
+
+        if (y < screenTileHeight) {
+            if ((passableTiles.indexOf(locale[x1][y]) < 0) || (passableTiles.indexOf(locale[x2][y]) < 0)) {
+                newPos = playerPosY;
+            }
+        }
+
+        // Edge of screen
+        if (newPos >= maxPosY) {
+            newPos = maxPosY;
+            moveYBuffer = moveYBuffer + 1;
+        } else {
+            moveYBuffer = 0;
+        }
+
+        playerPosY = newPos;
+
+        // Move screen
+        if (moveYBuffer > moveBufferMax) {
+            moveYBuffer = 0;
+            moveScreen(0, 1);
+            return;
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>
