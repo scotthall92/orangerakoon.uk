@@ -26,6 +26,7 @@
 
 <p><canvas id="screenCanvas" width="192" height="144">Unsupported by browser</canvas></p>
 <img id="tileset" src="tileset.png" width=0 height=0>
+<img id="charset" src="charset.png" width=0 height=0>
 <img id="playerSprite" src="red_square.png" width=0 height=0>
 
 <script type="text/javascript">
@@ -40,6 +41,9 @@ var mspf = 1000 / fps; // ms per frame
 var tileset = document.getElementById("tileset");
 var tsize = 12;
 
+var charset = document.getElementById("charset");
+var csize = 6;
+
 var screenTileWidth = 8;
 var screenTileHeight = 6;
 
@@ -48,16 +52,30 @@ var mapYCoord = 0;
 var locale = [];
 
 var playerSprite = document.getElementById("playerSprite");
+var psize = 12;
 
 var playerPosX = 0;
 var playerPosY = 0;
+var playerDirection = [0,0,1,0];  // +x,-x,+y,-y
 
-var maxPosX = (tsize * screenTileWidth) - tsize;
-var maxPosY = (tsize * screenTileHeight) - tsize;
+var maxPosX = (tsize * screenTileWidth) - psize;
+var maxPosY = (tsize * screenTileHeight) - psize;
 
-var moveBufferMax = 6;
-var moveXBuffer = 0;
-var moveYBuffer = 0;
+var inputDelayBuffer = 0;
+
+var transitionBufferMax = 6;
+var transitionXBuffer = 0;
+var transitionYBuffer = 0;
+var transitionInputDelay = 6;
+
+var portalBufferMax = 6;
+var portalBuffer = 0;
+var portalInputDelay = 6;
+
+var dialogueBuffer = [];
+var dialogueInputDelay = 6;
+var dialogueFirstLine = "";
+var dialogueSecondLine = "";
 
 var keyMap = {};
 
@@ -72,7 +90,16 @@ function keyup(event) {
 document.onkeydown = keydown;
 document.onkeyup = keyup;
 
-var map = {
+var passableTiles = [
+    "22","03","23","04","14","24","34","25","35","45","55","46","07","17","27","67",
+    "77","08","18","28","68","78","88","98","09","19","29","69","79","89","99",
+];
+
+var portalTiles = ["21", "43", "53"];
+
+var signpostTiles = ["44"];
+
+var outsideMap = {
     "00": "885967676723380158776767672339985867001013670338586701111303233858670377672323388957676723233799",
     "10": "110111011101110170808090626262007136369133533301713636849023238771363636911818037282828292181818",
     "20": "110111011101110110133141414151031113324242425218809033433343330318911334343434341884808080762275",
@@ -98,12 +125,33 @@ var map = {
     "24": "818181818181818125252525252525258293353535353583807435354535559135353545353535738293262626262626",
     "34": "818181818181819135353555353535919305153535051591710616353506169174353535353535842626262626262686",
     "44": "718191232303180071369162626223017136913353332300713684902323030194368684808080809636368681818181",
-}
+};
 
-var passableTiles = [
-    "22","03","23","04","14","24","34","25","35","45","55","46","07","17","27","67",
-    "77","08","18","28","68","78","88","98","09","19","29","69","79","89","99",
-]
+var maps = [outsideMap];
+
+var mapIndex = 0;
+var map = maps[mapIndex];
+
+var characters = " ABCDEFGHIKKLMNOPQRSTUVWXYZ*abcdefghijklmnopqrstuvwxyz0123456789.,!?-':^>_<";
+
+// Key is Map Index, Map X Coord, Map Y Coord, Tile x, Tile y (iXYxy)
+var dialogues = {
+    "unreadable": ["", "this angle!", "sign from", "read the", "You can't"],
+    "02132": ["", "move.", "heavy to", "It's too", ": :", ":"],
+    "00241": ["", "    Village", " >  Bema", "    Woods", " ^  Endless"],
+    "00244": ["", "pretty deep!", "It looks", "well:", "Well, well,"],
+    "04121": ["", "roads!", "maintained", "our well-", "ourselves on", "- We pride", "Bema Village", "Welcome to"],
+    "04330": ["", "", "Start _"],
+    "04311": ["", "", "Finish!"],
+    "04351": ["", "", "      <"],
+    "04333": ["", "", "      >"],
+    "04353": ["", "", "      ^"],
+};
+
+var portals = {
+    "01422": {"mapIndex": 0, "mapX": 3, "mapY": 0, "x": 2, "y": 3},
+    "03022": {"mapIndex": 0, "mapX": 1, "mapY": 4, "x": 2, "y": 3},
+};
 
 function resizeCanvas(increment) {
     scale = scale + increment;
@@ -116,7 +164,7 @@ function resizeCanvas(increment) {
 
 function init() {
     ctx.imageSmoothingEnabled = false;
-    changeLocale("22");
+    updateLocale("22");
     mapXCoord = 2;
     mapYCoord = 2;
     playerPosX = 3 * tsize;
@@ -142,7 +190,7 @@ function update() {
     }
 }
 
-function changeLocale(coords) {
+function updateLocale(coords) {
     for (i = 0; i < screenTileWidth; i++) {
         locale[i] = [];
         for (j = 0; j < screenTileHeight; j++) {
@@ -151,7 +199,10 @@ function changeLocale(coords) {
     }
 }
 
-function moveScreen(xincrement, yincrement) {
+function transitionScreen(xincrement, yincrement) {
+    transitionXBuffer = 0;
+    transitionYBuffer = 0;
+
     mapXCoord = mapXCoord + xincrement;
     mapYCoord = mapYCoord + yincrement;
 
@@ -160,7 +211,7 @@ function moveScreen(xincrement, yincrement) {
     }
 
     var coords = String(mapXCoord) + String(mapYCoord);
-    changeLocale(coords);
+    updateLocale(coords);
 
     if (xincrement > 0) {
         playerPosX = 0;
@@ -174,11 +225,37 @@ function moveScreen(xincrement, yincrement) {
     if (yincrement < 0) {
         playerPosY = maxPosY;
     }
+
+    inputDelayBuffer = transitionInputDelay;
+}
+
+function enterPortal() {
+    var xCoord = Math.floor((playerPosX + (psize - 1) * playerDirection[0]) / tsize) + playerDirection[0] - playerDirection[1];
+    var yCoord = Math.floor((playerPosY + (psize - 1) * playerDirection[2]) / tsize) + playerDirection[2] - playerDirection[3];
+    key = String(mapIndex) + String(mapXCoord) + String(mapYCoord) + String(xCoord) + String(yCoord);
+
+    if (portals[key]) {
+        portalBuffer = 0;
+        transitionXBuffer = 0;
+        transitionYBuffer = 0;
+
+        map = maps[portals[key]["mapIndex"]];
+        mapXCoord = portals[key]["mapX"];
+        mapYCoord = portals[key]["mapY"];
+        playerPosX = portals[key]["x"] * tsize;
+        playerPosY = portals[key]["y"] * tsize;
+
+        var coords = String(mapXCoord) + String(mapYCoord);
+        updateLocale(coords);
+
+        inputDelayBuffer = portalInputDelay;
+    }
 }
 
 function drawScreen() {
     drawLocale();
     drawActors();
+    drawDialogue();
 }
 
 function drawLocale() {
@@ -195,132 +272,246 @@ function drawLocale() {
 
 function drawActors() {
     // Player
-    ctx.drawImage(playerSprite, 0, 0, tsize, tsize, playerPosX * scale, playerPosY * scale, tsize * scale, tsize * scale);
+    ctx.drawImage(playerSprite, 0, 0, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
+}
+
+function drawDialogue() {
+    if (dialogueBuffer.length > 0) {
+        // Blank text box
+        for (i = 1; i < (screenTileWidth * 2) - 1; i++) {
+            for (j = 1; j < 6; j++) {
+                var dx = i * csize * scale;
+                var dy = j * csize * scale;
+                ctx.drawImage(charset, 0, 0, csize, csize, dx, dy, csize * scale, csize * scale);
+            }
+        }
+
+        // First line
+        for (i = 0; i < dialogueFirstLine.length; i++) {
+            var dx = ((2 * csize) + (i * csize)) * scale;
+            var dy = 2 * csize * scale;
+            var sx = (characters.indexOf(dialogueFirstLine[i]) % 27) * csize;
+            var sy = Math.floor(characters.indexOf(dialogueFirstLine[i]) / 27) * csize;
+            ctx.drawImage(charset, sx, sy, csize, csize, dx, dy, csize * scale, csize * scale);
+        }
+
+        // Second line
+        for (i = 0; i < dialogueSecondLine.length; i++) {
+            var dx = ((2 * csize) + (i * csize)) * scale;
+            var dy = 4 * csize * scale;
+            var sx = (characters.indexOf(dialogueSecondLine[i]) % 27) * csize;
+            var sy = Math.floor(characters.indexOf(dialogueSecondLine[i]) / 27) * csize;
+            ctx.drawImage(charset, sx, sy, csize, csize, dx, dy, csize * scale, csize * scale);
+        }
+
+        // "Read more" prompt
+        if (dialogueBuffer.length > 1) {
+            var dx = ((screenTileWidth * 2) - 2) * csize * scale;
+            var dy = 5 * csize * scale;
+            ctx.drawImage(charset, 0, csize, csize, csize, dx, dy, csize * scale, csize * scale);
+        }
+    }
+}
+
+function playerStep(collinearAxis) {
+    if (collinearAxis == "x") {
+        var collinearPos = playerPosX;
+        var orthogonalPos = playerPosY;
+        var maxCollinearPos = maxPosX;
+        var positiveCollinearDirection = playerDirection[0];
+        var negativeCollinearDirection = playerDirection[1];
+        var collinearTransitionBuffer = transitionXBuffer;
+        var screenTileMax = screenTileWidth;
+    } else if (collinearAxis == "y") {
+        var collinearPos = playerPosY;
+        var orthogonalPos = playerPosX;
+        var maxCollinearPos = maxPosY;
+        var positiveCollinearDirection = playerDirection[2];
+        var negativeCollinearDirection = playerDirection[3];
+        var collinearTransitionBuffer = transitionYBuffer;
+        var screenTileMax = screenTileHeight;
+    } else {
+        throw "Collinear axis must be 'x' or 'y'";
+    }
+
+    var newCollinearPos = collinearPos + positiveCollinearDirection - negativeCollinearDirection;
+    var newOrthogonalPos = orthogonalPos;
+
+    var collinearCoord = Math.floor((newCollinearPos + (psize - 1) * positiveCollinearDirection) / tsize);
+
+    if ((collinearCoord >= 0) && (collinearCoord < screenTileMax)) {
+        var start = Math.floor(orthogonalPos / tsize);
+        var end = Math.floor((orthogonalPos + psize - 1) / tsize);
+        var start1 = Math.floor((orthogonalPos + 1) / tsize);
+        var end1 = Math.floor((orthogonalPos + psize - 2) / tsize);
+        var start2 = Math.floor((orthogonalPos + 2) / tsize);
+        var end2 = Math.floor((orthogonalPos + psize - 3) / tsize);
+        if (collinearAxis == "x") {
+            var startTile = locale[collinearCoord][start];
+            var endTile = locale[collinearCoord][end];
+            var start1Tile = locale[collinearCoord][start1];
+            var end1Tile = locale[collinearCoord][end1];
+            var start2Tile = locale[collinearCoord][start2];
+            var end2Tile = locale[collinearCoord][end2];
+        } else if (collinearAxis == "y") {
+            var startTile = locale[start][collinearCoord];
+            var endTile = locale[end][collinearCoord];
+            var start1Tile = locale[start1][collinearCoord];
+            var end1Tile = locale[end1][collinearCoord];
+            var start2Tile = locale[start2][collinearCoord];
+            var end2Tile = locale[end2][collinearCoord];
+        }
+
+        var passableStart = passableTiles.indexOf(startTile) >= 0;
+        var passableEnd = passableTiles.indexOf(endTile) >= 0;
+        if (!passableStart && !passableEnd) {
+            newCollinearPos = collinearPos;
+        } else if (passableStart && !passableEnd) {
+            // Check for bump around corner
+            if (passableTiles.indexOf(end1Tile) >= 0) {
+                newOrthogonalPos = orthogonalPos - 1;
+            } else if (passableTiles.indexOf(end2Tile) >= 0) {
+                newOrthogonalPos = orthogonalPos - 1;
+                newCollinearPos = collinearPos;
+            } else {
+                newCollinearPos = collinearPos;
+            }
+        } else if (!passableStart && passableEnd) {
+            // Check for bump around corner
+            if (passableTiles.indexOf(start1Tile) >= 0) {
+                newOrthogonalPos = orthogonalPos + 1;
+            } else if (passableTiles.indexOf(start2Tile) >= 0) {
+                newOrthogonalPos = orthogonalPos + 1;
+                newCollinearPos = collinearPos;
+            } else {
+                newCollinearPos = collinearPos;
+            }
+        }
+
+        var portalStart = portalTiles.indexOf(startTile) >= 0;
+        var portalEnd = portalTiles.indexOf(endTile) >= 0;
+        if (portalStart && portalEnd) {
+            portalBuffer = portalBuffer + 1;
+        } else if (portalStart && !portalEnd) {
+            if (portalTiles.indexOf(end2Tile) >= 0) {
+                newOrthogonalPos = orthogonalPos - 1;
+            }
+        } else if (!portalStart && portalEnd) {
+            if (portalTiles.indexOf(start2Tile) >= 0) {
+                newOrthogonalPos = orthogonalPos + 1;
+            }
+        } else {
+            portalBuffer = 0;
+        }
+    }
+
+    // Edge of screen
+    var newCollinearTransitionBuffer = 0;
+    if (newCollinearPos < 0) {
+        newCollinearPos = collinearPos;
+        newCollinearTransitionBuffer = collinearTransitionBuffer - 1;
+    } else if (newCollinearPos >= maxCollinearPos) {
+        newCollinearPos = maxCollinearPos;
+        newCollinearTransitionBuffer = collinearTransitionBuffer + 1;
+    }
+
+    if (collinearAxis == "x") {
+        playerPosX = newCollinearPos;
+        playerPosY = newOrthogonalPos;
+        transitionXBuffer = newCollinearTransitionBuffer;
+    } else if (collinearAxis == "y") {
+        playerPosY = newCollinearPos;
+        playerPosX = newOrthogonalPos;
+        transitionYBuffer = newCollinearTransitionBuffer;
+    }
 }
 
 function processKeys() {
-    // This is very quick poc and needs rethinking!
-    if (keyMap["a"]) {
-        var newPos = playerPosX - 1;
+    if (inputDelayBuffer > 0) {
+        inputDelayBuffer = inputDelayBuffer - 1;
+        return;
+    }
 
-        // Check tile is passable
-        var x = Math.floor(newPos / tsize)
-        var y1 = Math.floor(playerPosY / tsize)
-        var y2 = Math.floor((playerPosY + tsize - 1) / tsize)
+    // Dialogue overrides other input
+    if (dialogueBuffer.length > 0) {
+        if (keyMap["j"]) {
+            dialogueFirstLine = dialogueSecondLine;
+            dialogueSecondLine = dialogueBuffer.pop();
+            inputDelayBuffer = dialogueInputDelay;
+        }
+        return;
+    }
 
-        if (x >= 0) {
-            if ((passableTiles.indexOf(locale[x][y1]) < 0) || (passableTiles.indexOf(locale[x][y2]) < 0)) {
-                newPos = playerPosX;
+    // Interact
+    if (keyMap["j"]) {
+        keyMap["j"] = false;
+
+        var hpsize = psize / 2;
+        var x = Math.floor((playerPosX + hpsize + (playerDirection[0] * hpsize) - (playerDirection[1] * hpsize) - playerDirection[1]) / tsize);
+        var y = Math.floor((playerPosY + hpsize + (playerDirection[2] * hpsize) - (playerDirection[3] * hpsize) - playerDirection[3]) / tsize);
+        var key = String(mapIndex) + String(mapXCoord) + String(mapYCoord) + String(x) + String(y);
+
+        console.info(key);
+
+        if (dialogues[key]) {
+            dialogueBuffer = dialogues[key].slice();
+
+            if ((signpostTiles.indexOf(locale[x][y]) >= 0) && (playerDirection[3] == 0)) {
+                dialogueBuffer = dialogues["unreadable"].slice();
             }
-        }
 
-        // Edge of screen
-        if (newPos < 0) {
-            newPos = playerPosX;
-            moveXBuffer = moveXBuffer - 1;
-        } else {
-            moveXBuffer = 0;
-        }
-
-        playerPosX = newPos;
-
-        // Move screen
-        if (moveXBuffer < -moveBufferMax) {
-            moveXBuffer = 0;
-            moveScreen(-1, 0);
+            dialogueFirstLine = dialogueBuffer.pop();
+            dialogueSecondLine = dialogueBuffer.pop();
+            inputDelayBuffer = dialogueInputDelay;
             return;
         }
     }
-    if (keyMap["d"]) {
-        var newPos = playerPosX + 1;
 
-        // Check tile is passable
-        var x = Math.floor((newPos + tsize - 1) / tsize)
-        var y1 = Math.floor(playerPosY / tsize)
-        var y2 = Math.floor((playerPosY + tsize - 1) / tsize)
-
-        if (x < screenTileWidth) {
-            if ((passableTiles.indexOf(locale[x][y1]) < 0) || (passableTiles.indexOf(locale[x][y2]) < 0)) {
-                newPos = playerPosX;
-            }
-        }
-
-        // Edge of screen
-        if (newPos >= maxPosX) {
-            newPos = maxPosX;
-            moveXBuffer = moveXBuffer + 1;
-        } else {
-            moveXBuffer = 0;
-        }
-
-        playerPosX = newPos;
-
-        // Move screen
-        if (moveXBuffer > moveBufferMax) {
-            moveXBuffer = 0;
-            moveScreen(1, 0);
-            return;
-        }
-    }
     if (keyMap["w"]) {
-        var newPos = playerPosY - 1;
-
-        // Check tile is passable
-        var x1 = Math.floor(playerPosX / tsize)
-        var x2 = Math.floor((playerPosX + tsize - 1) / tsize)
-        var y = Math.floor(newPos / tsize)
-
-        if (y >= 0) {
-            if ((passableTiles.indexOf(locale[x1][y]) < 0) || (passableTiles.indexOf(locale[x2][y]) < 0)) {
-                newPos = playerPosY;
-            }
+        playerDirection = [0,0,0,1];
+        playerStep("y");
+        if (transitionYBuffer < -transitionBufferMax) {
+            transitionScreen(0, -1);
+            return;
         }
-
-        // Edge of screen
-        if (newPos < 0) {
-            newPos = playerPosY;
-            moveYBuffer = moveYBuffer - 1;
-        } else {
-            moveYBuffer = 0;
+        if (portalBuffer > portalBufferMax) {
+            enterPortal();
+            return;
         }
-
-        playerPosY = newPos;
-
-        // Move screen
-        if (moveYBuffer < -moveBufferMax) {
-            moveYBuffer = 0;
-            moveScreen(0, -1);
+    }
+    if (keyMap["a"]) {
+        playerDirection = [0,1,0,0];
+        playerStep("x");
+        if (transitionXBuffer < -transitionBufferMax) {
+            transitionScreen(-1, 0);
+            return;
+        }
+        if (portalBuffer > portalBufferMax) {
+            enterPortal();
             return;
         }
     }
     if (keyMap["s"]) {
-        var newPos = playerPosY + 1;
-
-        // Check tile is passable
-        var x1 = Math.floor(playerPosX / tsize)
-        var x2 = Math.floor((playerPosX + tsize - 1) / tsize)
-        var y = Math.floor((newPos + tsize - 1) / tsize)
-
-        if (y < screenTileHeight) {
-            if ((passableTiles.indexOf(locale[x1][y]) < 0) || (passableTiles.indexOf(locale[x2][y]) < 0)) {
-                newPos = playerPosY;
-            }
+        playerDirection = [0,0,1,0];
+        playerStep("y");
+        if (transitionYBuffer > transitionBufferMax) {
+            transitionScreen(0, 1);
+            return;
         }
-
-        // Edge of screen
-        if (newPos >= maxPosY) {
-            newPos = maxPosY;
-            moveYBuffer = moveYBuffer + 1;
-        } else {
-            moveYBuffer = 0;
+        if (portalBuffer > portalBufferMax) {
+            enterPortal();
+            return;
         }
-
-        playerPosY = newPos;
-
-        // Move screen
-        if (moveYBuffer > moveBufferMax) {
-            moveYBuffer = 0;
-            moveScreen(0, 1);
+    }
+    if (keyMap["d"]) {
+        playerDirection = [1,0,0,0];
+        playerStep("x");
+        if (transitionXBuffer > transitionBufferMax) {
+            transitionScreen(1, 0);
+            return;
+        }
+        if (portalBuffer > portalBufferMax) {
+            enterPortal();
             return;
         }
     }
