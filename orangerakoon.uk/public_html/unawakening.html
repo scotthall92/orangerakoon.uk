@@ -58,6 +58,7 @@ var playerPosX = 0;
 var playerPosY = 0;
 var playerDirection = [0,0,1,0];  // +x,-x,+y,-y
 var playerMoving = false;
+var playerPushing = false;
 var playerAnimationFrame = 1;
 var playerAnimationBufferMax = 12;
 var playerAnimationBuffer = 0;
@@ -102,6 +103,7 @@ var passableTiles = [
 var portalTiles = ["21", "43", "53"];
 
 var signpostTiles = ["44"];
+var grassTiles = ["23"];
 
 var outsideMap = {
     "00": "885967676723380158776767672339985867001013670338586701111303233858670377672323388957676723233799",
@@ -297,7 +299,19 @@ function drawActors() {
     } else if (playerDirection[3] == 1) {
         sx = psize * 3;
     }
+    if (playerPushing) {
+        sy = psize * 2;
+    }
     ctx.drawImage(player, sx, sy, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
+
+    // Surface overlay
+    var feetXCoord = Math.floor((playerPosX + (psize / 2)) / tsize);
+    var feetYCoord = Math.floor((playerPosY + (psize - 1)) / tsize);
+    if (grassTiles.indexOf(locale[feetXCoord][feetYCoord]) >= 0) {
+        sx = psize * 4;
+        sy = 0;
+        ctx.drawImage(player, sx, sy, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
+    }
 }
 
 function drawDialogue() {
@@ -340,6 +354,7 @@ function drawDialogue() {
 
 function playerStep(collinearAxis) {
     playerMoving = true;
+    playerPushing = false;
 
     if (collinearAxis == "x") {
         var collinearPos = playerPosX;
@@ -393,6 +408,7 @@ function playerStep(collinearAxis) {
         var passableEnd = passableTiles.indexOf(endTile) >= 0;
         if (!passableStart && !passableEnd) {
             newCollinearPos = collinearPos;
+            playerPushing = true;
         } else if (passableStart && !passableEnd) {
             // Check for bump around corner
             if (passableTiles.indexOf(end1Tile) >= 0) {
@@ -402,6 +418,7 @@ function playerStep(collinearAxis) {
                 newCollinearPos = collinearPos;
             } else {
                 newCollinearPos = collinearPos;
+                playerPushing = true;
             }
         } else if (!passableStart && passableEnd) {
             // Check for bump around corner
@@ -412,6 +429,7 @@ function playerStep(collinearAxis) {
                 newCollinearPos = collinearPos;
             } else {
                 newCollinearPos = collinearPos;
+                playerPushing = true;
             }
         }
 
@@ -455,6 +473,7 @@ function playerStep(collinearAxis) {
 
 function processKeys() {
     playerMoving = false;
+    playerPushing = false;
 
     if (inputDelayBuffer > 0) {
         inputDelayBuffer = inputDelayBuffer - 1;
