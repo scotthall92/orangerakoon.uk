@@ -27,7 +27,7 @@
 <p><canvas id="screenCanvas" width="192" height="144">Unsupported by browser</canvas></p>
 <img id="tileset" src="tileset.png" width=0 height=0>
 <img id="charset" src="charset.png" width=0 height=0>
-<img id="playerSprite" src="red_square.png" width=0 height=0>
+<img id="player" src="player.png" width=0 height=0>
 
 <script type="text/javascript">
 
@@ -51,12 +51,16 @@ var mapXCoord = 0;
 var mapYCoord = 0;
 var locale = [];
 
-var playerSprite = document.getElementById("playerSprite");
+var player = document.getElementById("player");
 var psize = 12;
 
 var playerPosX = 0;
 var playerPosY = 0;
 var playerDirection = [0,0,1,0];  // +x,-x,+y,-y
+var playerMoving = false;
+var playerAnimationFrame = 1;
+var playerAnimationBufferMax = 12;
+var playerAnimationBuffer = 0;
 
 var maxPosX = (tsize * screenTileWidth) - psize;
 var maxPosY = (tsize * screenTileHeight) - psize;
@@ -137,6 +141,8 @@ var characters = " ABCDEFGHIKKLMNOPQRSTUVWXYZ*abcdefghijklmnopqrstuvwxyz01234567
 // Key is Map Index, Map X Coord, Map Y Coord, Tile x, Tile y (iXYxy)
 var dialogues = {
     "unreadable": ["", "this angle!", "sign from", "read the", "You can't"],
+    "00415": ["", "place:", "was a secret", "This cliff"],
+    "01353": ["", "are closed:", "The curtains", ":Huh?"],
     "02132": ["", "move.", "heavy to", "It's too", ": :", ":"],
     "00241": ["", "    Village", " >  Bema", "    Woods", " ^  Endless"],
     "00244": ["", "pretty deep!", "It looks", "well:", "Well, well,"],
@@ -272,7 +278,26 @@ function drawLocale() {
 
 function drawActors() {
     // Player
-    ctx.drawImage(playerSprite, 0, 0, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
+    if (playerMoving) {
+        playerAnimationBuffer = playerAnimationBuffer + 1;
+        if (playerAnimationBuffer == playerAnimationBufferMax) {
+            playerAnimationFrame = Number(playerAnimationFrame == 0);
+            playerAnimationBuffer = 0;
+        }
+    }
+
+    var sx = 0;
+    var sy = psize * playerAnimationFrame;
+    if (playerDirection[0] == 1) {
+        sx = 0;
+    } else if (playerDirection[1] == 1) {
+        sx = psize;
+    } else if (playerDirection[2] == 1) {
+        sx = psize * 2;
+    } else if (playerDirection[3] == 1) {
+        sx = psize * 3;
+    }
+    ctx.drawImage(player, sx, sy, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
 }
 
 function drawDialogue() {
@@ -314,6 +339,8 @@ function drawDialogue() {
 }
 
 function playerStep(collinearAxis) {
+    playerMoving = true;
+
     if (collinearAxis == "x") {
         var collinearPos = playerPosX;
         var orthogonalPos = playerPosY;
@@ -427,6 +454,8 @@ function playerStep(collinearAxis) {
 }
 
 function processKeys() {
+    playerMoving = false;
+
     if (inputDelayBuffer > 0) {
         inputDelayBuffer = inputDelayBuffer - 1;
         return;
@@ -479,11 +508,11 @@ function processKeys() {
             return;
         }
     }
-    if (keyMap["a"]) {
-        playerDirection = [0,1,0,0];
-        playerStep("x");
-        if (transitionXBuffer < -transitionBufferMax) {
-            transitionScreen(-1, 0);
+    if (keyMap["s"]) {
+        playerDirection = [0,0,1,0];
+        playerStep("y");
+        if (transitionYBuffer > transitionBufferMax) {
+            transitionScreen(0, 1);
             return;
         }
         if (portalBuffer > portalBufferMax) {
@@ -491,11 +520,11 @@ function processKeys() {
             return;
         }
     }
-    if (keyMap["s"]) {
-        playerDirection = [0,0,1,0];
-        playerStep("y");
-        if (transitionYBuffer > transitionBufferMax) {
-            transitionScreen(0, 1);
+    if (keyMap["a"]) {
+        playerDirection = [0,1,0,0];
+        playerStep("x");
+        if (transitionXBuffer < -transitionBufferMax) {
+            transitionScreen(-1, 0);
             return;
         }
         if (portalBuffer > portalBufferMax) {
