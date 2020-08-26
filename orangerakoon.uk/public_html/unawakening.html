@@ -25,7 +25,8 @@
 </div>
 
 <p><canvas id="screenCanvas" width="192" height="144">Unsupported by browser</canvas></p>
-<img id="tileset" src="tileset.png" width=0 height=0>
+<img id="tileset1" src="tileset1.png" width=0 height=0>
+<img id="tileset2" src="tileset2.png" width=0 height=0>
 <img id="charset" src="charset.png" width=0 height=0>
 <img id="player" src="player.png" width=0 height=0>
 
@@ -38,7 +39,7 @@ var scale = 2;
 var fps = 60;
 var mspf = 1000 / fps; // ms per frame
 
-var tileset = document.getElementById("tileset");
+var tilesets = [document.getElementById("tileset1"), document.getElementById("tileset2")];
 var tsize = 12;
 
 var charset = document.getElementById("charset");
@@ -96,14 +97,17 @@ document.onkeydown = keydown;
 document.onkeyup = keyup;
 
 var passableTiles = [
-    "22","03","23","04","14","24","34","25","35","45","55","46","07","17","27","67",
-    "77","08","18","28","68","78","88","98","09","19","29","69","79","89","99",
+    ["22","03","23","04","14","24","34","25","35","45","55","46","07","17","27","67","77","08","18","28","68","78","09","19","29","69","79"],
+    ["31","41","04","14","24","34","05","15","25"],
 ];
 
-var portalTiles = ["21", "43", "53"];
+var portalTiles = [
+    ["21","43","53"],
+    ["13"],
+];
 
-var signpostTiles = ["44"];
-var grassTiles = ["23"];
+var signpostTiles = [["44"], []];
+var grassTiles = [["23"], []];
 
 var outsideMap = {
     "00": "885967676723380158776767672339985867001013670338586701111303233858670377672323388957676723233799",
@@ -133,10 +137,26 @@ var outsideMap = {
     "44": "718191232303180071369162626223017136913353332300713684902323030194368684808080809636368681818181",
 };
 
-var maps = [outsideMap];
+var insideMap = {
+    "00": "003030303030302001313131313131210152045204045221010404040404042101520404040452210212120313231222",
+    "10": "001010101010101001001011102024040101430404212404010212341222240401434324242424040212120313231212",
+    "20": "101040104040402004044104414141210452440444444421045345044545452104040404040404211212031323121222",
+    "01": "353535353535353535353535353535353500405010203535350141510421353535010404042135353502031323223535",
+    "11": "001010401010102001434341040404210143430404040421014343043242042101434324242404210212120313231222",
+    "21": "001040101010102001434143434344210143432424434521014333242454432101430404040443210212031323121222",
+    "02": "001010104010102001440453414343210145043242434321010404045304432101525304040443210212031323121222",
+    "12": "102035353535353543213535353535354321001010102035432101051505213543210105050521351222020313232235",
+    "22": "001010101040102001442444244133210145244524045321012424242432422101434304040453210212120313231222",
+    "03": "001040404040102001044141414104210132420444445221015304044545042101522424240443210212031323121222",
+    "13": "001010104040102001254425414143210125452504044321012525250404042101333333043333210212120313231222",
+    "23": "001040101010102001144114141455210114440433523321010445140404142101141404044343210212031323121222",
+};
+
+var maps = [outsideMap, insideMap];
 
 var mapIndex = 0;
 var map = maps[mapIndex];
+var tileset = tilesets[mapIndex];
 
 var characters = " ABCDEFGHIKKLMNOPQRSTUVWXYZ*abcdefghijklmnopqrstuvwxyz0123456789.,!?-':^>_<";
 
@@ -156,9 +176,32 @@ var dialogues = {
     "04353": ["", "", "      ^"],
 };
 
+// Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
 var portals = {
-    "01422": {"mapIndex": 0, "mapX": 3, "mapY": 0, "x": 2, "y": 3},
-    "03022": {"mapIndex": 0, "mapX": 1, "mapY": 4, "x": 2, "y": 3},
+    "01052": [1, 0, 0, 4, 4],
+    "10045": [0, 1, 0, 5, 3],
+    "02033": [1, 1, 0, 4, 4],
+    "11045": [0, 2, 0, 3, 4],
+    "02053": [1, 2, 0, 3, 4],
+    "12035": [0, 2, 0, 5, 4],
+    "01123": [1, 0, 1, 3, 4],
+    "10135": [0, 1, 1, 2, 4],
+    "03124": [1, 1, 1, 4, 4],
+    "11145": [0, 3, 1, 2, 5],
+    "03233": [1, 2, 1, 3, 4],
+    "12135": [0, 3, 2, 3, 4],
+    "01223": [1, 0, 2, 3, 4],
+    "10235": [0, 1, 2, 2, 4],
+    "01243": [1, 1, 2, 4, 4],
+    "11245": [0, 1, 2, 4, 4],
+    "02233": [1, 2, 2, 4, 4],
+    "12245": [0, 2, 2, 3, 4],
+    "01343": [1, 0, 3, 3, 4],
+    "10335": [0, 1, 3, 4, 4],
+    "01422": [1, 1, 3, 4, 4],
+    "11345": [0, 1, 4, 2, 3],
+    "04442": [1, 2, 3, 3, 4],
+    "12335": [0, 4, 4, 4, 3],
 };
 
 function resizeCanvas(increment) {
@@ -247,11 +290,13 @@ function enterPortal() {
         transitionXBuffer = 0;
         transitionYBuffer = 0;
 
-        map = maps[portals[key]["mapIndex"]];
-        mapXCoord = portals[key]["mapX"];
-        mapYCoord = portals[key]["mapY"];
-        playerPosX = portals[key]["x"] * tsize;
-        playerPosY = portals[key]["y"] * tsize;
+        mapIndex = portals[key][0]
+        map = maps[mapIndex];
+        mapXCoord = portals[key][1];
+        mapYCoord = portals[key][2];
+        playerPosX = portals[key][3] * tsize;
+        playerPosY = portals[key][4] * tsize;
+        tileset = tilesets[mapIndex];
 
         var coords = String(mapXCoord) + String(mapYCoord);
         updateLocale(coords);
@@ -307,7 +352,7 @@ function drawActors() {
     // Surface overlay
     var feetXCoord = Math.floor((playerPosX + (psize / 2)) / tsize);
     var feetYCoord = Math.floor((playerPosY + (psize - 1)) / tsize);
-    if (grassTiles.indexOf(locale[feetXCoord][feetYCoord]) >= 0) {
+    if (grassTiles[mapIndex].indexOf(locale[feetXCoord][feetYCoord]) >= 0) {
         sx = psize * 4;
         sy = 0;
         ctx.drawImage(player, sx, sy, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
@@ -404,16 +449,16 @@ function playerStep(collinearAxis) {
             var end2Tile = locale[end2][collinearCoord];
         }
 
-        var passableStart = passableTiles.indexOf(startTile) >= 0;
-        var passableEnd = passableTiles.indexOf(endTile) >= 0;
+        var passableStart = passableTiles[mapIndex].indexOf(startTile) >= 0;
+        var passableEnd = passableTiles[mapIndex].indexOf(endTile) >= 0;
         if (!passableStart && !passableEnd) {
             newCollinearPos = collinearPos;
             playerPushing = true;
         } else if (passableStart && !passableEnd) {
             // Check for bump around corner
-            if (passableTiles.indexOf(end1Tile) >= 0) {
+            if (passableTiles[mapIndex].indexOf(end1Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos - 1;
-            } else if (passableTiles.indexOf(end2Tile) >= 0) {
+            } else if (passableTiles[mapIndex].indexOf(end2Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos - 1;
                 newCollinearPos = collinearPos;
             } else {
@@ -422,9 +467,9 @@ function playerStep(collinearAxis) {
             }
         } else if (!passableStart && passableEnd) {
             // Check for bump around corner
-            if (passableTiles.indexOf(start1Tile) >= 0) {
+            if (passableTiles[mapIndex].indexOf(start1Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos + 1;
-            } else if (passableTiles.indexOf(start2Tile) >= 0) {
+            } else if (passableTiles[mapIndex].indexOf(start2Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos + 1;
                 newCollinearPos = collinearPos;
             } else {
@@ -433,16 +478,16 @@ function playerStep(collinearAxis) {
             }
         }
 
-        var portalStart = portalTiles.indexOf(startTile) >= 0;
-        var portalEnd = portalTiles.indexOf(endTile) >= 0;
+        var portalStart = portalTiles[mapIndex].indexOf(startTile) >= 0;
+        var portalEnd = portalTiles[mapIndex].indexOf(endTile) >= 0;
         if (portalStart && portalEnd) {
             portalBuffer = portalBuffer + 1;
         } else if (portalStart && !portalEnd) {
-            if (portalTiles.indexOf(end2Tile) >= 0) {
+            if (portalTiles[mapIndex].indexOf(end2Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos - 1;
             }
         } else if (!portalStart && portalEnd) {
-            if (portalTiles.indexOf(start2Tile) >= 0) {
+            if (portalTiles[mapIndex].indexOf(start2Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos + 1;
             }
         } else {
@@ -504,7 +549,7 @@ function processKeys() {
         if (dialogues[key]) {
             dialogueBuffer = dialogues[key].slice();
 
-            if ((signpostTiles.indexOf(locale[x][y]) >= 0) && (playerDirection[3] == 0)) {
+            if ((signpostTiles[mapIndex].indexOf(locale[x][y]) >= 0) && (playerDirection[3] == 0)) {
                 dialogueBuffer = dialogues["unreadable"].slice();
             }
 
