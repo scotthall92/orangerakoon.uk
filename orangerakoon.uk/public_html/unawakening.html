@@ -98,7 +98,7 @@ document.onkeyup = keyup;
 
 var passableTiles = [
     ["22","03","23","04","14","24","34","25","35","45","55","46","07","17","27","67","77","08","18","28","68","78","09","19","29","69","79"],
-    ["31","41","04","14","24","34","05","15","25"],
+    ["31","41","04","14","24","34","05","15","25", "35"],
 ];
 
 var portalTiles = [
@@ -107,6 +107,8 @@ var portalTiles = [
 ];
 
 var signpostTiles = [["44"], []];
+var heavyTiles = [["60"], ["43"]];
+var drawerTiles = [[], ["40"]];
 var grassTiles = [["23"], []];
 
 var outsideMap = {
@@ -158,11 +160,13 @@ var mapIndex = 0;
 var map = maps[mapIndex];
 var tileset = tilesets[mapIndex];
 
-var characters = " ABCDEFGHIKKLMNOPQRSTUVWXYZ*abcdefghijklmnopqrstuvwxyz0123456789.,!?-':^>_<";
+var characters = " ABCDEFGHIJKLMNOPQRSTUVWXYZ#abcdefghijklmnopqrstuvwxyz0123456789.,!?-':*^>_<";
 
 // Key is Map Index, Map X Coord, Map Y Coord, Tile x, Tile y (iXYxy)
 var dialogues = {
-    "unreadable": ["", "this angle!", "sign from", "read the", "You can't"],
+    "signpost": ["", "this angle!", "sign from", "read the", "You can't"],
+    "heavy": ["", "this!", "can't lift", "definitely", ": Yep! You", "::::::::::::", "::::::::::::", "::::::::::::", "heavy! :::::", "looks pretty", "Oof! This"],
+    "drawer": ["", "drawers?", "people's", "in other", "always look", "Do you"],
     "00415": ["", "place:", "was a secret", "This cliff"],
     "01353": ["", "are closed:", "The curtains", ":Huh?"],
     "02132": ["", "move.", "heavy to", "It's too", ": :", ":"],
@@ -174,6 +178,13 @@ var dialogues = {
     "04351": ["", "", "      <"],
     "04333": ["", "", "      >"],
     "04353": ["", "", "      ^"],
+    "10133": ["", "playing!", "Thanks for", "", "OrangeRKN", "Last post by", "", "------------", "grcade.co.uk", "", ":: *beep*"],
+    "10010": ["", "put it back.", "boring. I'll", ":eh, sounds", "'Credits'"],
+    "10020": ["", "quite funny!", "These are", "book. Heh!", "It's a joke"],
+    "10030": ["", "expecting?", "were you", "books: what", "stacked with", "The shelf is"],
+    "10040": ["", "helpful:", "wasn't very", "Well that", "interact!'", "Press J to", "move around!", "'Use WASD to", "on controls.", "It's a book"],
+    "10050": ["", "Good advice!", "answers.'", "online for", "searching", "stuck, try", "'If you get"],
+    "10060": ["", "library?", "in a public", ":Why is this", "of the Land'", "Mysteries", "Secrets and", "'Forbidden"],
 };
 
 // Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
@@ -202,6 +213,7 @@ var portals = {
     "11345": [0, 1, 4, 2, 3],
     "04442": [1, 2, 3, 3, 4],
     "12335": [0, 4, 4, 4, 3],
+    "01242": [1, 1, 2, 7, 0],
 };
 
 function resizeCanvas(increment) {
@@ -254,27 +266,27 @@ function transitionScreen(xincrement, yincrement) {
     transitionXBuffer = 0;
     transitionYBuffer = 0;
 
-    mapXCoord = mapXCoord + xincrement;
-    mapYCoord = mapYCoord + yincrement;
-
-    if (mapYCoord < 0) {
-        mapYCoord = 0;
+    var coords = String(mapXCoord + xincrement) + String(mapYCoord + yincrement);
+    if (coords in map) {
+        mapXCoord = mapXCoord + xincrement;
+        mapYCoord = mapYCoord + yincrement;
+        updateLocale(coords);
     }
 
-    var coords = String(mapXCoord) + String(mapYCoord);
-    updateLocale(coords);
-
-    if (xincrement > 0) {
-        playerPosX = 0;
-    }
-    if (xincrement < 0) {
-        playerPosX = maxPosX;
-    }
-    if (yincrement > 0) {
-        playerPosY = 0;
-    }
-    if (yincrement < 0) {
-        playerPosY = maxPosY;
+    // Press - at transition to screen warp
+    if (!keyMap["-"]) {
+        if (xincrement > 0) {
+            playerPosX = 0;
+        }
+        if (xincrement < 0) {
+            playerPosX = maxPosX;
+        }
+        if (yincrement > 0) {
+            playerPosY = 0;
+        }
+        if (yincrement < 0) {
+            playerPosY = maxPosY;
+        }
     }
 
     inputDelayBuffer = transitionInputDelay;
@@ -323,8 +335,11 @@ function drawLocale() {
     }
 }
 
-function drawActors() {
-    // Player
+function drawNPCs() {
+
+}
+
+function drawPlayer() {
     if (playerMoving) {
         playerAnimationBuffer = playerAnimationBuffer + 1;
         if (playerAnimationBuffer == playerAnimationBufferMax) {
@@ -357,6 +372,11 @@ function drawActors() {
         sy = 0;
         ctx.drawImage(player, sx, sy, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
     }
+}
+
+function drawActors() {
+    drawNPCs();
+    drawPlayer();
 }
 
 function drawDialogue() {
@@ -482,14 +502,17 @@ function playerStep(collinearAxis) {
         var portalEnd = portalTiles[mapIndex].indexOf(endTile) >= 0;
         if (portalStart && portalEnd) {
             portalBuffer = portalBuffer + 1;
+            playerPushing = false;
         } else if (portalStart && !portalEnd) {
             if (portalTiles[mapIndex].indexOf(end2Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos - 1;
             }
+            playerPushing = false;
         } else if (!portalStart && portalEnd) {
             if (portalTiles[mapIndex].indexOf(start2Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos + 1;
             }
+            playerPushing = false;
         } else {
             portalBuffer = 0;
         }
@@ -516,6 +539,33 @@ function playerStep(collinearAxis) {
     }
 }
 
+function interact() {
+    var hpsize = psize / 2;
+    var x = Math.floor((playerPosX + hpsize + (playerDirection[0] * hpsize) - (playerDirection[1] * hpsize) - playerDirection[1]) / tsize);
+    var y = Math.floor((playerPosY + hpsize + (playerDirection[2] * hpsize) - (playerDirection[3] * hpsize) - playerDirection[3]) / tsize);
+    var key = String(mapIndex) + String(mapXCoord) + String(mapYCoord) + String(x) + String(y);
+
+    console.info(key);
+
+    if (dialogues[key]) {
+        dialogueBuffer = dialogues[key].slice();
+    }
+
+    if ((0 <= x) && (x < screenTileWidth) && (0 <= y) && (y < screenTileHeight)) {
+        if ((signpostTiles[mapIndex].indexOf(locale[x][y]) >= 0) && playerDirection[3] == 0) {
+            dialogueBuffer = dialogues["signpost"].slice();
+        }
+
+        if (heavyTiles[mapIndex].indexOf(locale[x][y]) >= 0) {
+            dialogueBuffer = dialogues["heavy"].slice();
+        }
+
+        if (drawerTiles[mapIndex].indexOf(locale[x][y]) >= 0) {
+            dialogueBuffer = dialogues["drawer"].slice();
+        }
+    }
+}
+
 function processKeys() {
     playerMoving = false;
     playerPushing = false;
@@ -538,21 +588,8 @@ function processKeys() {
     // Interact
     if (keyMap["j"]) {
         keyMap["j"] = false;
-
-        var hpsize = psize / 2;
-        var x = Math.floor((playerPosX + hpsize + (playerDirection[0] * hpsize) - (playerDirection[1] * hpsize) - playerDirection[1]) / tsize);
-        var y = Math.floor((playerPosY + hpsize + (playerDirection[2] * hpsize) - (playerDirection[3] * hpsize) - playerDirection[3]) / tsize);
-        var key = String(mapIndex) + String(mapXCoord) + String(mapYCoord) + String(x) + String(y);
-
-        console.info(key);
-
-        if (dialogues[key]) {
-            dialogueBuffer = dialogues[key].slice();
-
-            if ((signpostTiles[mapIndex].indexOf(locale[x][y]) >= 0) && (playerDirection[3] == 0)) {
-                dialogueBuffer = dialogues["unreadable"].slice();
-            }
-
+        interact();
+        if (dialogueBuffer.length > 0) {
             dialogueFirstLine = dialogueBuffer.pop();
             dialogueSecondLine = dialogueBuffer.pop();
             inputDelayBuffer = dialogueInputDelay;
@@ -560,6 +597,7 @@ function processKeys() {
         }
     }
 
+    // Movement
     if (keyMap["w"]) {
         playerDirection = [0,0,0,1];
         playerStep("y");
@@ -607,6 +645,21 @@ function processKeys() {
             enterPortal();
             return;
         }
+    }
+
+    // Special cases
+    // Kennel World
+    if (keyMap["a"] && keyMap["s"]) {
+        if (mapIndex == 0 && mapXCoord == 1 && mapYCoord == 2 && playerPosX == 60 && playerPosY == 24) {
+            enterPortal();
+            tileset = tilesets[0];
+            return;
+        }
+    }
+
+    // Screen warp
+    if ((transitionXBuffer == 0) && (transitionYBuffer == 0)) {
+        keyMap["-"] = false;
     }
 }
 
