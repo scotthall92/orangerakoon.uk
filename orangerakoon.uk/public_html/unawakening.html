@@ -490,6 +490,7 @@ function playerStep(collinearAxis) {
         var negativeCollinearDirection = playerDirection[1];
         var collinearTransitionBuffer = transitionXBuffer;
         var screenTileMax = screenTileWidth;
+        var orthogonalMovement = keyMap["w"] || keyMap["s"];
     } else if (collinearAxis == "y") {
         var collinearPos = playerPosY;
         var orthogonalPos = playerPosX;
@@ -498,6 +499,7 @@ function playerStep(collinearAxis) {
         var negativeCollinearDirection = playerDirection[3];
         var collinearTransitionBuffer = transitionYBuffer;
         var screenTileMax = screenTileHeight;
+        var orthogonalMovement = keyMap["a"] || keyMap["d"];
     } else {
         throw "Collinear axis must be 'x' or 'y'";
     }
@@ -621,6 +623,11 @@ function playerStep(collinearAxis) {
     } else if (newCollinearPos >= maxCollinearPos) {
         newCollinearPos = maxCollinearPos;
         newCollinearTransitionBuffer = collinearTransitionBuffer + 1;
+    }
+
+    // Fix to prevent corner bump with diagonal movement
+    if (orthogonalMovement) {
+        newOrthogonalPos = orthogonalPos;
     }
 
     if (collinearAxis == "x") {
