@@ -79,6 +79,8 @@ var maxPosY = (tsize * screenTileHeight) - psize;
 
 var inputDelayBuffer = 0;
 
+var reverseInputDelay = 3;
+
 var transitionBufferMax = 6;
 var transitionXBuffer = 0;
 var transitionYBuffer = 0;
@@ -87,25 +89,32 @@ var transitionInputDelay = 6;
 var portalBufferMax = 6;
 var portalBuffer = 0;
 var kennelBuffer = 0;
-var portalInputDelay = 6;
+var portalInputDelay = 12;
 
 var dialogueBuffer = [];
-var dialogueInputDelay = 6;
+var dialogueInputDelay = 10;
 var dialogueFirstLine = "";
 var dialogueSecondLine = "";
 
 var keyMap = {};
 
 function keydown(event) {
-    keyMap[event.key] = true;
+    if (!event.repeat) {
+        keyMap[event.key] = true;
+    }
 }
 
 function keyup(event) {
     keyMap[event.key] = false;
 }
 
+function blur(event) {
+    keyMap = {};
+}
+
 document.onkeydown = keydown;
 document.onkeyup = keyup;
+document.body.onblur = blur;
 
 var passableTiles = [
     ["22","03","23","04","14","24","34","25","35","45","55","46","07","17","27","67","77","08","18","28","68","78","09","19","29","69","79"],
@@ -285,7 +294,7 @@ var portals = {
     "11345": [0, 1, 4, 2, 3],
     "04442": [1, 2, 3, 3, 4],
     "12335": [0, 4, 4, 4, 3],
-    "01242": [1, 1, 2, 7, 0],
+    "01252": [1, 1, 2, 7, 0],
 };
 
 function resizeCanvas(increment) {
@@ -378,7 +387,7 @@ function transitionScreen(xincrement, yincrement) {
 }
 
 function enterPortal() {
-    var xCoord = Math.floor((playerPosX + (psize - 1) * playerDirection[0]) / tsize) + playerDirection[0] - playerDirection[1];
+    var xCoord = Math.floor((playerPosX + (psize / 2)) / tsize);
     var yCoord = Math.floor((playerPosY + (psize - 1) * playerDirection[2]) / tsize) + playerDirection[2] - playerDirection[3];
     key = String(mapIndex) + String(mapXCoord) + String(mapYCoord) + String(xCoord) + String(yCoord);
 
@@ -456,11 +465,11 @@ function drawPlayer() {
         sx = psize * 3;
     }
     if (playerPushing) {
-        sy = psize * 2;
+        sy = sy + (psize * 2);
     }
     if (playerDown) {
         sx = psize * 4;
-        sy = psize * 2;
+        sy = psize * 3;
     }
     ctx.drawImage(player, sx, sy, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
 
@@ -517,8 +526,12 @@ function drawDialogue() {
     }
 }
 
-function playerStep(collinearAxis) {
-    playerMoving = true;
+function playerStep(collinearAxis, reverse) {
+    if (reverse) {
+        inputDelayBuffer = reverseInputDelay;
+        return;
+    }
+
     playerPushing = false;
 
     if (collinearAxis == "x") {
@@ -600,22 +613,33 @@ function playerStep(collinearAxis) {
             }
         }
 
-        var portalStart = portalTiles[mapIndex].indexOf(startTile) >= 0;
-        var portalEnd = portalTiles[mapIndex].indexOf(endTile) >= 0;
-        if (portalStart && portalEnd) {
-            portalBuffer = portalBuffer + 1;
-            playerPushing = false;
-        } else if (portalStart && !portalEnd) {
-            if (portalTiles[mapIndex].indexOf(end2Tile) >= 0) {
-                newOrthogonalPos = orthogonalPos - 1;
+        // Portals only in y direction
+        if (collinearAxis == "y") {
+            var portalStart = portalTiles[mapIndex].indexOf(startTile) >= 0;
+            var portalEnd = portalTiles[mapIndex].indexOf(endTile) >= 0;
+            if (portalStart && portalEnd) {
+                portalBuffer = portalBuffer + 1;
+                playerPushing = false;
+            } else if (portalStart && !portalEnd) {
+                if (portalTiles[mapIndex].indexOf(end2Tile) >= 0) {
+                    newOrthogonalPos = orthogonalPos - 1;
+                    portalBuffer = portalBuffer + 1;
+                    playerPushing = false;
+                } else {
+                    portalBuffer = 0;
+                }
+            } else if (!portalStart && portalEnd) {
+                if (portalTiles[mapIndex].indexOf(start2Tile) >= 0) {
+                    newOrthogonalPos = orthogonalPos + 1;
+                    portalBuffer = portalBuffer + 1;
+                    playerPushing = false;
+                } else {
+                    portalBuffer = 0;
+                }
+            } else {
+                portalBuffer = 0;
             }
-            playerPushing = false;
-        } else if (!portalStart && portalEnd) {
-            if (portalTiles[mapIndex].indexOf(start2Tile) >= 0) {
-                newOrthogonalPos = orthogonalPos + 1;
-            }
-            playerPushing = false;
-        } else {
+        } else if (collinearAxis == "x" && !orthogonalMovement) {
             portalBuffer = 0;
         }
 
@@ -651,6 +675,8 @@ function playerStep(collinearAxis) {
             if (!npcStart2) {
                 newOrthogonalPos = orthogonalPos + 1;
             }
+        } else {
+            playerMoving = true;
         }
     }
 
@@ -664,9 +690,11 @@ function playerStep(collinearAxis) {
         newCollinearTransitionBuffer = collinearTransitionBuffer + 1;
     }
 
-    // Fix to prevent corner bump with diagonal movement
+
     if (orthogonalMovement) {
+        // Fix to prevent corner bump with diagonal movement
         newOrthogonalPos = orthogonalPos;
+        playerMoving = true;
     }
 
     if (collinearAxis == "x") {
@@ -731,6 +759,8 @@ function interact() {
 }
 
 function processKeys() {
+    var lastPlayerDirection = playerDirection;
+
     playerMoving = false;
     playerPushing = false;
 
@@ -742,6 +772,7 @@ function processKeys() {
     // Dialogue overrides other input
     if (dialogueBuffer.length > 0) {
         if (keyMap["j"]) {
+            keyMap["j"] = false;
             dialogueFirstLine = dialogueSecondLine;
             dialogueSecondLine = dialogueBuffer.pop();
             inputDelayBuffer = dialogueInputDelay;
@@ -764,9 +795,9 @@ function processKeys() {
     }
 
     // Movement
-    if (keyMap["w"]) {
+    if (keyMap["w"] && !keyMap["s"]) {
         playerDirection = [0,0,0,1];
-        playerStep("y");
+        playerStep("y", lastPlayerDirection[2] == 1);
         if (transitionYBuffer < -transitionBufferMax) {
             transitionScreen(0, -1);
             return;
@@ -776,9 +807,9 @@ function processKeys() {
             return;
         }
     }
-    if (keyMap["s"]) {
+    if (keyMap["s"] && !keyMap["w"]) {
         playerDirection = [0,0,1,0];
-        playerStep("y");
+        playerStep("y", lastPlayerDirection[3] == 1);
         if (transitionYBuffer > transitionBufferMax) {
             transitionScreen(0, 1);
             return;
@@ -788,29 +819,24 @@ function processKeys() {
             return;
         }
     }
-    if (keyMap["a"]) {
+    if (keyMap["a"] && !keyMap["d"] && portalBuffer < 3) {
         playerDirection = [0,1,0,0];
-        playerStep("x");
+        playerStep("x", lastPlayerDirection[0] == 1);
         if (transitionXBuffer < -transitionBufferMax) {
             transitionScreen(-1, 0);
             return;
         }
-        if (portalBuffer > portalBufferMax) {
-            enterPortal();
-            return;
-        }
     }
-    if (keyMap["d"]) {
+    if (keyMap["d"] && !keyMap["a"] && portalBuffer < 3) {
         playerDirection = [1,0,0,0];
-        playerStep("x");
+        playerStep("x", lastPlayerDirection[1] == 1);
         if (transitionXBuffer > transitionBufferMax) {
             transitionScreen(1, 0);
             return;
         }
-        if (portalBuffer > portalBufferMax) {
-            enterPortal();
-            return;
-        }
+    }
+    if (!(keyMap["w"] || keyMap["s"])) {
+        portalBuffer = 0;
     }
 
     // Special cases
@@ -823,7 +849,8 @@ function processKeys() {
                 tileset = tilesets[0];
                 return;
             }
-
+        } else {
+            kennelBuffer = 0;
         }
     } else {
         kennelBuffer = 0;
