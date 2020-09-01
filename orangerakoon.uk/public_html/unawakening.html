@@ -51,10 +51,6 @@ var csize = 6;
 var screenTileWidth = 8;
 var screenTileHeight = 6;
 
-var stage = 0;
-var goal = "02132";
-var goals = [""];
-
 var mapXCoord = 0;
 var mapYCoord = 0;
 var locale = [];
@@ -69,6 +65,7 @@ var playerPosY = 0;
 var playerDirection = [0,0,1,0];  // +x,-x,+y,-y
 var playerMoving = false;
 var playerPushing = false;
+var playerDown = true;
 var playerAnimationFrame = 1;
 var playerAnimationBufferMax = 12;
 var playerAnimationBuffer = 0;
@@ -141,7 +138,7 @@ var outsideMap = {
     "22": "181818181818181818545454545454180354626262001023185433433301112318545434545454183434343418181818",
     "32": "181818181818180118133141511370801813304050137136031333533313713618181318131872821803181818232300",
     "42": "110111232301021090232323232301119123232323560010912323562356011192230010235600101000121123230111",
-    "03": "369118183434340183921818340318009118877622759701911818033418180091181834341818018480762275808080",
+    "03": "369118183434340183921818340318009118877622759701911844033418180091181834341818018480762275808080",
     "13": "110318031818180310626231615123181163633242522318102323335333231811181818181803188080808080808080",
     "23": "181818181818181803708022902323231871464691232318237282829223181803182323231818038080808080808080",
     "33": "232323232323230123131313131323002313131313132301231313131313230023232323232323018080808080808090",
@@ -176,24 +173,8 @@ var tileset = tilesets[mapIndex];
 
 var characters = " ABCDEFGHIJKLMNOPQRSTUVWXYZ#abcdefghijklmnopqrstuvwxyz0123456789.,!?-':*^>_<";
 
-// Index in each staged list defines which NPC, as commented
-// Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
-var npcs = [
-    [
-        [0, 3, 0, 2, 3],    // Madame
-        [1, 1, 3, 5, 2],    // Croc
-        [0, 3, 4, 4, 3],    // Monkey
-        [1, 1, 1, 5, 2],    // Shopkeeper
-    ],
-    [
-        [0, 3, 0, 2, 3],    // Madame
-        [1, 1, 3, 5, 2],    // Croc
-        [0, 4, 0, 2, 2],    // Monkey
-        [1, 1, 1, 5, 2],    // Shopkeeper
-    ],
-];
-
 var dialoguesDefault = {
+    "init": ["", "move:", ":use WASD to", "interact:", ":press J to"],
     "signpost": ["", "this angle!", "sign from", "read the", "You can't"],
     "heavy": ["", "this!", "can't lift", "definitely", ": Yep! You", "::::::::::::", "::::::::::::", "::::::::::::", "heavy! :::::", "looks pretty", "Oof! This"],
     "drawer": ["", "drawers?", "people's", "in other", "always look", "Do you"],
@@ -201,6 +182,7 @@ var dialoguesDefault = {
 // Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
 var dialoguesStatic = {
     "00415": ["", "place:", "was a secret", "This cliff"],
+    "00323": ["", "Library", "pond - Bema", "the fishing", "Find us by", "We've moved!"],
     "01353": ["", "are closed:", "The curtains", ":Huh?"],
     "02132": ["", "move.", "heavy to", "It's too", ": :", ":"],
     "00241": ["", "    Village", " >  Bema", "    Woods", " ^  Endless"],
@@ -221,12 +203,61 @@ var dialoguesStatic = {
 };
 var dialoguesStaged = [
     {
-        "03023": ["", "here yet.", "can't go in", "Sorry, you"],
+        "10222": ["", "the beach.", "Get back to", "doing here?!", "What are you"], // Madame
+        "11352": ["", "can find!", "see what you", "- you should", "beach lately", "up on the", "been washing", "things have", "Lots of"],  // Croc
+        "03023": ["", "here yet.", "can't go in", "Sorry, you"],    // Raccoon
+        "03443": ["", "night, ko ko!", "storm last", "Ook! Big"],   // Monkey
+        "03454": ["", "came from.", "book this", "find the", "You should", "torn page!", "You got a", "the bottle:", "something in", "There's"],   // Bottle
+        "00341": ["", "the beach:", "begins at", "Your quest", "Hoot! Hoot!"],  // Owl
     },
     {
-        "03023": ["", "go in here.", "still can't", "Sorry, you"],
+        "10133": ["", "from there.", "is just up", "The library", "Keep going!", "", "Karl", "Last post by", "", "------------", "grcade.co.uk", "", ":: *beep*"],  // Computer
+        "10222": ["", "of here.", "It's north", "The library?"], // Madame
+        "11352": ["", "television.", "I only like", ":Books?", "I own it!", "my house!", "Welcome to"],  // Croc
+        "03023": ["", "here yet.", "can't go in", "Sorry, you"],  // Raccoon
+        "10030": ["", "in this?", "interested", "Now who'd be", "recipe book!", "You got a", "missing:", "with a page", "book here", "There's a"],    // Bookcase goal
+        "03443": ["", "koko miss?", "Ook? What"],   // Monkey
+    },
+    {
+        "01064": ["", "development.", "still under", "The rest is", "the moment!", "can get at", "as far you", "That's about"], // Raccoon
     },
 ];
+
+// Index in each staged list defines which NPC, as commented
+// Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
+var npcs = [
+    [
+        [1, 0, 2, 2, 2],    // Madame
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Monkey
+        [1, 1, 1, 5, 2],    // Shopkeeper
+        [0, 3, 4, 5, 4],    // Bottle
+        [0, 0, 3, 4, 1],    // Owl
+        [0, 3, 0, 2, 3],    // Raccoon
+    ],
+    [
+        [1, 0, 2, 2, 2],    // Madame
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Monkey
+        [1, 1, 1, 5, 2],    // Shopkeeper
+        [9, 3, 4, 5, 4],    // Bottle
+        [9, 0, 0, 0, 0],    // Owl
+        [0, 3, 0, 2, 3],    // Raccoon
+    ],
+    [
+        [1, 0, 2, 1, 3],    // Madame
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Monkey
+        [1, 1, 1, 5, 2],    // Shopkeeper
+        [9, 0, 0, 0, 0],    // Bottle
+        [9, 0, 0, 0, 0],    // Owl
+        [0, 1, 0, 6, 4],    // Raccoon
+    ],
+];
+
+var stage = 0;
+var goal = "03454";
+var goals = ["", "10030"];
 
 // Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
 var portals = {
@@ -260,6 +291,7 @@ var portals = {
 function resizeCanvas(increment) {
     scale = scale + increment;
     if (scale < 1) { scale = 1; }
+    if (scale > 20) { scale = 20; }
     c.width = screenTileWidth * tsize * scale;
     c.height = screenTileHeight * tsize * scale;
     ctx.imageSmoothingEnabled = false;
@@ -273,6 +305,9 @@ function init() {
     mapYCoord = 4;
     playerPosX = 5 * tsize;
     playerPosY = 4 * tsize;
+    dialogueBuffer = dialoguesDefault["init"].slice();
+    dialogueFirstLine = dialogueBuffer.pop();
+    dialogueSecondLine = dialogueBuffer.pop();
 
     update();
 }
@@ -421,6 +456,10 @@ function drawPlayer() {
         sx = psize * 3;
     }
     if (playerPushing) {
+        sy = psize * 2;
+    }
+    if (playerDown) {
+        sx = psize * 4;
         sy = psize * 2;
     }
     ctx.drawImage(player, sx, sy, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
@@ -709,6 +748,8 @@ function processKeys() {
         }
         return;
     }
+
+    playerDown = false;
 
     // Interact
     if (keyMap["j"]) {
