@@ -40,6 +40,8 @@ var scale = 2;
 var fps = 60;
 var mspf = 1000 / fps; // ms per frame
 
+var frameCount3 = 1;
+
 var tilesets = [document.getElementById("tileset1"), document.getElementById("tileset2")];
 var tsize = 12;
 
@@ -341,6 +343,10 @@ function update() {
     var start = Date.now();
 
     // Do stuff
+    frameCount3 = frameCount3 + 1;
+    if (frameCount3 > 3) {
+        frameCount3 = 1;
+    }
     processKeys();
     drawScreen();
 
@@ -753,7 +759,13 @@ function playerStep(collinearAxis, reverse) {
     if (orthogonalMovement) {
         // Fix to prevent corner bump with diagonal movement
         newOrthogonalPos = orthogonalPos;
+        // Diagonal movement is always moving
         playerMoving = true;
+        // Ignore every third frame of diagonal movement
+        if (frameCount3 == 3) {
+            newCollinearPos = collinearPos;
+            newOrthogonalPos = orthogonalPos;
+        }
     }
 
     if (collinearAxis == "x") {
