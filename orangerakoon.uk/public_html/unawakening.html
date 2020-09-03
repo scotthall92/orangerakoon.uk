@@ -72,6 +72,9 @@ var playerAnimationFrame = 1;
 var playerAnimationBufferMax = 12;
 var playerAnimationBuffer = 0;
 
+var wasMovingX = 0;
+var wasMovingY = 0;
+
 var npcAnimationFrame = 1;
 var npcAnimationBufferMax = 12;
 var npcAnimationBuffer = 0;
@@ -759,12 +762,26 @@ function playerStep(collinearAxis, reverse) {
     if (orthogonalMovement) {
         // Fix to prevent corner bump with diagonal movement
         newOrthogonalPos = orthogonalPos;
+
         // Diagonal movement is always moving
         playerMoving = true;
+
         // Ignore every third frame of diagonal movement
+        // Except when y movement is blocked
+        if (collinearAxis == "x") {
+            wasMovingX = newCollinearPos - collinearPos;;
+        } else if (collinearAxis == "y") {
+            wasMovingY = newCollinearPos - collinearPos;;
+        }
         if (frameCount3 == 3) {
             newCollinearPos = collinearPos;
             newOrthogonalPos = orthogonalPos;
+
+            if (collinearAxis == "x") {
+                if (wasMovingX && !wasMovingY) {
+                    newCollinearPos = collinearPos + wasMovingX;
+                }
+            }
         }
     }
 
@@ -831,6 +848,9 @@ function interact() {
 
 function processKeys() {
     var lastPlayerDirection = playerDirection;
+
+    wasMovingX = 0;
+    wasMovingY = 0;
 
     playerMoving = false;
     playerPushing = false;
