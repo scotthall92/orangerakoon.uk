@@ -193,7 +193,7 @@ var characters = " ABCDEFGHIJKLMNOPQRSTUVWXYZ#abcdefghijklmnopqrstuvwxyz01234567
 var dialoguesDefault = {
     "init": ["", "move:", ":use WASD to", "interact:", ":press J to"],
     "signpost": ["", "this angle!", "sign from", "read the", "You can't"],
-    "heavy": ["", "this!", "can't lift", "definitely", ": Yep! You", "::::::::::::", "::::::::::::", "::::::::::::", "heavy! :::::", "looks pretty", "Oof! This"],
+    "heavy": ["", "this!", "can't lift", "definitely", "Yep! You", "", ": : :", "", "heavy!", "looks pretty", "Oof! This"],
     "drawer": ["", "drawers?", "people's", "in other", "always look", "Do you"],
 };
 // Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
@@ -217,34 +217,50 @@ var dialoguesStatic = {
     "10040": ["", "helpful:", "wasn't very", "Well that", "interact!'", "Press J to", "move around!", "'Use WASD to", "on controls.", "It's a book"],
     "10050": ["", "Good advice!", "answers.'", "online for", "searching", "stuck, try", "'If you get"],
     "10060": ["", "library?", "in a public", ":Why is this", "of the Land'", "Mysteries", "Secrets and", "'Forbidden"],
+    "12231": ["", "sleeping!", "time to be", "This is no"],
 };
 var dialoguesStaged = [
+    // Stage 0 - Bottle
     {
         "10222": ["", "the beach.", "Get back to", "doing here?!", "What are you"], // Madame
         "11352": ["", "can find!", "see what you", "- you should", "beach lately", "up on the", "been washing", "things have", "Lots of"],  // Croc
         "03023": ["", "here yet.", "can't go in", "Sorry, you"],    // Raccoon
         "03443": ["", "night, ko ko!", "storm last", "Ook! Big"],   // Monkey
         "03454": ["", "came from.", "book this", "find the", "You should", "torn page!", "You got a", "the bottle:", "something in", "There's"],   // Bottle
-        "00341": ["", "the beach:", "begins at", "Your quest", "Hoot! Hoot!"],  // Owl
+        "00341": ["", "talk again.", "before we", "the beach", "return to", "You should", "we met.", "since last", "some time", "It has been", "Hoot! Hoot!"],  // Owl
         "12132": ["", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],   // Witch
-        "00250": ["", ":mushrooms:", ":Zzz: :mmm:"], // Sleeping T
+        "00250": ["", ":mushrooms:", ":Zzz: :mmm:"], // Sleeping Mushroom Man
     },
+    // Stage 1 - Torn page
     {
         "10133": ["", "from there.", "is just up", "The library", "Keep going!", "", "Karl", "Last post by", "", "------------", "grcade.co.uk", "", ":: *beep*"],  // Computer
         "10222": ["", "of here.", "It's north", "The library?"], // Madame
-        "11352": ["", "television.", "I only like", ":Books?", "I own it!", "my house!", "Welcome to"],  // Croc
+        "11352": ["", "later!", "see me again", "Come back to", "the cliffs.", "is just past", "Bema Village"],  // Croc
         "03023": ["", "here yet.", "can't go in", "Sorry, you"],  // Raccoon
         "10030": ["", "in this?", "interested", "Now who'd be", "recipe book!", "You got a", "missing:", "with a page", "book here", "There's a"],    // Bookcase goal
         "03443": ["", "koko miss?", "Ook? What"],   // Monkey
+        "00351": ["", "Be careful!", "the same.", "are rarely", "Two dreams", "I remember.", "is not as", "The island", "Hoot! Hoot!"], // Owl
         "12132": ["", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],   // Witch
-        "00250": ["", ":mushrooms:", ":Zzz: :mmm:"], // Sleeping T
+        "00250": ["", ":mushrooms:", ":Zzz: :mmm:"], // Sleeping Mushroom Man
     },
+    // Stage 2 - Recipe book
     {
         "01064": ["", "development.", "still under", "The rest is", "the moment!", "can get at", "as far you", "That's about"], // Raccoon
+        "11352": ["", "back later!", "I said come", "already?!", "Back again"], // Croc
     },
+    // Stage 3 - Mushroom picking
     {
 
     },
+    // Stage 4 - Mushroom
+    {
+
+    },
+    // Stage 5 - Potion
+    {
+
+    },
+    // Stage 6 - Old broom
     {
 
     },
@@ -253,70 +269,173 @@ var dialoguesStaged = [
 // Index in each staged list defines which NPC, as commented
 // Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
 var npcs = [
+    // Stage 0 - Bottle
     [
+        [9, 0, 0, 0, 0],    // Dreamer
+        [9, 0, 0, 0, 0],    // Mushroom Man
+        [0, 0, 2, 5, 0],    // Sleeping Mushroom Man
         [1, 0, 2, 2, 2],    // Madame
-        [1, 1, 3, 5, 2],    // Croc
-        [0, 3, 4, 4, 3],    // Monkey
+        [9, 0, 0, 0, 0],    // Bow Bow
+        [9, 0, 0, 0, 0],    // Trendy Man
+        [9, 0, 0, 0, 0],    // Mama
+        [9, 0, 0, 0, 0],    // Papa
         [1, 1, 1, 5, 2],    // Shopkeeper
-        [0, 3, 4, 5, 4],    // Bottle
+        [1, 2, 1, 3, 2],    // Witch
+        [1, 2, 1, 3, 3],    // Caldron
+        [9, 0, 0, 0, 0],    // Grandma
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Koko
+        [9, 0, 0, 0, 0],    // Ghost
+        [9, 0, 0, 0, 0],    // Fox
+        [0, 3, 0, 2, 3],    // Raccoon
         [0, 0, 3, 4, 1],    // Owl
-        [0, 3, 0, 2, 3],    // Raccoon
-        [1, 2, 1, 3, 2],    // Witch
-        [1, 2, 1, 3, 3],    // Caldron
-        [0, 0, 2, 5, 0],    // Sleeping Mushroom Man
-        [9, 0, 0, 0, 0],    // Mushroom Man
+        [9, 0, 0, 0, 0],    // Mushroom
+        [9, 0, 0, 0, 0],    // Signpost
+        [0, 3, 4, 5, 4],    // Bottle
     ],
+    // Stage 1 - Torn page
     [
+        [9, 0, 0, 0, 0],    // Dreamer
+        [9, 0, 0, 0, 0],    // Mushroom Man
+        [0, 0, 2, 5, 0],    // Sleeping Mushroom Man
         [1, 0, 2, 2, 2],    // Madame
-        [1, 1, 3, 5, 2],    // Croc
-        [0, 3, 4, 4, 3],    // Monkey
+        [9, 0, 0, 0, 0],    // Bow Bow
+        [9, 0, 0, 0, 0],    // Trendy Man
+        [9, 0, 0, 0, 0],    // Mama
+        [9, 0, 0, 0, 0],    // Papa
         [1, 1, 1, 5, 2],    // Shopkeeper
-        [9, 3, 4, 5, 4],    // Bottle
-        [9, 0, 0, 0, 0],    // Owl
+        [1, 2, 1, 3, 2],    // Witch
+        [1, 2, 1, 3, 3],    // Caldron
+        [9, 0, 0, 0, 0],    // Grandma
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Koko
+        [9, 0, 0, 0, 0],    // Ghost
+        [9, 0, 0, 0, 0],    // Fox
         [0, 3, 0, 2, 3],    // Raccoon
-        [1, 2, 1, 3, 2],    // Witch
-        [1, 2, 1, 3, 3],    // Caldron
-        [0, 0, 2, 5, 0],    // Sleeping Mushroom Man
-        [9, 0, 0, 0, 0],    // Mushroom Man
+        [0, 0, 3, 5, 1],    // Owl
+        [9, 0, 0, 0, 0],    // Mushroom
+        [9, 0, 0, 0, 0],    // Signpost
+        [9, 3, 4, 5, 4],    // Bottle
     ],
+    // Stage 2 - Recipe book
     [
-        [1, 0, 2, 1, 3],    // Madame
-        [1, 1, 3, 5, 2],    // Croc
-        [0, 3, 4, 4, 3],    // Monkey
-        [1, 1, 1, 5, 2],    // Shopkeeper
-        [9, 0, 0, 0, 0],    // Bottle
-        [9, 0, 0, 0, 0],    // Owl
-        [0, 1, 0, 6, 4],    // Raccoon
-        [1, 2, 1, 3, 2],    // Witch
-        [1, 2, 1, 3, 3],    // Caldron
-        [9, 0, 0, 0, 0],    // Sleeping Mushroom Man
+        [9, 0, 0, 0, 0],    // Dreamer
         [0, 0, 1, 5, 1],    // Mushroom Man
-    ],
-    [
-        [1, 0, 2, 1, 3],    // Madame
-        [1, 1, 3, 5, 2],    // Croc
-        [0, 3, 4, 4, 3],    // Monkey
+        [9, 0, 0, 0, 0],    // Sleeping Mushroom Man
+        [1, 0, 2, 2, 2],    // Madame
+        [9, 0, 0, 0, 0],    // Bow Bow
+        [9, 0, 0, 0, 0],    // Trendy Man
+        [9, 0, 0, 0, 0],    // Mama
+        [9, 0, 0, 0, 0],    // Papa
         [1, 1, 1, 5, 2],    // Shopkeeper
-        [9, 0, 0, 0, 0],    // Bottle
-        [9, 0, 0, 0, 0],    // Owl
-        [0, 1, 0, 6, 4],    // Raccoon
         [1, 2, 1, 3, 2],    // Witch
         [1, 2, 1, 3, 3],    // Caldron
-        [9, 0, 0, 0, 0],    // Sleeping Mushroom Man
-        [0, 0, 0, 3, 4],    // Mushroom Man
-    ],
-    [
-        [1, 0, 2, 1, 3],    // Madame
+        [9, 0, 0, 0, 0],    // Grandma
         [1, 1, 3, 5, 2],    // Croc
-        [0, 3, 4, 4, 3],    // Monkey
-        [1, 1, 1, 5, 2],    // Shopkeeper
-        [9, 0, 0, 0, 0],    // Bottle
+        [0, 3, 4, 4, 3],    // Koko
+        [9, 0, 0, 0, 0],    // Ghost
+        [9, 0, 0, 0, 0],    // Fox
+        [0, 3, 0, 2, 3],    // Raccoon
         [9, 0, 0, 0, 0],    // Owl
-        [0, 1, 0, 6, 4],    // Raccoon
+        [9, 0, 0, 0, 0],    // Mushroom
+        [9, 0, 0, 0, 0],    // Signpost
+        [9, 0, 0, 0, 0],    // Bottle
+    ],
+    // Stage 3 - Mushroom picking
+    [
+        [9, 0, 0, 0, 0],    // Dreamer
+        [0, 0, 0, 3, 4],    // Mushroom Man
+        [9, 0, 0, 0, 0],    // Sleeping Mushroom Man
+        [1, 0, 2, 2, 2],    // Madame
+        [9, 0, 0, 0, 0],    // Bow Bow
+        [9, 0, 0, 0, 0],    // Trendy Man
+        [9, 0, 0, 0, 0],    // Mama
+        [9, 0, 0, 0, 0],    // Papa
+        [1, 1, 1, 5, 2],    // Shopkeeper
         [1, 2, 1, 3, 2],    // Witch
         [1, 2, 1, 3, 3],    // Caldron
-        [9, 0, 0, 0, 0],    // Sleeping Mushroom Man
+        [9, 0, 0, 0, 0],    // Grandma
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Koko
+        [9, 0, 0, 0, 0],    // Ghost
+        [9, 0, 0, 0, 0],    // Fox
+        [0, 3, 0, 2, 3],    // Raccoon
+        [9, 0, 0, 0, 0],    // Owl
+        [9, 0, 0, 0, 0],    // Mushroom
+        [9, 0, 0, 0, 0],    // Signpost
+        [9, 0, 0, 0, 0],    // Bottle
+    ],
+    // Stage 4 - Mushroom
+    [
+        [9, 0, 0, 0, 0],    // Dreamer
         [0, 0, 0, 3, 4],    // Mushroom Man
+        [9, 0, 0, 0, 0],    // Sleeping Mushroom Man
+        [1, 0, 2, 2, 2],    // Madame
+        [9, 0, 0, 0, 0],    // Bow Bow
+        [9, 0, 0, 0, 0],    // Trendy Man
+        [9, 0, 0, 0, 0],    // Mama
+        [9, 0, 0, 0, 0],    // Papa
+        [1, 1, 1, 5, 2],    // Shopkeeper
+        [1, 2, 1, 3, 2],    // Witch
+        [1, 2, 1, 3, 3],    // Caldron
+        [9, 0, 0, 0, 0],    // Grandma
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Koko
+        [9, 0, 0, 0, 0],    // Ghost
+        [9, 0, 0, 0, 0],    // Fox
+        [0, 3, 0, 2, 3],    // Raccoon
+        [9, 0, 0, 0, 0],    // Owl
+        [9, 0, 0, 0, 0],    // Mushroom
+        [9, 0, 0, 0, 0],    // Signpost
+        [9, 0, 0, 0, 0],    // Bottle
+    ],
+    // Stage 5 - Potion
+    [
+        [9, 0, 0, 0, 0],    // Dreamer
+        [0, 0, 0, 3, 4],    // Mushroom Man
+        [9, 0, 0, 0, 0],    // Sleeping Mushroom Man
+        [1, 0, 2, 2, 2],    // Madame
+        [9, 0, 0, 0, 0],    // Bow Bow
+        [9, 0, 0, 0, 0],    // Trendy Man
+        [9, 0, 0, 0, 0],    // Mama
+        [9, 0, 0, 0, 0],    // Papa
+        [1, 1, 1, 5, 2],    // Shopkeeper
+        [1, 2, 1, 3, 2],    // Witch
+        [1, 2, 1, 3, 3],    // Caldron
+        [9, 0, 0, 0, 0],    // Grandma
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Koko
+        [9, 0, 0, 0, 0],    // Ghost
+        [9, 0, 0, 0, 0],    // Fox
+        [0, 3, 0, 2, 3],    // Raccoon
+        [9, 0, 0, 0, 0],    // Owl
+        [9, 0, 0, 0, 0],    // Mushroom
+        [9, 0, 0, 0, 0],    // Signpost
+        [9, 0, 0, 0, 0],    // Bottle
+    ],
+    // Stage 6 - Old broom
+    [
+        [9, 0, 0, 0, 0],    // Dreamer
+        [0, 0, 0, 3, 4],    // Mushroom Man
+        [9, 0, 0, 0, 0],    // Sleeping Mushroom Man
+        [1, 0, 2, 2, 2],    // Madame
+        [9, 0, 0, 0, 0],    // Bow Bow
+        [9, 0, 0, 0, 0],    // Trendy Man
+        [9, 0, 0, 0, 0],    // Mama
+        [9, 0, 0, 0, 0],    // Papa
+        [1, 1, 1, 5, 2],    // Shopkeeper
+        [1, 2, 1, 3, 2],    // Witch
+        [1, 2, 1, 3, 3],    // Caldron
+        [9, 0, 0, 0, 0],    // Grandma
+        [1, 1, 3, 5, 2],    // Croc
+        [0, 3, 4, 4, 3],    // Koko
+        [9, 0, 0, 0, 0],    // Ghost
+        [9, 0, 0, 0, 0],    // Fox
+        [0, 3, 0, 2, 3],    // Raccoon
+        [9, 0, 0, 0, 0],    // Owl
+        [9, 0, 0, 0, 0],    // Mushroom
+        [9, 0, 0, 0, 0],    // Signpost
+        [9, 0, 0, 0, 0],    // Bottle
     ],
 ];
 
