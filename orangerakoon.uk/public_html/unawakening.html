@@ -210,7 +210,6 @@ var dialoguesStatic = {
     "04351": ["", "", "      <"],
     "04333": ["", "", "      >"],
     "04353": ["", "", "      ^"],
-    "10133": ["", "playing!", "Thanks for", "", "OrangeRKN", "Last post by", "", "------------", "grcade.co.uk", "", ":: *beep*"],
     "10010": ["", "put it back.", "boring. I'll", ":eh, sounds", "'Credits'"],
     "10020": ["", "quite funny!", "These are", "book. Heh!", "It's a joke"],
     "10030": ["", "expecting?", "were you", "books: what", "stacked with", "The shelf is"],
@@ -219,71 +218,368 @@ var dialoguesStatic = {
     "10060": ["", "library?", "in a public", ":Why is this", "of the Land'", "Mysteries", "Secrets and", "'Forbidden"],
     "12231": ["", "sleeping!", "time to be", "This is no"],
 };
-var dialoguesStaged = [
-    // Stage 0 - Bottle
-    {
-        "10133": ["", "already?", "you are here", "any hints if", "Do you need", "", "OrangeRKN", "Last post by", "", "------------", "grcade.co.uk", "", ":: *beep*"],   // Computer
-        "00250": ["", ":mushrooms:", ":mmm:", ":Zzz:"], // Sleeping Mushroom Man
-        "10222": ["", "the beach.", "Get back to", "doing here?!", "What are you"], // Madame
-        "01252": ["", "is it?", "playthrough,", "your first", "this isn't", ":Huh? Oh,"], // Trendy Man
-        "12132": ["", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],   // Witch
-        "11352": ["", "can find!", "see what you", "- you should", "beach lately", "up on the", "been washing", "things have", "Lots of"],  // Croc
-        "03443": ["", "night, ko ko!", "storm last", "Ook! Big"],   // Koko
-        "00341": ["", "back?", "should go", "I guess I", "", "Grr:", "Yip! Yip!"],  // Fox
-        "03023": ["", "here yet.", "can't go in", "Sorry, you"],    // Raccoon
-        "01453": ["", "awake:", "are finally", "Hoot! You"],  // Owl
-        "03454": ["", "came from.", "book this", "find the", "You should", "torn page!", "You got a", "the bottle:", "something in", "There's"],   // Bottle
-        "00014": ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],  // Mushroom
-    },
+var computerStartupDialogue = ["Last post by", "", "------------", "grcade.co.uk", "", ":: *beep*"];
+var dialoguesComputer = [
+    ["", "already?", "you are here", "any hints if", "Do you need", "", "OrangeRKN"],
+    ["", "from there.", "is just up", "The library", "Keep going!", "", "Karl"],
+    ["", "the village!", "the rest of", "exploring", "already? Try", "You're stuck", "", "Jenuall"],
+    ["", "the woods!", "growing in", "can be found", "odd things", "All sorts of", "", "Not a Growth"],
+    ["", "did you?", "forget that,", "You didn't", "her potion:", "witch with", "helping the", "You were", "", "Lime"],
+    ["", "in on her?", "should check", "Maybe you", "rather ill:", "been feeling", "Grandma has", "Apparently", "", "Jezo"],
+    ["", "to buy it!", "would love", "collector", "an antiques", "old: I bet", "looks pretty", "That broom", "", "Karl"],
+    ["", "hear!", "days, so I", "rage these", "is all the", "Dog fashion", "", "Jenuall"],
+    ["", "house.", "in the big", "talk to Mama", "just need to", "either! You", "this one", "didn't get", "game so I", "that other", "much about", "I don't know", "", "Not a Growth"],
+    ["", "village.", "east of the", "It's to the", "maze yet?", "signpost", "been to the", "Have you", "", "Lime"],
+    ["", "- it's true!", "just bananas", "fruits, not", "all kinds of", "Monkeys eat", "", "Jezo"],
+    ["", "now, right?", "swapped with", "you haven't", "people left", "aren't many", "There surely", "really well!", "You're doing", "", "Karl"],
+    ["", "Spooky!", "is haunted.", "people say", "that some", "the cliffs", "old house on", "There is an", "", "Jenuall"],
+    ["", "for playing!", "done! Thanks", "pretty much", "Wow, you're", "", "OrangeRKN"],
+];
+// Index in list defines which NPC, as commented
+var dialoguesNPCs = [
+    // Stage 0 - Find the bottle
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ":mushrooms:", ":mmm:", ":Zzz:"],    // 2 Sleeping Mushroom Man
+        ["", "the beach.", "Get back to", "doing here?!", "What are you"],    // 3 Madame
+        ["", "I love it!", "Fashion!", "Jewellery!"],    // 4 Bow Bow
+        ["", "is it?", "playthrough,", "your first", "this isn't", ":Huh? Oh,"],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", "can find!", "see what you", "- you should", "beach lately", "up on the", "been washing", "things have", "Lots of", "antiques!", "my house of", "Welcome to"],    // 12 Croc
+        ["", "night, ko ko!", "storm last", "Ook! Big"],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", "Grr:", "Yip! Yip!"],    // 15 Fox
+        ["", "here yet.", "can't go in", "Sorry, you"],    // 16 Raccoon
+        ["", "talk again.", "before we", "the beach", "return to", "You should", "it been?", "How long has", "Hoot! Hoot!"],    // 17 Owl
+        ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", "came from.", "book this", "find the", "You should", "torn page!", "You got a", "the bottle:", "something in", "There's"],    // 20 Bottle
+    ],
     // Stage 1 - Torn page
-    {
-        "10133": ["", "from there.", "is just up", "The library", "Keep going!", "", "Karl", "Last post by", "", "------------", "grcade.co.uk", "", ":: *beep*"],  // Computer
-        "00250": ["", ":mushrooms:", ":mmm:", ":Zzz:"], // Sleeping Mushroom Man
-        "10222": ["", "everywhere.", "her hair gets", "Bow! Even if", "darling Bow", "I love my"], // Madame
-        "01252": ["", "of here.", "it's north", "the library,", "want to find", "me. If you", "don't mind", ":Huh? Oh,"], // Trendy Man
-        "12132": ["", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],   // Witch
-        "11352": ["", "later!", "see me again", "Come back to", "the cliffs.", "is just past", "Bema Village"],  // Croc
-        "03443": ["", "koko miss?", "Ook? What"],   // Koko
-        "00351": ["", "Yip!", "Yip! Yip!"],  // Fox
-        "03023": ["", "here yet.", "can't go in", "Sorry, you"],  // Raccoon
-        "01453": ["", "the dreamer.", "must awaken", "island, you", "to leave the", "If you wish", "Hoot! Hoot!"],  // Owl
-        "00014": ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],  // Mushroom
-        "10030": ["", "in this?", "interested", "Now who'd be", "recipe book!", "You got a", "missing:", "with a page", "book here", "There's a"],    // Bookcase goal
-    },
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ":mushrooms:", ":mmm:", ":Zzz:"],    // 2 Sleeping Mushroom Man
+        ["", "bottles too.", "collecting", "have started", "Recently I", "Bow!", "darling Bow", "I love my"],    // 3 Madame
+        ["", "I love it!", "Fashion!", "Jewellery!"],    // 4 Bow Bow
+        ["", "of here.", "it's north", "the library,", "want to find", "me. If you", "don't mind", ":Huh? Oh,"],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", "antique!", "you find an", "see me when", "Come back to", "A torn page?", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
+        ["", "koko miss?", "Ook? What"],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
+        ["", "here yet.", "can't go in", "Sorry, you"],    // 16 Raccoon
+        ["", "your help!", "relying on", "Everyone is", "the dreamer.", "must awaken", "island, you", "to leave the", "If you wish", "Hoot! Hoot!"],    // 17 Owl
+        ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
     // Stage 2 - Recipe book
-    {
-        "01252": ["", "the forum!", "about it on", "here. I read", "secret back", "there is a", ":Huh? Oh,"],  // Trendy Man
-        "12132": ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a", ":hmm: :aha!", "that book!", "You, give me", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],   // Witch
-        "11352": ["", "back later!", "I said come", "already?!", "Back again"], // Croc
-        "01064": ["", "Be careful!", "the same.", "are rarely", "Two dreams", "I remember.", "is not as", "The island", "Hoot! Hoot!"], // Owl
-        "00014": ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],  // Mushroom
-    },
+    [
+        ["", ""],    // 0 Dreamer
+        ["", "mushrooms!", "pick some", "I'm off ta"],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", "I love it!", "Fashion!", "Jewellery!"],    // 4 Bow Bow
+        ["", "the forum!", "about it on", "here. I read", "secret back", "there is a", ":Huh? Oh,"],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a", ":hmm: :aha!", "that book!", "You, give me", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", "Be careful!", "the same.", "are rarely", "Two dreams", "I remember.", "is not as", "The island", "Hoot! Hoot!"],    // 17 Owl
+        ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
     // Stage 3 - Mushroom picking
-    {
-        "12132": ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a"],   // Witch
-    },
+    [
+        ["", ""],    // 0 Dreamer
+        ["", "this one.", "you can have", ":Oh, I guess", "mushroom!", "the BIGGEST", "I just found"],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a"],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
     // Stage 4 - Mushroom
-    {
-        "12132": ["", "yourself?", "drink it", ":Maybe don't", "potion!", "odd smelling", "You got an", "", ":", "", "special!", "up something", "I'll mix you", "the pot and", "Throw it in", "a mushroom!", "Ah, it has"],    // Witch
-    },
+    [
+        ["", ""],    // 0 Dreamer
+        ["", "mushrooms!", "I just love"],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", "yourself?", "drink it", ":Maybe don't", "potion!", "odd smelling", "You got an", "", ":", "", "special!", "up something", "I'll mix you", "the pot and", "Throw it in", "a mushroom!", "Ah, it has"],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
     // Stage 5 - Potion
-    {
-        "12132": ["", "anyone!", "will perk up", "That potion"],    // Witch
-    },
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", "anyone!", "will perk up", "That potion"],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", "it anymore!", "I don't need", "old broom -", "can take my", "better! You", "feeling much", "Yahey! I'm", ":", "*slurp*", ":", "me?", "medicine for", ":oh, is that"],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
     // Stage 6 - Old broom
-    {
-
-    },
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", ""],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", "in no time!", "on my feet", "I'll be back"],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
+    // Stage 7 - Necklace
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", "answer!", "no for an", "I won't take", "my ribbon?", "you swap for", "Please, will", "a necklace!", "Oh wow, what"],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", ""],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
+    // Stage 8 - Ribbon
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["",  "home!", "him to come", "please tell", "my husband,", "If you see", "Thank you!", "can have it?", "You say I", "little:", "my boys were", "me of when", "it reminds", "That ribbon:"],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", ""],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
+    // Stage 9 - Finding Papa
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", ""],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
+    // Stage 10 - Orange
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", ""],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
+    // Stage 11 - Bottle
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", ""],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ""],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
+    // Stage 12 - Flowers
+    [
+        ["", ""],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", ""],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ":thank you:", ":at peace:", ":I feel:", ":", ":for me?", ":flowers?"],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
+    // Stage 13 - Talked to ghost
+    [
+        ["", "to find me?", "Did you come", "one day.", "would return", "I knew you"],    // 0 Dreamer
+        ["", ""],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", ""],    // 3 Madame
+        ["", ""],    // 4 Bow Bow
+        ["", ""],    // 5 Trendy Man
+        ["", ""],    // 6 Mama
+        ["", ""],    // 7 Papa
+        ["", ""],    // 8 Shopkeeper
+        ["", ""],    // 9 Witch
+        ["", ""],    // 10 Caldron
+        ["", ""],    // 11 Grandma
+        ["", ""],    // 12 Croc
+        ["", ""],    // 13 Koko
+        ["", ":thank you:", ":at peace:", ":I feel:"],    // 14 Ghost
+        ["", ""],    // 15 Fox
+        ["", ""],    // 16 Raccoon
+        ["", ""],    // 17 Owl
+        ["", ""],    // 18 Mushroom
+        ["", ""],    // 19 Signpost
+        ["", ""],    // 20 Bottle
+    ],
     // Stage X - Dreamer
-    {
-        "03444": ["", "to find me?", "Did you come", "one day.", "would return", "I knew you"],
-    },
-    { "03444": ["", "isn't it?", "to forget,", "It is hard", "This island:"] },
-    { "03444": ["", "like it was.", "all to be", "I wanted it"] },
-    { "03444": ["", "the sea.", "bottle into", "I threw that", "stop you.", "I tried to"] },
-    { "03444": ["", "didn't you?", "all anyway,", "You fixed it"] },
-    { "03444": ["", "point?", "what's the", "thing then", "change any-", "If you can't"] },
-    { "03444": ["", "wake up now:", "I'm going to"] },
+    [["", "isn't it?", "to forget,", "It is hard", "This island:"]],
+    [["", ":How was it?", "like it was.", "all to be", "I wanted it"]],
+    [["", "the sea.", "bottle into", "I threw that", "stop you.", "I tried to"]],
+    [["", "didn't you?", "all anyway,", "You fixed it"]],
+    [["", "point?", "what's the", "thing then", "change any-", "If you can't"]],
+    [["", "wake up now:", "I'm going to"]],
 ];
 
 // Index in list defines which NPC, as commented
@@ -292,21 +588,21 @@ var npcs = [
     [9, 0, 0, 0, 0],    // 0 Dreamer
     [9, 0, 0, 0, 0],    // 1 Mushroom Man
     [0, 0, 2, 5, 0],    // 2 Sleeping Mushroom Man
-    [1, 0, 2, 2, 2],    // 3 Madame
+    [1, 0, 2, 2, 1],    // 3 Madame
     [1, 1, 2, 3, 3],    // 4 Bow Bow
     [0, 1, 2, 5, 2],    // 5 Trendy Man
     [1, 2, 0, 3, 2],    // 6 Mama
-    [0, 4, 2, 4, 3],    // 7 Papa
+    [1, 2, 0, 1, 3],    // 7 Papa
     [1, 1, 1, 5, 2],    // 8 Shopkeeper
     [1, 2, 1, 3, 2],    // 9 Witch
     [1, 2, 1, 3, 3],    // 10 Caldron
     [1, 0, 3, 4, 2],    // 11 Grandma
     [1, 1, 3, 5, 2],    // 12 Croc
     [0, 3, 4, 4, 3],    // 13 Koko
-    [9, 0, 0, 0, 0],    // 14 Ghost
-    [0, 0, 3, 5, 1],    // 15 Fox
+    [1, 2, 3, 5, 3],    // 14 Ghost
+    [0, 2, 3, 6, 3],    // 15 Fox
     [0, 3, 0, 2, 3],    // 16 Raccoon
-    [0, 1, 4, 5, 3],    // 17 Owl
+    [0, 0, 3, 4, 1],    // 17 Owl
     [0, 0, 0, 1, 4],    // 18 Mushroom
     [9, 0, 0, 0, 0],    // 19 Signpost
     [0, 3, 4, 5, 4],    // 20 Bottle
@@ -314,10 +610,11 @@ var npcs = [
 
 // npcs gets updated every stage according to this list
 var npcsDiffs = [
-    // Stage 0 - Bottle
+    // Stage 0 - Find the bottle
     {},
     // Stage 1 - Torn page
     {
+        17: [0, 1, 4, 5, 3],    // Owl
         20: [9, 3, 4, 5, 4],    // Bottle
     },
     // Stage 2 - Recipe book
@@ -325,12 +622,14 @@ var npcsDiffs = [
         1: [0, 0, 1, 5, 1],     // Mushroom Man
         2: [9, 0, 0, 0, 0],     // Sleeping Mushroom Man
         4: [1, 1, 2, 5, 3],     // Bow Bow
-        15: [0, 0, 3, 6, 1],    // Fox
+        13: [0, 4, 0, 2, 3],    // Koko
         17: [0, 1, 0, 6, 4],    // Owl
     },
     // Stage 3 - Mushroom picking
     {
         1: [0, 0, 0, 3, 4],     // Mushroom Man
+        17: [9, 0, 0, 0, 0],    // Owl
+        18: [9, 0, 0, 0, 0],    // Mushroom
     },
     // Stage 4 - Mushroom
     {},
@@ -338,10 +637,26 @@ var npcsDiffs = [
     {},
     // Stage 6 - Old broom
     {},
-    // Stage X - Dreamer
+    // Stage 7 - Necklace
+    {
+        7: [0, 4, 3, 1, 2],     // Papa
+    },
+    // Stage 8 - Ribbon
+    {},
+    // Stage 9 - Finding Papa
+    {},
+    // Stage 10 - Orange
+    {},
+    // Stage 11 - Bottle
+    {},
+    // Stage 12 - Flowers
+    {},
+    // Stage 13 - Talk to ghost
     {
         0: [0, 3, 4, 4, 4]      // Dreamer
     },
+    // Stage X - Dreamer
+    {},
     {},
     {},
     {},
@@ -351,8 +666,28 @@ var npcsDiffs = [
 ];
 
 var stage = 0;
-var goal = "03454";
-var goals = ["", "03444", "03444", "03444", "03444", "03444", "03444", "00432", "10342", "12132", "00034", "12132", "10030"];
+var goal = "03454"; // Bottle
+var goals = [
+    "",         // End
+    "03444",    // Dreamer
+    "03444",    // Dreamer
+    "03444",    // Dreamer
+    "03444",    // Dreamer
+    "03444",    // Dreamer
+    "03444",    // Dreamer
+    "12353",    // Ghost
+    "10221",    // Madame
+    "04023",    // Koko
+    "04312",    // Papa
+    "12032",    // Mama
+    "11253",    // Bow Bow
+    "11352",    // Croc
+    "10342",    // Grandma
+    "12132",    // Witch
+    "00034",    // Mushroom Man
+    "12132",    // Witch
+    "10030",    // Book
+];
 
 // Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
 var portals = {
@@ -864,6 +1199,14 @@ function playerStep(collinearAxis, reverse) {
     }
 }
 
+function advanceStage() {
+    stage = stage + 1;
+    goal = goals.pop();
+    Object.entries(npcsDiffs[stage]).forEach(
+        ([key, value]) => npcs[key] = value
+    );
+}
+
 function interact() {
     var hpsize = psize / 2;
     var x = Math.floor((playerPosX + hpsize + (playerDirection[0] * hpsize) - (playerDirection[1] * hpsize) - playerDirection[1]) / tsize);
@@ -875,10 +1218,6 @@ function interact() {
     // Check for dialogue
     if (dialoguesStatic[key]) {
         dialogueBuffer = dialoguesStatic[key].slice();
-    }
-
-    if (dialoguesStaged[stage][key]) {
-        dialogueBuffer = dialoguesStaged[stage][key].slice();
     }
 
     if ((0 <= x) && (x < screenTileWidth) && (0 <= y) && (y < screenTileHeight)) {
@@ -895,10 +1234,16 @@ function interact() {
         }
     }
 
-    // NPCs change direction to face player when interacted with
+    // Computer dialogue
+    if (key == "10133") {
+        dialogueBuffer = [...dialoguesComputer[stage], ...computerStartupDialogue];
+    }
+
     for (i = 0; i < localNPCs.length; i++) {
         var npc = npcs[localNPCs[i]];
         if (npc[3] == x && npc[4] == y) {
+            dialogueBuffer = dialoguesNPCs[stage][localNPCs[i]].slice();
+            // NPCs change direction to face player when interacted with
             for (j = 0; j < playerDirection.length; j++) {
                 if (playerDirection[j] == 1) {
                     localNPCDirections[i] = j;
@@ -909,11 +1254,7 @@ function interact() {
 
     // Advance stage if goal reached
     if (goal == key) {
-        stage = stage + 1;
-        goal = goals.pop();
-        Object.entries(npcsDiffs[stage]).forEach(
-            ([key, value]) => npcs[key] = value
-        );
+        advanceStage();
     }
 }
 
