@@ -30,6 +30,8 @@
 <img id="charset" src="charset.png" width=0 height=0>
 <img id="player" src="player.png" width=0 height=0>
 <img id="npcset" src="npcset.png" width=0 height=0>
+<img id="tileFadeMask" src="tile_fade_mask.png" width=0 height=0>
+<img id="tileWhiteMask" src="tile_white_mask.png" width=0 height=0>
 
 <script type="text/javascript">
 
@@ -44,6 +46,10 @@ var frameCount3 = 1;
 
 var tilesets = [document.getElementById("tileset1"), document.getElementById("tileset2")];
 var tsize = 12;
+
+var tileFadeMask = document.getElementById("tileFadeMask");
+var tileWhiteMask = document.getElementById("tileWhiteMask");
+var fadeOut = 0;
 
 var npcset = document.getElementById("npcset");
 
@@ -256,7 +262,7 @@ var dialoguesNPCs = [
         ["", ""],    // 14 Ghost
         ["", "Grr:", "Yip! Yip!"],    // 15 Fox
         ["", "here yet.", "can't go in", "Sorry, you"],    // 16 Raccoon
-        ["", "talk again.", "before we", "the beach", "return to", "You should", "it been?", "How long has", "Hoot! Hoot!"],    // 17 Owl
+        ["", "speak again.", "before we", "the beach", "return to", "You should", "it been?", "How long has", "Hoot! Hoot!"],    // 17 Owl
         ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],    // 18 Mushroom
         ["", ""],    // 19 Signpost
         ["", "came from.", "book this", "find the", "You should", "torn page!", "You got a", "the bottle:", "something in", "There's"],    // 20 Bottle
@@ -293,16 +299,16 @@ var dialoguesNPCs = [
         ["", ""],    // 3 Madame
         ["", "I love it!", "Fashion!", "Jewellery!"],    // 4 Bow Bow
         ["", "the forum!", "about it on", "here. I read", "secret back", "there is a", ":Huh? Oh,"],    // 5 Trendy Man
-        ["", ""],    // 6 Mama
+        ["", "of them.", "very proud", "now: we're", "all grown up", "Our boys are"],    // 6 Mama
         ["", ""],    // 7 Papa
         ["", ""],    // 8 Shopkeeper
         ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a", ":hmm: :aha!", "that book!", "You, give me", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "me this!", "can't sell", "book! You", "is a library", "Wait, this", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", "screen warp!", "press '-' to", "quick! Koko", "get here", "Ook! Koko"],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", "Be careful!", "the same.", "are rarely", "Two dreams", "I remember.", "is not as", "The island", "Hoot! Hoot!"],    // 17 Owl
         ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],    // 18 Mushroom
@@ -317,16 +323,16 @@ var dialoguesNPCs = [
         ["", ""],    // 3 Madame
         ["", ""],    // 4 Bow Bow
         ["", ""],    // 5 Trendy Man
-        ["", ""],    // 6 Mama
+        ["", "selves now.", "room to our-", "we have more", "moved away:", "Our boys all"],    // 6 Mama
         ["", ""],    // 7 Papa
         ["", ""],    // 8 Shopkeeper
         ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a"],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "right now!", "thing on you", "to have any-", "don't appear", "Well, you", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", ""],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -336,21 +342,21 @@ var dialoguesNPCs = [
     // Stage 4 - Mushroom
     [
         ["", ""],    // 0 Dreamer
-        ["", "mushrooms!", "I just love"],    // 1 Mushroom Man
+        ["", "love me.", "think they", "But I don't", "mushrooms!", "I just love"],    // 1 Mushroom Man
         ["", ""],    // 2 Sleeping Mushroom Man
         ["", ""],    // 3 Madame
         ["", ""],    // 4 Bow Bow
         ["", ""],    // 5 Trendy Man
-        ["", ""],    // 6 Mama
+        ["", "quiet.", "peace and", "we enjoy the", "moved away:", "Our boys all"],    // 6 Mama
         ["", ""],    // 7 Papa
         ["", ""],    // 8 Shopkeeper
         ["", "yourself?", "drink it", ":Maybe don't", "potion!", "odd smelling", "You got an", "", ":", "", "special!", "up something", "I'll mix you", "the pot and", "Throw it in", "a mushroom!", "Ah, it has"],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "you?", "means, don't", "what antique", "You DO know", "A mushroom?!", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", ""],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -365,18 +371,18 @@ var dialoguesNPCs = [
         ["", ""],    // 3 Madame
         ["", ""],    // 4 Bow Bow
         ["", ""],    // 5 Trendy Man
-        ["", ""],    // 6 Mama
+        ["", "again.", "home now and", "still write", "but they do", "moved away:", "Our boys all"],    // 6 Mama
         ["", ""],    // 7 Papa
         ["", ""],    // 8 Shopkeeper
         ["", "anyone!", "will perk up", "That potion"],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", "it anymore!", "I don't need", "old broom -", "can take my", "better! You", "feeling much", "Yahey! I'm", ":", "*slurp*", ":", "me?", "medicine for", ":oh, is that"],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "you?", "means, don't", "what antique", "You DO know", "A potion?!", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
-        ["", ""],    // 17 Owl
+        ["", "Do not stop!", "of a dream.", "but a shadow", "The dreamer", "reflection:", "nought but a", "The dream is", "Hoot! Hoot!"],    // 17 Owl
         ["", ""],    // 18 Mushroom
         ["", ""],    // 19 Signpost
         ["", ""],    // 20 Bottle
@@ -398,7 +404,7 @@ var dialoguesNPCs = [
         ["", "and begone!", "on the beach", "found lying", "necklace I", "take this", "own! Here,", "simply must", "manship I", "Such crafts-", "so firm:", "so soft yet", "the bristles", "weighted:", "is perfectly", "The handle", "a rare find!", "like this is", "An old broom", "oh SNAP!", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", ""],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -422,7 +428,7 @@ var dialoguesNPCs = [
         ["", "delicious!", "was simply", "That broom", "*burp* Mmm:"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", ""],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -443,10 +449,10 @@ var dialoguesNPCs = [
         ["", ""],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "worth much!", "old, but not", "Well, it IS", "A ribbon?", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", ""],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -467,12 +473,12 @@ var dialoguesNPCs = [
         ["", ""],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "right now!", "thing on you", "to have any-", "don't appear", "Well, you", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
-        ["", ""],    // 17 Owl
+        ["", "Keep going!", "this is yet?", "whose dream", "Do you know", "Hoot! Hoot!"],    // 17 Owl
         ["", ""],    // 18 Mushroom
         ["", ""],    // 19 Signpost
         ["", ""],    // 20 Bottle
@@ -491,10 +497,10 @@ var dialoguesNPCs = [
         ["", ""],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "you?", "means, don't", "what antique", "You DO know", "An orange?!", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", "familiar?", "strangely", "- it looks", "empty bottle", "You got an", "", "for orange!", "Koko trade", "earlier!", "from beach", "took this", "Here! Koko", "fruit!", "Koko smell", "Ook! Ook!"],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", ""],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -515,10 +521,10 @@ var dialoguesNPCs = [
         ["", ""],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "it to them!", "should show", "village, you", "lives in the", "collector", "A specialist", "A bottle?", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", "oranges!", "loves to eat", "Ook! Koko"],    // 13 Koko
         ["", ""],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", ""],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -539,10 +545,10 @@ var dialoguesNPCs = [
         ["", ""],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "you?", "means, don't", "what antique", "You DO know", "Flowers?!", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ":thank you:", ":at peace:", ":I feel:", ":for me?", ":flowers?"],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", ""],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -563,10 +569,10 @@ var dialoguesNPCs = [
         ["", ""],    // 9 Witch
         ["", ""],    // 10 Caldron
         ["", ""],    // 11 Grandma
-        ["", ""],    // 12 Croc
+        ["", "past!", "reliving the", "time to stop", "house! It's", "the antiques", "closing up", "Well, I'm"],    // 12 Croc
         ["", ""],    // 13 Koko
         ["", ":thank you:", ":at peace:", ":I feel:"],    // 14 Ghost
-        ["", ""],    // 15 Fox
+        ["", "Yip!", "Yip! Yip!"],    // 15 Fox
         ["", ""],    // 16 Raccoon
         ["", "for you!", "been waiting", "Someone has", "all began.", "to where it", "Return now", "shall cross.", "our paths", "last time", "This is the", "unawakens.", "The seagull", "draws near:", "The morning", "Hoot! Hoot!"],    // 17 Owl
         ["", ""],    // 18 Mushroom
@@ -574,6 +580,7 @@ var dialoguesNPCs = [
         ["", ""],    // 20 Bottle
     ],
     // Stage 14+ - Dreamer
+    [["", ""]],
     [["", ""]],
     [["", ""]],
     [["", ""]],
@@ -597,7 +604,7 @@ var npcs = [
     [9, 0, 0, 0, 0],    // 0 Dreamer
     [9, 0, 0, 0, 0],    // 1 Mushroom Man
     [0, 0, 2, 5, 0],    // 2 Sleeping Mushroom Man
-    [1, 0, 2, 2, 1],    // 3 Madame
+    [1, 0, 2, 2, 2],    // 3 Madame
     [1, 1, 2, 3, 3],    // 4 Bow Bow
     [0, 1, 2, 5, 2],    // 5 Trendy Man
     [1, 2, 0, 3, 2],    // 6 Mama
@@ -608,7 +615,7 @@ var npcs = [
     [1, 0, 3, 4, 2],    // 11 Grandma
     [1, 1, 3, 5, 2],    // 12 Croc
     [0, 3, 4, 4, 3],    // 13 Koko
-    [1, 2, 3, 5, 3],    // 14 Ghost
+    [9, 0, 0, 0, 0],    // 14 Ghost
     [0, 2, 3, 6, 3],    // 15 Fox
     [0, 3, 0, 2, 3],    // 16 Raccoon
     [0, 0, 3, 4, 1],    // 17 Owl
@@ -643,9 +650,13 @@ var npcsDiffs = [
     // Stage 4 - Mushroom
     {},
     // Stage 5 - Potion
-    {},
+    {
+        17: [0, 3, 2, 1, 4],    // Owl
+    },
     // Stage 6 - Old broom
-    {},
+    {
+        17: [9, 0, 0, 0, 0],    // Owl
+    },
     // Stage 7 - Necklace
     {
         7: [0, 4, 3, 1, 2],     // Papa
@@ -653,17 +664,24 @@ var npcsDiffs = [
     // Stage 8 - Ribbon
     {},
     // Stage 9 - Finding Papa
-    {},
+    {
+        14: [1, 2, 3, 5, 3],    // Ghost
+        17: [0, 4, 1, 3, 1],    // Owl
+    },
     // Stage 10 - Orange
-    {},
+    {
+        17: [9, 0, 0, 0, 0],    // Owl
+    },
     // Stage 11 - Bottle
-    {},
+    {
+        7: [1, 2, 0, 1, 3],     // Papa
+    },
     // Stage 12 - Flowers
     {},
     // Stage 13 - Talked to ghost
     {
         0: [0, 3, 4, 4, 4],     // Dreamer
-        17: [0, 4, 3, 3, 2],    // Owl
+        17: [0, 4, 3, 2, 1],    // Owl
     },
     // Stage 14+ - Dreamer
     {},
@@ -685,8 +703,9 @@ var goals = [
     "03435",    // Dreamer
     "03435",    // Dreamer
     "03435",    // Dreamer
+    "03435",    // Dreamer
     "12353",    // Ghost
-    "10221",    // Madame
+    "10222",    // Madame
     "04023",    // Koko
     "04312",    // Papa
     "12032",    // Mama
@@ -852,6 +871,23 @@ function drawScreen() {
     drawLocale();
     drawActors();
     drawDialogue();
+    drawScreenMask();
+}
+
+function drawScreenMask() {
+    for (i = 0; i < screenTileWidth; i++) {
+        for (j = 0; j < screenTileHeight; j++) {
+            var dx = i * tsize * scale;
+            var dy = j * tsize * scale;
+            if (fadeOut > 180) {
+                if (fadeOut < 240) {
+                    ctx.drawImage(tileFadeMask, 0, 0, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
+                } else {
+                    ctx.drawImage(tileWhiteMask, 0, 0, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
+                }
+            }
+        }
+    }
 }
 
 function drawLocale() {
@@ -862,6 +898,14 @@ function drawLocale() {
             var sx = parseInt(locale[i][j][0]) * tsize;
             var sy = parseInt(locale[i][j][1]) * tsize;
             ctx.drawImage(tileset, sx, sy, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
+
+            if (fadeOut > 60) {
+                if (fadeOut < 120) {
+                    ctx.drawImage(tileFadeMask, 0, 0, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
+                } else {
+                    ctx.drawImage(tileWhiteMask, 0, 0, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
+                }
+            }
         }
     }
 }
@@ -1284,6 +1328,15 @@ function processKeys() {
     playerMoving = false;
     playerPushing = false;
 
+    // Ending
+    if (stage == 20) {
+        fadeOut = fadeOut + 1;
+        if (fadeOut > 240) {
+            throw "Error: The dream has ended";
+        }
+        return;
+    }
+
     if (inputDelayBuffer > 0) {
         inputDelayBuffer = inputDelayBuffer - 1;
         return;
@@ -1300,9 +1353,8 @@ function processKeys() {
         return;
     }
 
-    // One-off game events
-    playerDown = false;
-    if (stage == 19) { throw "Error: The dream has ended"; }
+    // Opening
+    if (playerDown) { playerDown = false; }
 
     // Interact
     if (keyMap["j"]) {
