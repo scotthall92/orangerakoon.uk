@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Gundam Character Name Generator</title>
+    <link rel="stylesheet" type="text/css" href="aznable.css" title="Simple">
+
+    <!--
+      ____                             _____       _
+     / __ \                           |  __ \     | |
+    | |  | |_ __ __ _ _ __   __ _  ___| |__) |__ _| | _____   ___  _ __
+    | |  | | '__/ _` | '_ \ / _` |/ _ \  _  // _` | |/ / _ \ / _ \| '_ \
+    | |__| | | | (_| | | | | (_| |  __/ | \ \ (_| |   < (_) | (_) | | | |
+     \____/|_|  \__,_|_| |_|\__, |\___|_|  \_\__,_|_|\_\___/ \___/|_| |_|.uk
+    =========================__/ |==========================================
+                            |___/  Author: Scott Hall   github: scotthall92
+    -->
+
+</head>
+<body>
+
+<div class="main">
+<noscript><h2>* This page requires JavaScript *</h2></noscript>
+<h1>Gundam Character Name Randomiser</h1>
+
+<p>Real character names, remixed.</p>
+
+<br>
+
+<h2 id="generatedName"></h2>
+
+<br><br>
+
+<form onsubmit='return generateName();'>
+<span class='center'><input type="submit" value="Generate!"></span>
+</form>
+
+<p class='attribution'>Character names sourced (hastily) from <a href="https://gundam.fandom.com/wiki/Gundam_Wiki:Characters?oldid=457952">The Gundam Wiki</a></p>
+
+<p class='attribution'><a href='/'><<< back to orkn.uk</a></p>
+
+<script type="text/javascript">
+
+const names = ["Akron", "Halida", "Alice", "Miller", "Alpha", "Bate", "Amuro", "Ray", "Anita", "Julianne", "Bernard", "Monsha", "Bob", "Rock", "Bright", "Noa", "Chap", "Adel", "Chan", "Agi", "Cherie", "Allison", "Chuck", "Keith", "Christina", "MacKenzie", "Dan", "Beserk", "Dick", "Allen", "Eiphar", "Synapse", "Eledore", "Massis", "Ethan", "Ryer", "Ford", "Romfellow", "Francis", "Beckmeyer", "Fraw", "Bow", "Gary", "Rogers", "Gene", "Corini", "General", "Revil", "Green", "Wyatt", "Haro", "Hayato", "Kobayashi", "Heinz", "Baer", "Hugues", "Courand", "Ivan", "Pacerof", "Jack", "Bayard", "Jidan", "Nickard", "John", "Kowen", "Kai", "Shiden", "Karen", "Joshua", "Kou", "Uraki", "Kojima", "Leung", "Lee-Fai", "Lido", "Wolf", "Lon", "Luce", "Kassel", "Marnery", "Pierce", "Rayer", "Matilda", "Ajan", "Maureen", "Kitamura", "Maximilian", "Berger", "Michel", "Ninorich", "Mike", "Mirai", "Yashima", "Nakaha", "Nakato", "Phillip", "Hughes", "Raban", "Karcs", "Reed", "Rob", "Ryu", "Jose", "Sally", "Sayla", "Mass", "Scott", "Shiro", "Amada", "Jacqueline", "Simone", "Slegger", "Law", "South", "Burning", "Stanley", "Hawkins", "Summona", "Fulis", "Terry", "Sanders", "William", "Morris", "Yuu", "Kajima", "Lucette", "Odebby", "Latteura", "Chapra", "Mora", "Boscht", "Nina", "Purpleton", "Neil", "Orville", "O'Sullivan", "Paula", "Guilish", "Aina", "Sahalin", "Andy", "Strauss", "Arth", "Barry", "Wiseman", "Black", "Tri-Stars", "Char", "Aznable", "Challia", "Bull", "Crowley", "Hamon", "Degwin", "Sodo", "Zabi", "Dell", "Dozle", "Gabby", "Hazard", "Gabriel", "Garcia", "Garma", "Giren", "Gihren", "Ginias", "Hardy", "Steiner", "Kelly", "Layzner", "Killing", "Kishiria", "Kycilia", "Kusko", "Al", "Lalah", "Sune", "Marion", "Welch", "Masasdo", "Mikhail", "Kaminsky", "M'Quve", "Nieba", "Nimbus", "Schterzen", "Norris", "Packard", "Ramba", "Ral", "Ramuiko", "Stein", "Runen", "Topp", "Visch", "Donahue", "Von", "Abst", "Helsing", "Walter", "Curtis", "Yuri", "Hassler", "Kellarney", "Aiguille", "Delaz", "Anavel", "Gato", "Captain", "Dry", "Cima", "Garahau", "Karius", "Kult", "Neuen", "Bitter", "Alfred", "Izuruha", "Baresto", "Cameron", "Bloom", "Charlie", "Chay", "Chibi", "Dorothy", "Hige", "Kiki", "Rosita", "Kamaria", "Noppo", "Richard", "Lumunba", "Telcott", "Wong", "Lee", "Stephanie", "Luio", "Bask", "Om", "Jamitov", "Hymem", "Jamaican", "Daninghan", "Jerid", "Messa", "Lila", "Milla", "Rira", "Paptimus", "Scirocco", "Sarah", "Zabiarov", "Yazan", "Gable", "Ramsus", "Hasa", "Dunkel", "Cooper", "Rosamia", "Badam", "Gates", "Capa", "Buran", "Blutarch", "Kacricon", "Cacooler", "Mouar", "Pharaoh", "Four", "Murasame", "Astonaige", "Medoz", "Blex", "Forer", "Emma", "Sheen", "Henken", "Bekkener", "Kamille", "Bidan", "Katz", "Reccoa", "Londe", "Fa", "Yuiry", "Judau", "Ashta", "Roux", "Louka", "Mondo", "Agake", "Elle", "Vianno", "Iino", "Abbav", "Beecha", "Oleg", "Torres", "Quattro", "Bajeena", "Haman", "Karn", "Mineva", "Lao", "Glemy", "Toto", "Rakan", "Dahkaran", "Mashymre", "Cello", "Chara", "Soon", "Nanai", "Miguel", "Gyunei", "Guss", "Rezin", "Schnyder", "Quess", "Paraya", "Lucille", "Liliant", "Jamil", "Neate", "Shagia", "Frost", "Olba", "Romanof", "Aimzat", "Kartral", "Katokk", "Alzamille", "Demar", "Griffe", "Duett", "Langraph", "Milra", "Draid", "Abel", "Bauer", "Karon", "Rudd", "Kozov", "Sala", "Tyrrell", "Seidel", "Rasso", "Nicola", "Fafas", "Togusa", "Ain", "Pala", "Sys", "Roybea", "Loy", "Witz", "Sou", "Tiffa", "Adill", "Techcs", "Farzenberg", "Toniya", "Malme", "Shingo", "Mori", "Kid", "Salsamille", "Rhine", "Rocogo", "Ennil", "El", "Zakott", "Dattonel", "Grits", "Joe", "Rosa", "Intenso", "Rosso", "Aramant", "Doza", "Bale", "Marcus", "Guy", "Jenice", "Crisis", "Weiss", "Mirage", "Georgie", "Linn", "Kie", "Mie", "Nie", "Reiko", "Rick", "Aller", "Mana", "Gaspa", "Rooks", "Hanomark", "Grant", "Stewart", "Jackson", "Nomoa", "Long", "Harten", "Shora", "Drasso", "Onimimu", "Saelia", "Kortol", "White", "Dolphin", "Lumark", "Kauto", "Crockas", "Wedoba", "Morte", "Yurina", "Sonohara", "Tessa", "Tain", "Loran", "Cehack", "Sochie", "Heim", "Guin", "Sard", "Lineford", "Michael", "Gern", "Yanny", "Oviess", "Ladderrum", "Kune", "Miashei", "Joseph", "Yaht", "Lily", "Borjarno", "Lord", "Mallygan", "Gavane", "Gooney", "Aimes", "Dianna", "Soreil", "Gym", "Ghingham", "Merrybell", "Gadget", "Harry", "Ord", "Phil", "Ackman", "Miran", "Rex", "Corin", "Nander", "Bruno", "Jacop", "Cancer", "Kafka", "Muron", "Sweatson", "Stero", "Agrippa", "Maintainer", "Meme", "Midgard", "Teteth", "Halleh", "Kihel", "Dylan", "Mistress", "Sam", "Jessica", "Quoatl", "Taruka", "Mayalito", "Sid", "Munzer", "Niven", "Horace", "Will", "Game", "Verlaine", "Bond", "Anise", "Bell", "Fran", "Doll", "Laijie", "Dona", "Roroi", "Hammett", "Lieutenant", "Amagi", "Sai", "Argyle", "Dalida", "Lolaha", "Chandra", "Miriallia", "Haw", "Mu", "La", "Flaga", "Kojiro", "Murdoch", "Arnold", "Newmann", "Romero", "Pal", "Murrue", "Ramius", "Jackie", "Tonomura", "Kira", "Yamato", "Go", "Ikeya", "Nishizawa", "Lacus", "Clyne", "Martin", "DaCosta", "Meyrin", "Hawke", "Andrew", "Waltfeld", "Athrun", "Zala", "Cagalli", "Yula", "Athha", "Asagi", "Caldwell", "Ledonir", "Kisaka", "Mayura", "Labatt", "Juri", "Wu", "Nien", "Erica", "Simmons", "Jean", "Carry", "Hilda", "Harken", "Ho", "Mars", "Simeon", "Herbert", "Reinhard", "Kano", "Kikuchi", "Flay", "Allster", "Natarle", "Badgiruel", "Kuzzey", "Buskirk", "Tolle", "Koenig", "Shani", "Andras", "Muruta", "Azrael", "Clotho", "Buer", "Orga", "Sabnak", "Matisse", "Sven", "Cal", "Bayan", "Shams", "Couza", "Mudie", "Holcroft", "Ian", "Stella", "Loussier", "Auel", "Neider", "Sting", "Oakley", "Neo", "Roanoke", "Jon", "Matias", "Djibril", "Celestine", "Groht", "Lucs", "Kohler", "Lally", "McWilliams", "Duncan", "Luis", "Mockelberg", "Graham", "Nelleis", "Alwin", "Ritter", "Sutherland", "Adam", "Vermilyea", "George", "Chris", "Dill", "Copland", "Da", "Lewis", "Halberton", "Edward", "Harrelson", "Stephen", "Hilbert", "Hoffman", "Jane", "Houston", "Rena", "Imelia", "Koopman", "Brian", "Gail", "Hamana", "Luke", "Balsam", "Arendo", "Morgan", "Chevalier", "Gerard", "Canard", "Pars", "Meriol", "Pistis", "Fredrik", "Ades", "Aiman", "Nicol", "Amalfi", "Dearka", "Elsman", "Yzak", "Joule", "Olor", "Koudenburg", "Rau", "Le", "Creuset", "Rusty", "Mackenzie", "Zelman", "Matthew", "Madd", "Aves", "Vino", "Dupre", "Talia", "Gladys", "Bart", "Yolan", "Kent", "Arthur", "Trine", "Abby", "Windsor", "Malik", "Yardbirds", "Chen", "Jian", "Yee", "Shinn", "Asuka", "Rey", "Za", "Burrel", "Lunamaria", "Heine", "Westenfluss", "Dale", "Shawn", "Eileen", "Canaver", "Siegel", "Gilbert", "Durandal", "Tad", "Ezalia", "Patrick", "Coast", "Ash", "Gray", "Shiho", "Hahnenfuss", "Courtney", "Heironimus", "Isaac", "Mau", "Marco", "Morassim", "Riika", "Sheder", "Mare", "Strode", "Goud", "Veia", "Joppe", "Arafas", "Aisha", "Hans", "Kirkwood", "Maylam", "Sato", "Rudolf", "Schreiber", "Alec", "Lad", "Meer", "Campbell", "Bernadette", "Leroux", "Joachim", "Ruddle", "Diller", "Rojo", "Yuki", "Lenore", "Sara", "Uzumi", "Nara", "Homura", "Rondo", "Ghina", "Sahaku", "Mina", "Unato", "Ema", "Seiran", "Yuna", "Roma", "Mayu", "Baba", "Tatsuki", "Mashima", "Todaka", "Myrna", "Soga", "Sahib", "Ashman", "Ahmed", "Fasi", "Liam", "Garfield", "Lowe", "Guele", "Professor", "Prayer", "Reverie", "Yoon", "Sefan", "Kisato", "Yamabuki", "Kazahana", "Adja", "Loretta", "Elijah", "Kiel", "Gai", "Murakumo", "Wheeler", "Edmond", "Du", "Clos", "Sol", "Ryuune", "L'ange", "Selene", "McGriff", "Agnes", "Brahe", "Nahe", "Herschel", "Diego", "Lowell", "Coniel", "Elisa", "Azana", "Glenn", "Ulen", "Hibiki", "Via", "Jairi", "Kenaf", "Luchini", "Kaite", "Madigan", "Reverend", "Malchio", "Jess", "Rabble", "Setona", "Winters", "Caridad", "Porsche", "Shinisto", "Leons", "Graves", "Suu", "Lukas", "O'Donnell", "Junichi", "Akutsu", "Xist", "Elwes", "Aeolia", "Schenberg", "Setsuna", "Seiei", "Lockon", "Stratos", "Allelujah", "Haptism", "Tieria", "Erde", "Johann", "Trinity", "Nena", "Sumeragi", "Noriega", "Sierra", "Feldt", "Grace", "Lichtendahl", "Tsery", "Lasse", "Aeon", "Vashti", "Joyce", "Moreno", "Wang", "Liu", "Mei", "Hong", "Alejandro", "Corner", "Ribbons", "Almark", "Laguna", "Harvey", "Aker", "Billy", "Katagiri", "Leif", "Eifman", "Howard", "Mason", "Daryl", "Dodge", "Saji", "Crossroad", "Louise", "Halevy", "Kinue", "Sergei", "Smirnov", "Soma", "Peries", "Colasour", "Kathy", "Mannequin", "Marina", "Ismail", "Shirin", "Bakhtiar", "Rasa", "Massoud", "Rachmadi", "Ali", "Sarshes", "Homer", "Barack", "Zinin", "Kati", "Zhejiang", "Bushido", "Aber", "Rindt", "Bring", "Stability", "Devine", "Nova", "Healing", "Care", "Revive", "Revival", "Andrei", "Goodman", "Regene", "Regetta", "Stabity", "Anew", "Returner", "Divine", "Gaga", "Forces"];
+
+function generateName() {
+    const first = names[Math.floor(Math.random() * names.length)];
+    const last = names[Math.floor(Math.random() * names.length)];
+    document.getElementById("generatedName").innerText = first + " " + last;
+    return false
+}
+
+</script>
+</div>
+
+</body>
+</html>
