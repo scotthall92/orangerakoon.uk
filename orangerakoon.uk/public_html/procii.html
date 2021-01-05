@@ -2,8 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Procii</title>
-    <link rel="stylesheet" type="text/css" href="procii.css" title="Procii">
+    <link rel="stylesheet" type="text/css" href="common.css">
+    <link rel="stylesheet" type="text/css" href="procii.css">
 
     <!--
       ____                             _____       _
@@ -19,6 +21,8 @@
 </head>
 <body>
 
+<noscript><h2>* This page requires JavaScript *</h2></noscript>
+
 <div id="nerDiv" class="screen" onclick="interact()"></div>
 <div id="midDiv" class="screen" onclick="moveForward()"></div>
 <div id="farDiv" class="screen" onclick="moveForward()"></div>
@@ -27,6 +31,8 @@
 
 <span class="button" onclick="turnLeft()">///</span><span class="controls">  wasd or arrows to move  </span><span class="button" onclick="turnRight()">\\\</span><br/>
 <span class="button" onclick="turnLeft()">\\\</span><span class="controls">  z or space to interact  </span><span class="button" onclick="turnRight()">///</span>
+
+<p class='attribution'><a href='/'><<< back to orkn.uk</a></p>
 
 <script type="text/javascript">
 

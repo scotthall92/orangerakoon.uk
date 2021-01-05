@@ -2,8 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Unawakening: Return to the Island</title>
-    <link rel="stylesheet" type="text/css" href="unawakening.css" title="Unawakening">
+    <link rel="stylesheet" type="text/css" href="common.css">
+    <link rel="stylesheet" type="text/css" href="unawakening.css">
 
     <!--
       ____                             _____       _
@@ -19,19 +21,23 @@
 </head>
 <body onload="init()">
 
+<noscript><p>Please enable JavaScript</p></noscript>
+
 <div>
 <button onclick="resizeCanvas(1)">+</button>
 <button onclick="resizeCanvas(-1)">-</button>
 </div>
 
 <p><canvas id="screenCanvas" width="192" height="144">Unsupported by browser</canvas></p>
-<img id="tileset1" src="tileset1.png" width=0 height=0>
-<img id="tileset2" src="tileset2.png" width=0 height=0>
-<img id="charset" src="charset.png" width=0 height=0>
-<img id="player" src="player.png" width=0 height=0>
-<img id="npcset" src="npcset.png" width=0 height=0>
-<img id="tileFadeMask" src="tile_fade_mask.png" width=0 height=0>
-<img id="tileWhiteMask" src="tile_white_mask.png" width=0 height=0>
+
+<p class='attribution'><a href='/'><<< back to orkn.uk</a></p>
+<img id="tileset1" src="unawakening_assets/tileset1.png" width=0 height=0>
+<img id="tileset2" src="unawakening_assets/tileset2.png" width=0 height=0>
+<img id="charset" src="unawakening_assets/charset.png" width=0 height=0>
+<img id="player" src="unawakening_assets/player.png" width=0 height=0>
+<img id="npcset" src="unawakening_assets/npcset.png" width=0 height=0>
+<img id="tileFadeMask" src="unawakening_assets/tile_fade_mask.png" width=0 height=0>
+<img id="tileWhiteMask" src="unawakening_assets/tile_white_mask.png" width=0 height=0>
 
 <script type="text/javascript">
 

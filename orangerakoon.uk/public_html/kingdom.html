@@ -2,8 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fantasy Kingdom Generator - Medieval demographics for fantasy worlds</title>
-    <link rel="stylesheet" type="text/css" href="kingdom.css" title="Simple">
+    <link rel="stylesheet" type="text/css" href="common.css">
+    <link rel="stylesheet" type="text/css" href="kingdom.css">
 
     <!--
       ____                             _____       _
@@ -185,7 +187,7 @@
     </tbody>
 </table>
 
-<p class='attribution'><a href='/'><<< back to orangerakoon.uk</a></p>
+<p class='attribution'><a href='/'><<< back to orkn.uk</a></p>
 
 <script type="text/javascript">
 // Returns a random integer between min (included) and max (excluded)
@@ -354,14 +356,14 @@ function generateKingdom() {
     var villages = Math.floor((population - urbanPopulation) / 450);
 
     var developedLandArea = Math.floor(population / 180);       // in square miles
-    var wildernessArea = area - developedLandArea;  // in square miles  
+    var wildernessArea = area - developedLandArea;  // in square miles
 
     var castles = chancedRound(population / 50000);
     var frontierCastles = chancedRound(castles * 0.25);
     var civilisedCastles = castles - frontierCastles;
     var ruinedCastles = chancedRound((population / 5000000) * Math.sqrt(age));
 
-    var universities = chancedRound(population / 27300000); 
+    var universities = chancedRound(population / 27300000);
 
     var livestock = Math.floor(population * 2.2);
     var fowlLivestock = Math.floor(livestock * 0.68);
