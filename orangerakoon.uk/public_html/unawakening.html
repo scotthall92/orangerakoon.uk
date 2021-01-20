@@ -106,6 +106,8 @@ var transitionXBuffer = 0;
 var transitionYBuffer = 0;
 var transitionInputDelay = 6;
 
+var offMapTransitions = 0;
+
 var portalBufferMax = 6;
 var portalBuffer = 0;
 var kennelBuffer = 0;
@@ -192,6 +194,7 @@ var insideMap = {
     "03": "001040404040102001044141414104210132420444445221015304044545042101522424240443210212031323121222",
     "13": "001010104040102001254425414143210125452504044321012525250404042101333333043333210212120313231222",
     "23": "001040101010102001144114141455210114440433523321010445140404142101141404044343210212031323121222",
+    "99": "353535353535353535001010101020353501550505552135350105050505213535015505055521353502031323122235",
 };
 
 var maps = [outsideMap, insideMap];
@@ -218,7 +221,7 @@ var dialoguesStatic = {
     "00244": ["", "pretty deep!", "It looks", "well:", "Well, well,"],
     "04121": ["", "roads!", "maintained", "our well-", "ourselves on", "- We pride", "Bema Village", "Welcome to"],
     "04330": ["", "", "Start _"],
-    "04311": ["", "", "Finish!"],
+    "04311": ["", ":is that it?", "", "Finish!"],
     "04351": ["", "", "      <"],
     "04333": ["", "", "      >"],
     "04353": ["", "", "      ^"],
@@ -260,7 +263,7 @@ var dialoguesNPCs = [
         ["", "is it?", "playthrough,", "your first", "this isn't", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "visitors!", "expecting", "We weren't", "Ah, a guest!"],    // 7 Mama
         ["", "I'm Papa!", "Hullo there!"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "potion!", "mix up a new", "I'm about to", "Caldron boil", "Double toil"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -288,7 +291,7 @@ var dialoguesNPCs = [
         ["", "of here.", "it's north", "the library,", "want to find", "me. If you", "don't mind", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "home!", "yourself at", "Please make", "Ah, a guest!"],    // 7 Mama
         ["", "lost later!", "when I get", "Come find me", "I'm Papa!"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -316,7 +319,7 @@ var dialoguesNPCs = [
         ["", "the forum!", "about it on", "here. I read", "secret back", "there is a", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "of them.", "very proud", "now: we're", "all grown up", "Our boys are"],    // 7 Mama
         ["", "lost later!", "when I get", "Come find me", "Hullo!"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a", ":hmm: :aha!", "that book!", "You, give me", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -344,7 +347,7 @@ var dialoguesNPCs = [
         ["", "somewhere.", "is one here", "I know there", "a secret!", "looking for", "I'm still", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "selves now.", "room to our-", "we have more", "moved away:", "Our boys all"],    // 7 Mama
         ["", "just a man!", "though, I'm", "Don't ask me", "new players!", "to help out", "My kids used"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -372,7 +375,7 @@ var dialoguesNPCs = [
         ["", "empty?", "noticeably", "house seem", "doesn't this", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "quiet.", "peace and", "we enjoy the", "moved away:", "Our boys all"],    // 7 Mama
         ["", "beds anyway.", "one of the", "I assembled", "myself! Well", "I built it", "our house?", "Do you like"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "yourself?", "drink it", ":Maybe don't", "potion!", "odd smelling", "You got an", "", ":", "", "special!", "up something", "I'll mix you", "the pot and", "Throw it in", "a mushroom!", "Ah, it has"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -400,7 +403,7 @@ var dialoguesNPCs = [
         ["", "lives here?", "I wonder who", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "again.", "home now and", "still write", "but they do", "moved away:", "Our boys all"],    // 7 Mama
         ["", "the house!", "man around", "real handy", "Yep, I'm a"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "drinks it!", "anyone who", "will perk up", "That potion"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -428,7 +431,7 @@ var dialoguesNPCs = [
         ["", "ago though!", "long time", "that was a", "work here:", "I used to", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "a hoover!", "but we have", "kind of you,", "That's very"],    // 7 Mama
         ["", "tell anyone!", "walk! Don't", "go out for a", "I'm about to"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "a broom!", "mean I need", "it doesn't", "I'm a witch", "Just because"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -456,7 +459,7 @@ var dialoguesNPCs = [
         ["", "much money!", "I lost too", "my old job.", "I packed in", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "this time?", "husand gone", "Where has my"],    // 7 Mama
         ["", "eating!", "me while I'm", "Don't bother", "", "*munch*", "*munch*"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "about it!", "Don't think", "mushrooms?", "you to pick", "why I sent", "wondering", ":Are you", "in that air!", "Ah! Breathe"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -484,7 +487,7 @@ var dialoguesNPCs = [
         ["", "inside, huh?", "redecorated", "they really", ":Huh? Oh,"],    // 6 Trendy Man
         ["",  "home!", "him to come", "please tell", "my husband,", "If you see", "Thank you!", "can have it?", "You say I", "little:", "my boys were", "me of when", "it reminds", "That ribbon:"],    // 7 Mama
         ["", "eating here!", "I'm still", "*munch*", "*munch*"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "woods!", "lost in the", "Don't get", "Hehehe:"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -512,7 +515,7 @@ var dialoguesNPCs = [
         ["", "for me!", "memory lane", "trip down", "enough of a", "well that's", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "home!", "him to come", "please tell", "my husband,", "If you see"],    // 7 Mama
         ["", "the ribbon?", "in place of", "I guess it's", "orange!", "You got an", "", "instead!", "can have it", "guess you", "lunch, but I", "finishing my", "I was just", "get home?", "wants me to", ":My wife", "Hullo there!"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "goblins!", "counting the", ":Well, not", "old me!", "but little", "one out here", "There's no"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -540,7 +543,7 @@ var dialoguesNPCs = [
         ["", "that?", "Did you know", "of a legend!", "is something", "that old man", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "same!", "him all the", "but I love", "sharpest,", "He's not the", "my husband?", "Did you find"],    // 7 Mama
         ["", "a minute!", "resting for", "I'm just"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "village!", "shop in the", "now I have a", "more potions", "I sell a lot"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -568,7 +571,7 @@ var dialoguesNPCs = [
         ["", "the forum!", "about it on", "I should ask", "there?", "hidden back", "something is", "do you think", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "my husband!", "for finding", "Thank you"],    // 7 Mama
         ["", "for dinner!", "- it's curry", "just in time", "got home", "Looks like I"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "for a while.", "haven't been", "the woods! I", "is deeper in", "My old house"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -596,7 +599,7 @@ var dialoguesNPCs = [
         ["", "building!", "get in that", "can't ever", "to think you", "I'm starting", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "my husband!", "for finding", "Thanks again"],    // 7 Mama
         ["", "curry!", "the hottest", "Mama makes"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "I know!", "to believe,", "woods. Hard", "deep in the", "fairy lives", "They say a"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -624,7 +627,7 @@ var dialoguesNPCs = [
         ["", "playthrough!", "see you next", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "us around!", "okay without", "boys will be", "I'm sure our"],    // 7 Mama
         ["", "meet you!", "was nice to", "Goodbye! It"],    // 8 Papa
-        ["", "here yet.", "can't go in", "Sorry, you"],    // 9 Old Man
+        ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
         ["", ""],    // 10 Shopkeeper
         ["", "embarassing.", "a little bit", "magic! It's", "can't do any", "Actually I"],    // 11 Witch
         ["", ""],    // 12 Caldron
@@ -672,7 +675,7 @@ var npcs = [
     [0, 1, 2, 5, 2],    // 6 Trendy Man
     [1, 2, 0, 3, 2],    // 7 Mama
     [1, 2, 0, 1, 3],    // 8 Papa
-    [0, 3, 0, 2, 3],    // 9 Old Man
+    [9, 0, 0, 4, 3],    // 9 Old Man
     [9, 0, 0, 0, 0],    // 10 Shopkeeper
     [1, 2, 1, 3, 2],    // 11 Witch
     [1, 2, 1, 3, 3],    // 12 Caldron
@@ -845,6 +848,8 @@ var portals = {
     "04442": [1, 2, 3, 3, 4],
     "12335": [0, 4, 4, 4, 3],
     "01252": [1, 1, 2, 7, 0],
+    "03022": [1, 9, 9, 3, 4],
+    "19935": [0, 3, 0, 2, 3],
 };
 
 function resizeCanvas(increment) {
@@ -892,6 +897,18 @@ function update() {
     }
 }
 
+function generateShrine() {
+    var lampXCoords = ["2", "5", "5", "2"];
+    var lampYCoords = ["2", "2", "4", "4"];
+    for (i = 0; i < (offMapTransitions % 5); i++) {
+        locale[lampXCoords[i]][lampYCoords[i]] = "54";
+        if (i == 3) {
+            localNPCs.push(9);
+            localNPCDirections.push(3);
+        }
+    }
+}
+
 function updateLocale(coords) {
     for (i = 0; i < screenTileWidth; i++) {
         locale[i] = [];
@@ -908,6 +925,8 @@ function updateLocale(coords) {
             localNPCDirections.push(3);
         }
     }
+
+    if (coords == 99) { generateShrine(); }  // shrine
 }
 
 function transitionScreen(xincrement, yincrement) {
@@ -921,6 +940,8 @@ function transitionScreen(xincrement, yincrement) {
         mapXCoord = mapXCoord + xincrement;
         mapYCoord = mapYCoord + yincrement;
         updateLocale(coords);
+    } else {
+        offMapTransitions += 1;
     }
 
     // Press - at transition to screen warp
