@@ -70,6 +70,7 @@ var mapYCoord = 0;
 var locale = [];
 var localNPCs = [];
 var localNPCDirections = [];    // 0: -x, 1: +x, 2: -y, 3: +y
+var lastMetNPC = 0;
 
 var player = document.getElementById("player");
 var psize = 12;
@@ -250,6 +251,34 @@ var dialoguesComputer = [
     ["", "Spooky!", "is haunted.", "people say", "that some", "the cliffs", "old house on", "There is an", "", "Jenuall"],
     ["", "for playing!", "done! Thanks", "pretty much", "Wow, you're", "", "OrangeRKN"],
 ];
+var raccoonOpeningDialogue = ["", "to, huh?", "been talking", "who have you", "Let's see:", "SECRETS!", "SHACK OF", "RACCOON'S", "Welcome to", "Nyeh heh!"];
+var dialoguesRaccoon = [
+    [""],    // 0 Dreamer
+    ["", "it's a lie!", "related, but", "think we're", "some people", "Actually,", "weird?", "think that's", "Don't ya", "mushrooms!", "really likes", "So that man"],    // 1 Mushroom Man
+    ["", "a dream?", "sleep inside", "Can you even", "asleep, huh?", "That man is"],    // 2 Sleeping Mushroom Man
+    ["", "Bow Bow!", "dognapping", "want to try", "I wouldn't", "dognapping.", "since the", "goblins ever", "is scared of", "Madame Meow"],    // 3 Madame
+    ["", "mysteries!", "life's great", "just one of", "to be. It's", "is supposed", "dog Bow Bow", "what kind of", "really sure", "No one is"],    // 4 Bow Bow Ribbon
+    ["", "mysteries!", "life's great", "just one of", "to be. It's", "is supposed", "dog Bow Bow", "what kind of", "really sure", "No one is"],    // 5 Bow Bow
+    ["", "running.", "into speed-", "he is really", "These days", "money!", "made any", "but he never", "the village", "work here in", "He used to", "Trendy man!"],    // 6 Trendy Man
+    ["", "to animate.", "much effort", "was far too", "ball around", "throwing a", "I'm afraid", "blame her!", "and who can", "her children", "Mama misses"],    // 7 Mama
+    ["", "fine though!", "turned out", "Their kids", "his wife.", "trouble with", "always in", "That Papa is"],    // 8 Papa
+    ["", "proud of ya!", "game! I'm", "good at this", "must be real", "eh? Boy, you", "the old man,", "So you found"],    // 9 Old Man
+    [""],    // 10 Shopkeeper
+    ["", "seasoning!", "soup is the", "to a perfect", "- the secret", "I'll tell ya", "soup? Well", "for mushroom", "magic recipe", "to learn her", "eh? Trying", "that witch,", "talking to", "You've been"],    // 11 Witch
+    ["", "the caldron?", "dialogue for", "had separate", "know that I", "How did ya", "Clever you!"],    // 12 Caldron
+    ["", "blame her!", "and who can", "tucked up -", "likes being", "She actually", "thought!", "- or so ya", "stuck in bed", "Poor grandma"],    // 13 Grandma
+    ["", "collects!", "antiques he", "EATS all the", "He actually", "crocodile!", "about that", "juicy secret", "Oh I have a"],    // 14 Croc
+    ["", "village!", "outside the", "she stays", "That's why", "Bow Bow?", "a fight with", "Koko got in", "Did you know"],    // 15 Koko
+    ["", "here then?", "doing around", "What's he", "island.", "side of the", "the opposite", "a village on", "He lives in", "little guy!", "is a weird", "That rabbit"],    // 16 Rabbit
+    ["", "us, eh?", "the rest of", "alive than", "is no less", "you think he", "Funny when", "met a ghost!", "Oh, you even"],    // 17 Ghost
+    ["", "into it.", "Don't read", "lil' fella!", "an emotional", "That fox is"],    // 18 Fox
+    ["", "me:?", "talking: to:", "You've been"],    // 19 Raccoon
+    ["", "knew that:", "I guess you", ": : :", "makes, heh!", "noise an owl", "That's the", "Hoot! Hoot!"],    // 20 Owl
+    [""],    // 21 Mushroom
+    ["", "sign said?", "what the", ":oh, is that", "the woods!", "she went to", "the witch,", "looking for", "If you were"],    // 22 Signpost
+    [""],    // 23 Book
+    [""],    // 24 Bottle
+];
 // Index in list defines which NPC, as commented
 var dialoguesNPCs = [
     // Stage 0 - Find the bottle
@@ -267,7 +296,7 @@ var dialoguesNPCs = [
         ["", ""],    // 10 Shopkeeper
         ["", "potion!", "mix up a new", "I'm about to", "Caldron boil", "Double toil"],    // 11 Witch
         ["", ""],    // 12 Caldron
-        ["", "there:?", "Is someone", ":h-hello?"],    // 13 Grandma
+        ["", "a noise!", ":wow, what", "", "*SNORE*"],    // 13 Grandma
         ["", "can find!", "see what you", "- you should", "beach lately", "up on the", "been washing", "things have", "Lots of", "antiques!", "my house of", "Welcome to"],    // 14 Croc
         ["", "night, ko ko!", "storm last", "Ook! Big"],    // 15 Koko
         ["", "this!", "anyone about", "don't tell", "Oh! Please"],    // 16 Rabbit
@@ -276,7 +305,7 @@ var dialoguesNPCs = [
         ["", ""],    // 19 Raccoon
         ["", "speak again.", "before we", "the beach", "return to", "You should", "it been?", "How long has", "Hoot! Hoot!"],    // 20 Owl
         ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],    // 21 Mushroom
-        ["", "setting up!", "We're still"],    // 22 Signpost
+        ["", "SECRETS", "SHACK OF", "- RACCOON'S", "setting up!", "We're still"],    // 22 Signpost
         ["", "missing:", "with a page", "book here", "There's a"],    // 23 Book
         ["", "came from.", "book this", "find the", "You should", "torn page!", "You got a", "the bottle:", "something in", "There's"],    // 24 Bottle
     ],
@@ -304,7 +333,7 @@ var dialoguesNPCs = [
         ["", ""],    // 19 Raccoon
         ["", "your help!", "relying on", "Everyone is", "the dreamer.", "must awaken", "island, you", "to leave the", "If you wish", "Hoot! Hoot!"],    // 20 Owl
         ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],    // 21 Mushroom
-        ["", "setting up!", "We're still"],    // 22 Signpost
+        ["", "SECRETS", "SHACK OF", "- RACCOON'S", "setting up!", "We're still"],    // 22 Signpost
         ["", "in this?", "interested", "Now who'd be", "recipe book!", "You got a", "missing:", "with a page", "book here", "There's a"],    // 23 Book
         ["", ""],    // 24 Bottle
     ],
@@ -323,7 +352,7 @@ var dialoguesNPCs = [
         ["", ""],    // 10 Shopkeeper
         ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a", ":hmm: :aha!", "that book!", "You, give me", "recipe?", "What was the", "and: hmm?", "Eye of newt", "Caldron boil", "Double toil"],    // 11 Witch
         ["", ""],    // 12 Caldron
-        ["", "there:?", "Is someone", ":h-hello?"],    // 13 Grandma
+        ["", "Mouse:?", "you, Bucket", "Is it really", ":h-hello?"],    // 13 Grandma
         ["", "me this!", "can't sell", "book! You", "is a library", "Wait, this", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 14 Croc
         ["", "screen warp!", "press '-' to", "quick! Koko", "get here", "Ook! Koko"],    // 15 Koko
         ["", "right here!", "I'm staying", "spot! Yep,", "favourite", "It's my new", "spot, hop!", "I like this"],    // 16 Rabbit
@@ -332,7 +361,7 @@ var dialoguesNPCs = [
         ["", ""],    // 19 Raccoon
         ["", "Be careful!", "the same.", "are rarely", "Two dreams", "I remember.", "is not as", "The island", "Hoot! Hoot!"],    // 20 Owl
         ["", "mushrooms?!", "mysterious", "not to pick", "never taught", "Were you"],    // 21 Mushroom
-        ["", "setting up!", "We're still"],    // 22 Signpost
+        ["", "SECRETS", "SHACK OF", "- RACCOON'S", "setting up!", "We're still"],    // 22 Signpost
         ["", ""],    // 23 Book
         ["", ""],    // 24 Bottle
     ],
@@ -351,7 +380,7 @@ var dialoguesNPCs = [
         ["", ""],    // 10 Shopkeeper
         ["", "nice!", "something", "you'll get", "mushroom and", "Bring me a"],    // 11 Witch
         ["", ""],    // 12 Caldron
-        ["", "there:?", "Is someone", ":h-hello?"],    // 13 Grandma
+        ["", "torches:", ":light the", ":woods:"],    // 13 Grandma
         ["", "right now!", "thing on you", "to have any-", "don't appear", "Well, you", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 14 Croc
         ["", "here, ko ko!", "No mushrooms", "Ook?"],    // 15 Koko
         ["", "have you?", "haven't been", "I guess you", "the island!", "from across", "I'm visiting"],    // 16 Rabbit
@@ -360,7 +389,7 @@ var dialoguesNPCs = [
         ["", ""],    // 19 Raccoon
         ["", ""],    // 20 Owl
         ["", ""],    // 21 Mushroom
-        ["", "setting up!", "We're still"],    // 22 Signpost
+        ["", "SECRETS", "SHACK OF", "- RACCOON'S", "setting up!", "We're still"],    // 22 Signpost
         ["", ""],    // 23 Book
         ["", ""],    // 24 Bottle
     ],
@@ -379,7 +408,7 @@ var dialoguesNPCs = [
         ["", ""],    // 10 Shopkeeper
         ["", "yourself?", "drink it", ":Maybe don't", "potion!", "odd smelling", "You got an", "", ":", "", "special!", "up something", "I'll mix you", "the pot and", "Throw it in", "a mushroom!", "Ah, it has"],    // 11 Witch
         ["", ""],    // 12 Caldron
-        ["", "there:?", "Is someone", ":h-hello?"],    // 13 Grandma
+        ["", ":medicine:", ":n-need:"],    // 13 Grandma
         ["", "you?", "means, don't", "what antique", "You DO know", "A mushroom?!", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 14 Croc
         ["", "incident!", "Not after", "in village!", "not allowed", "Ook! Koko"],    // 15 Koko
         ["", "overshot!", "shop, you", "the potion", "looking for", "If you are"],    // 16 Rabbit
@@ -388,7 +417,7 @@ var dialoguesNPCs = [
         ["", ""],    // 19 Raccoon
         ["", ""],    // 20 Owl
         ["", ""],    // 21 Mushroom
-        ["", "setting up!", "We're still"],    // 22 Signpost
+        ["", "SECRETS", "SHACK OF", "- RACCOON'S", "setting up!", "We're still"],    // 22 Signpost
         ["", ""],    // 23 Book
         ["", ""],    // 24 Bottle
     ],
@@ -435,7 +464,7 @@ var dialoguesNPCs = [
         ["", ""],    // 10 Shopkeeper
         ["", "a broom!", "mean I need", "it doesn't", "I'm a witch", "Just because"],    // 11 Witch
         ["", ""],    // 12 Caldron
-        ["", "in no time!", "on my feet", "I'll be back"],    // 13 Grandma
+        ["", "valuable!", "- it's very", "my old broom", "Take care of"],    // 13 Grandma
         ["", "and begone!", "on the beach", "found lying", "necklace I", "take this", "own! Here,", "simply must", "manship I", "Such crafts-", "so firm:", "so soft yet", "the bristles", "weighted:", "is perfectly", "The handle", "a rare find!", "like this is", "An old broom", "oh SNAP!", "Let's see:", "antiques!", "my house of", "Welcome to"],    // 14 Croc
         ["", "bananas!", "Worth many", "good find!", "Ook! Broom"],    // 15 Koko
         ["", "the way!", "sweep me out", "You can't", "", "STOP THAT!", "WOAH! HEY!"],    // 16 Rabbit
@@ -1390,7 +1419,7 @@ function interact() {
     var y = Math.floor((playerPosY + hpsize + (playerDirection[2] * hpsize) - (playerDirection[3] * hpsize) - playerDirection[3]) / tsize);
     var key = String(mapIndex) + String(mapXCoord) + String(mapYCoord) + String(x) + String(y);
 
-    console.info(key);
+    console.info(key);  // FIXME delete this
 
     // Check for dialogue
     if (dialoguesStatic[key]) {
@@ -1424,7 +1453,14 @@ function interact() {
     for (i = 0; i < localNPCs.length; i++) {
         var npc = npcs[localNPCs[i]];
         if (npc[3] == x && npc[4] == y) {
-            dialogueBuffer = dialoguesNPCs[stage][localNPCs[i]].slice();
+            // Raccoon dialogue
+            if ((localNPCs[i] == 19) && (stage < 13)) {
+                dialogueBuffer = [...dialoguesRaccoon[lastMetNPC], ...raccoonOpeningDialogue];
+            } else {
+                lastMetNPC = localNPCs[i];
+                dialogueBuffer = dialoguesNPCs[stage][localNPCs[i]].slice();
+            }
+
             // NPCs change direction to face player when interacted with
             for (j = 0; j < playerDirection.length; j++) {
                 if (playerDirection[j] == 1) {
