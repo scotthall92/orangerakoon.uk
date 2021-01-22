@@ -917,15 +917,12 @@ function update() {
 
     // Do stuff
     frameCount3 = frameCount3 + 1;
-    if (frameCount3 > 3) {
-        frameCount3 = 1;
-    }
+    if (frameCount3 > 3) { frameCount3 = 1; }
     processKeys();
     drawScreen();
 
     var delta = Date.now() - start;
     var delay = mspf - delta;
-    // console.info(delay);
     if (delay > 0) {
         setTimeout(update, delay);
     } else {
@@ -973,8 +970,8 @@ function transitionScreen(xincrement, yincrement) {
 
     var coords = String(mapXCoord + xincrement) + String(mapYCoord + yincrement);
     if (coords in map) {
-        mapXCoord = mapXCoord + xincrement;
-        mapYCoord = mapYCoord + yincrement;
+        mapXCoord += xincrement;
+        mapYCoord += yincrement;
         updateLocale(coords);
     } else {
         offMapTransitions += 1;
@@ -1086,7 +1083,7 @@ function drawNPCs() {
 
 function drawPlayer() {
     if (playerMoving) {
-        playerAnimationBuffer = playerAnimationBuffer + 1;
+        playerAnimationBuffer += 1;
         if (playerAnimationBuffer == playerAnimationBufferMax) {
             playerAnimationFrame = Number(playerAnimationFrame == 0);
             playerAnimationBuffer = 0;
@@ -1301,29 +1298,29 @@ function playerStep(collinearAxis, reverse) {
         var portalStart = portalTiles[mapIndex].indexOf(startTile) >= 0;
         var portalEnd = portalTiles[mapIndex].indexOf(endTile) >= 0;
         if (portalStart && portalEnd) {
-            portalBuffer = portalBuffer + 1;
+            portalBuffer += 1;
             playerPushing = false;
         } else if (portalStart && !portalEnd) {
             if (portalTiles[mapIndex].indexOf(end2Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos - 1;
-                portalBuffer = portalBuffer + 1;
+                portalBuffer += 1;
                 playerPushing = false;
             } else {
-                portalBuffer = portalBuffer - 1;
+                portalBuffer -= 1;
             }
         } else if (!portalStart && portalEnd) {
             if (portalTiles[mapIndex].indexOf(start2Tile) >= 0) {
                 newOrthogonalPos = orthogonalPos + 1;
-                portalBuffer = portalBuffer + 1;
+                portalBuffer += 1;
                 playerPushing = false;
             } else {
-                portalBuffer = portalBuffer - 1;
+                portalBuffer -= 1;
             }
         } else {
-            portalBuffer = portalBuffer - 1;
+            portalBuffer -= 1;
         }
     } else if (!orthogonalMovement) {
-        portalBuffer = portalBuffer - 1;
+        portalBuffer -= 1;
     }
     if (portalBuffer < 0) {
         portalBuffer = 0;
@@ -1421,7 +1418,7 @@ function playerStep(collinearAxis, reverse) {
 }
 
 function advanceStage() {
-    stage = stage + 1;
+    stage += 1;
     goal = goals.pop();
     Object.entries(npcsDiffs[stage]).forEach(
         ([key, value]) => npcs[key] = value
@@ -1516,7 +1513,7 @@ function processKeys() {
 
     // Ending
     if (stage == 20) {
-        fadeOut = fadeOut + 1;
+        fadeOut += 1;
         if (fadeOut > 240) {
             throw "Error: The dream has ended";
         }
@@ -1528,9 +1525,9 @@ function processKeys() {
         if (stage > 13) {
             fadeOut = 0;
         } else if (mapIndex == 0 && mapXCoord == 2 && mapYCoord == 3) {
-            fadeOut = fadeOut - 1;
+            fadeOut -= 1;
         } else {
-            fadeOut = fadeOut + 1
+            fadeOut += 1
         }
         if (fadeOut == 179) {
             enterPortal();
@@ -1543,7 +1540,7 @@ function processKeys() {
     }
 
     if (inputDelayBuffer > 0) {
-        inputDelayBuffer = inputDelayBuffer - 1;
+        inputDelayBuffer -= 1;
         return;
     }
 
@@ -1628,7 +1625,7 @@ function processKeys() {
     // Kennel World
     if (keyMap["a"] && keyMap["s"]) {
         if (mapIndex == 0 && mapXCoord == 1 && mapYCoord == 2 && playerPosX == 60 && playerPosY == 24) {
-            kennelBuffer = kennelBuffer + 1;
+            kennelBuffer += 1;
             if (kennelBuffer > portalBufferMax) {
                 enterPortal();
                 tileset = tilesets[0];
