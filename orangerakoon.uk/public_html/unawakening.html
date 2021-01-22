@@ -81,9 +81,13 @@ var playerDirection = [0,0,1,0];  // +x,-x,+y,-y
 var playerMoving = false;
 var playerPushing = false;
 var playerDown = true;
+var playerOcarina = false;
 var playerAnimationFrame = 1;
 var playerAnimationBufferMax = 12;
 var playerAnimationBuffer = 0;
+
+var hasOcarina = false;
+var playingOcarina = false;
 
 var wasMovingX = 0;
 var wasMovingY = 0;
@@ -251,6 +255,8 @@ var dialoguesComputer = [
     ["", "Spooky!", "is haunted.", "people say", "that some", "the cliffs", "old house on", "There is an", "", "Jenuall"],
     ["", "for playing!", "done! Thanks", "pretty much", "Wow, you're", "", "OrangeRKN"],
 ];
+var foundOcarinaDialogue = ["", "to play it!", "Press 'o'", "an ocarina!", "You found", "Huh?! Wow!"];
+var playOcarinaDialogue = ["", ":huh?!", "*toot toot*"];
 var raccoonOpeningDialogue = ["", "to, huh?", "been talking", "who have you", "Let's see:", "SECRETS!", "SHACK OF", "RACCOON'S", "Welcome to", "Nyeh heh!"];
 var dialoguesRaccoon = [
     [""],    // 0 Dreamer
@@ -569,7 +575,7 @@ var dialoguesNPCs = [
         ["", "in the sun!", "play outside", "loves to", "Bow Bow just", "My darling"],    // 3 Madame
         ["", ""],    // 4 Bow Bow Ribbon
         ["", "to see me!", "world gets", "The whole", "on walks!", "I love going"],    // 5 Bow Bow
-        ["", "that?", "Did you know", "of a legend!", "is something", "that old man", ":Huh? Oh,"],    // 6 Trendy Man
+        ["", "that?", "Did you know", "of a legend!", "is something", "the old man", ":Huh? Oh,"],    // 6 Trendy Man
         ["", "same!", "him all the", "but I love", "sharpest,", "He's not the", "my husband?", "Did you find"],    // 7 Mama
         ["", "a minute!", "resting for", "I'm just"],    // 8 Papa
         ["", "Well done!", "to find me:", "You managed", "Oh ho ho!"],    // 9 Old Man
@@ -879,6 +885,7 @@ var portals = {
     "01252": [1, 1, 2, 7, 0],
     "03022": [1, 9, 9, 3, 4],
     "19935": [0, 3, 0, 2, 3],
+    "ocarina": [0, 2, 3, 2, 2],
 };
 
 function resizeCanvas(increment) {
@@ -997,6 +1004,8 @@ function enterPortal() {
     var yCoord = Math.floor((playerPosY + (psize - 1) * playerDirection[2]) / tsize);
     key = String(mapIndex) + String(mapXCoord) + String(mapYCoord) + String(xCoord) + String(yCoord);
 
+    if (playingOcarina) { key = "ocarina"; }
+
     if (portals[key]) {
         portalBuffer = 0;
         transitionXBuffer = 0;
@@ -1103,6 +1112,10 @@ function drawPlayer() {
     if (playerDown) {
         sx = psize * 4;
         sy = psize * 3;
+    }
+    if (playerOcarina) {
+        sx = psize * 4;
+        sy = psize * 2;
     }
     ctx.drawImage(player, sx, sy, psize, psize, playerPosX * scale, playerPosY * scale, psize * scale, psize * scale);
 
@@ -1421,8 +1434,6 @@ function interact() {
     var y = Math.floor((playerPosY + hpsize + (playerDirection[2] * hpsize) - (playerDirection[3] * hpsize) - playerDirection[3]) / tsize);
     var key = String(mapIndex) + String(mapXCoord) + String(mapYCoord) + String(x) + String(y);
 
-    console.info(key);  // FIXME delete this
-
     // Check for dialogue
     if (dialoguesStatic[key]) {
         dialogueBuffer = dialoguesStatic[key].slice();
@@ -1445,6 +1456,12 @@ function interact() {
     // Computer dialogue
     if (key == "10133") {
         dialogueBuffer = [...dialoguesComputer[stage], ...computerStartupDialogue];
+    }
+
+    // Find ocarina
+    if (!hasOcarina && key == "03343") {
+        dialogueBuffer = foundOcarinaDialogue.slice();
+        hasOcarina = true;
     }
 
     // Ending
@@ -1478,6 +1495,16 @@ function interact() {
     }
 }
 
+function playOcarina() {
+    dialogueBuffer = playOcarinaDialogue.slice();
+    dialogueFirstLine = dialogueBuffer.pop();
+    dialogueSecondLine = dialogueBuffer.pop();
+    inputDelayBuffer = dialogueInputDelay;
+    playerDirection = [0,0,1,0];
+    playerOcarina = true;
+    playingOcarina = true;
+}
+
 function processKeys() {
     var lastPlayerDirection = playerDirection;
 
@@ -1492,6 +1519,25 @@ function processKeys() {
         fadeOut = fadeOut + 1;
         if (fadeOut > 240) {
             throw "Error: The dream has ended";
+        }
+        return;
+    }
+
+    // Playing ocarina
+    if (playingOcarina) {
+        if (stage > 13) {
+            fadeOut = 0;
+        } else if (mapIndex == 0 && mapXCoord == 2 && mapYCoord == 3) {
+            fadeOut = fadeOut - 1;
+        } else {
+            fadeOut = fadeOut + 1
+        }
+        if (fadeOut == 179) {
+            enterPortal();
+        }
+        if (fadeOut < 1) {
+            fadeOut = 0;
+            playingOcarina = false;
         }
         return;
     }
@@ -1514,6 +1560,15 @@ function processKeys() {
 
     // Opening
     if (playerDown) { playerDown = false; }
+
+    // Ocarina
+    if (playerOcarina) { playerOcarina = false; }
+
+    // Play ocarina
+    if (keyMap["o"] && hasOcarina) {
+        playOcarina();
+        return;
+    }
 
     // Interact
     if (keyMap["j"]) {
