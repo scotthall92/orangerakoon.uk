@@ -130,12 +130,12 @@ var keyMap = {};
 
 function keydown(event) {
     if (!event.repeat) {
-        keyMap[event.key] = true;
+        keyMap[event.key.toLowerCase()] = true;
     }
 }
 
 function keyup(event) {
-    keyMap[event.key] = false;
+    keyMap[event.key.toLowerCase()] = false;
 }
 
 function blur(event) {
