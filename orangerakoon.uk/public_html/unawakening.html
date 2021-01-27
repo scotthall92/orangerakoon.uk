@@ -51,6 +51,9 @@ var scale = 2;
 var fps = 60;
 var mspf = 1000 / fps; // ms per frame
 
+var timerStart;
+var timerEnd;
+
 var frameCount3 = 1;
 
 var tilesets = [document.getElementById("tileset1"), document.getElementById("tileset2")];
@@ -1049,20 +1052,40 @@ function drawScreen() {
     drawLocale();
     drawActors();
     drawDialogue();
-    drawScreenMask();
+    if (stage == 20) {
+        drawScreenMask();
+        if (fadeOut > 300) {
+            drawPlaytime();
+        }
+    }
+}
+
+function drawPlaytime() {
+    var completionTime = (timerEnd - timerStart) / 1000;
+    var hours = Math.floor(completionTime / 3600).toString();
+    var mins = Math.floor(completionTime % 3600 / 60).toString();
+    var secs = (completionTime % 3600 % 60).toFixed(2);
+    var timestamp = hours + "h" + ("0" + mins).slice(-2) + "m" + ("0" + secs).slice(-5) + "s";
+    dialogueBuffer = [""];
+    dialogueFirstLine = "End playtime";
+    dialogueSecondLine = timestamp;
+    drawDialogue();
+
+    throw "Error: The dream has ended";
 }
 
 function drawScreenMask() {
+    fadeOut += 1;
+    if (fadeOut == 1) { timerEnd = Date.now(); }
+    if (fadeOut < 180) { return; }
     for (i = 0; i < screenTileWidth; i++) {
         for (j = 0; j < screenTileHeight; j++) {
             var dx = i * tsize * scale;
             var dy = j * tsize * scale;
-            if (fadeOut > 180) {
-                if (fadeOut < 240) {
-                    ctx.drawImage(tileFadeMask, 0, 0, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
-                } else {
-                    ctx.drawImage(tileWhiteMask, 0, 0, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
-                }
+            if (fadeOut < 240) {
+                ctx.drawImage(tileFadeMask, 0, 0, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
+            } else {
+                ctx.drawImage(tileWhiteMask, 0, 0, tsize, tsize, dx, dy, tsize * scale, tsize * scale);
             }
         }
     }
@@ -1533,12 +1556,8 @@ function processKeys() {
     playerMoving = false;
     playerPushing = false;
 
-    // Ending
+    // Ending blocks input
     if (stage == 20) {
-        fadeOut += 1;
-        if (fadeOut > 240) {
-            throw "Error: The dream has ended";
-        }
         return;
     }
 
@@ -1578,7 +1597,10 @@ function processKeys() {
     }
 
     // Opening
-    if (playerDown) { playerDown = false; }
+    if (playerDown) {
+        playerDown = false;
+        timerStart = Date.now();
+    }
 
     // Ocarina
     if (playerOcarina) { playerOcarina = false; }
