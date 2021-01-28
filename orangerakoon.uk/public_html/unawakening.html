@@ -855,28 +855,20 @@ var npcsDiffs = [
 ];
 
 var stage = 0;
-var goal = "03454"; // Bottle
-var goals = [
-    "",         // End
-    "03435",    // Dreamer
-    "03435",    // Dreamer
-    "03435",    // Dreamer
-    "03435",    // Dreamer
-    "03435",    // Dreamer
-    "03435",    // Dreamer
-    "03435",    // Dreamer
-    "12353",    // Ghost
-    "10222",    // Madame
-    "04023",    // Koko
-    "04312",    // Papa
-    "11062",    // Mama
-    "11243",    // Bow Bow Ribbon
-    "11352",    // Croc
-    "10342",    // Grandma
-    "12132",    // Witch
-    "00034",    // Mushroom Man
-    "12132",    // Witch
-    "10032",    // Book
+var target = 24; // Bottle
+var targets = [
+    17, // Ghost
+    3,  // Madame
+    15, // Koko
+    8,  // Papa
+    7,  // Mama
+    4,  // Bow Bow Ribbon
+    14, // Croc
+    13, // Grandma
+    11, // Witch
+    1,  // Mushroom Man
+    11, // Witch
+    23, // Book
 ];
 
 // Map Index, Map X Coord, Map Y Coord, Tile x, Tile y
@@ -1464,7 +1456,7 @@ function playerStep(collinearAxis, reverse) {
 
 function advanceStage() {
     stage += 1;
-    goal = goals.pop();
+    target = targets.pop();
     Object.entries(npcsDiffs[stage]).forEach(
         ([key, value]) => npcs[key] = value
     );
@@ -1509,6 +1501,7 @@ function interact() {
     // Ending
     if (stage > 12 && key == "03435") {
         dialogueBuffer = dialoguesEnding[stage - 13].slice();
+        advanceStage();
     }
 
     for (i = 0; i < localNPCs.length; i++) {
@@ -1531,10 +1524,8 @@ function interact() {
         }
     }
 
-    // Advance stage if goal reached
-    if (goal == key) {
-        advanceStage();
-    }
+    // Advance stage if target spoken to
+    if (lastMetNPC == target) { advanceStage(); }
 }
 
 function playOcarina() {
