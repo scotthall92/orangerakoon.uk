@@ -159,6 +159,7 @@ var portalTiles = [
     ["13", "50"],
 ];
 
+var computerTiles = [[], ["51"]];
 var signpostTiles = [["44"], []];
 var heavyTiles = [["60"], ["43"]];
 var drawerTiles = [[], ["40"]];
@@ -905,6 +906,9 @@ var portals = {
     "ocarina": [0, 2, 3, 2, 2],
 };
 
+var locationEnding = "03435";
+var locationOcarina = "03343";
+
 function resizeCanvas(increment) {
     scale = scale + increment;
     if (scale < 1) { scale = 1; }
@@ -1485,21 +1489,20 @@ function interact() {
         if (drawerTiles[mapIndex].indexOf(locale[x][y]) >= 0) {
             dialogueBuffer = dialoguesDefault["drawer"].slice();
         }
-    }
 
-    // Computer dialogue
-    if (key == "10133") {
-        dialogueBuffer = [...dialoguesComputer[stage], ...computerStartupDialogue];
+        if (computerTiles[mapIndex].indexOf(locale[x][y]) >= 0) {
+            dialogueBuffer = [...dialoguesComputer[stage], ...computerStartupDialogue];
+        }
     }
 
     // Find ocarina
-    if (!hasOcarina && key == "03343") {
+    if (!hasOcarina && key == locationOcarina) {
         dialogueBuffer = foundOcarinaDialogue.slice();
         hasOcarina = true;
     }
 
     // Ending
-    if (stage > 12 && key == "03435") {
+    if (stage > 12 && key == locationEnding) {
         dialogueBuffer = dialoguesEnding[stage - 13].slice();
         advanceStage();
     }
