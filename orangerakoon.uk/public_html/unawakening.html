@@ -859,6 +859,8 @@ var npcsDiffs = [
 ];
 
 var stage = 0;
+var stages = 13;
+var endStage = 20;
 var target = 24; // Bottle
 var targets = [
     17, // Ghost
@@ -942,7 +944,7 @@ function update() {
     var start = Date.now();
 
     // Do stuff
-    frameCount3 = frameCount3 + 1;
+    frameCount3 += 1;
     if (frameCount3 > 3) { frameCount3 = 1; }
     processKeys();
     drawScreen();
@@ -992,7 +994,7 @@ function transitionScreen(xincrement, yincrement) {
     transitionXBuffer = 0;
     transitionYBuffer = 0;
 
-    if (stage > 13) { return; } // Cannot leave ending
+    if (stage > stages) { return; } // Cannot leave ending
 
     var coords = String(mapXCoord + xincrement) + String(mapYCoord + yincrement);
     if (coords in map) {
@@ -1053,7 +1055,7 @@ function drawScreen() {
     drawLocale();
     drawActors();
     drawDialogue();
-    if (stage == 20) {
+    if (stage == endStage) {
         drawScreenMask();
         if (fadeOut > 300) {
             drawPlaytime();
@@ -1512,8 +1514,8 @@ function interact() {
     }
 
     // Ending
-    if (stage > 12 && key == locationEnding) {
-        dialogueBuffer = dialoguesEnding[stage - 13].slice();
+    if (stage >= stages && key == locationEnding) {
+        dialogueBuffer = dialoguesEnding[stage - stages].slice();
         advanceStage();
     }
 
@@ -1521,7 +1523,7 @@ function interact() {
         var npc = npcs[localNPCs[i]];
         if (npc[3] == x && npc[4] == y) {
             // Raccoon dialogue
-            if ((localNPCs[i] == 19) && (stage < 13)) {
+            if ((localNPCs[i] == 19) && (stage < stages)) {
                 dialogueBuffer = [...dialoguesRaccoon[lastMetNPC], ...raccoonOpeningDialogue];
             } else {
                 lastMetNPC = localNPCs[i];
@@ -1561,13 +1563,13 @@ function processKeys() {
     playerPushing = false;
 
     // Ending blocks input
-    if (stage == 20) {
+    if (stage == endStage) {
         return;
     }
 
     // Playing ocarina
     if (playingOcarina) {
-        if (stage > 13) {
+        if (stage > stages) {
             fadeOut = 0;
         } else if (mapIndex == 0 && mapXCoord == 2 && mapYCoord == 3) {
             fadeOut -= 1;
