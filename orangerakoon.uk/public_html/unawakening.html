@@ -42,6 +42,7 @@
 <img id="tileFadeMask" src="unawakening_assets/tile_fade_mask.png" width=0 height=0>
 <img id="tileWhiteMask" src="unawakening_assets/tile_white_mask.png" width=0 height=0>
 
+<script src="seedrandom.js"></script>
 <script type="text/javascript">
 
 var c = document.getElementById("screenCanvas");
@@ -53,6 +54,8 @@ var mspf = 1000 / fps; // ms per frame
 
 var timerStart;
 var timerEnd;
+
+var seed = "";
 
 var frameCount3 = 1;
 
@@ -930,6 +933,8 @@ function init() {
     dialogueFirstLine = dialogueBuffer.pop();
     dialogueSecondLine = dialogueBuffer.pop();
 
+    if (location.hash.startsWith("#randomiser")) { randomise(); }
+
     update();
 }
 
@@ -1063,7 +1068,12 @@ function drawPlaytime() {
     var secs = (completionTime % 3600 % 60).toFixed(2);
     var timestamp = hours + "h" + ("0" + mins).slice(-2) + "m" + ("0" + secs).slice(-5) + "s";
     dialogueBuffer = [""];
-    dialogueFirstLine = "End playtime";
+
+    if (seed.length > 0) {
+        dialogueFirstLine = seed;
+    } else {
+        dialogueFirstLine = "End playtime";
+    }
     dialogueSecondLine = timestamp;
     drawDialogue();
 
@@ -1680,6 +1690,49 @@ function processKeys() {
     if ((transitionXBuffer == 0) && (transitionYBuffer == 0)) {
         keyMap["-"] = false;
     }
+}
+
+// ////////////////////////////////////////////////////////////
+// #RANDOMISER=SEED                                          //
+// ////////////////////////////////////////////////////////////
+
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+function getSeed() {
+    var seedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var seed = "";
+    if (location.hash.indexOf("#randomiser=") >= 0) {
+        seed = location.hash.split("#randomiser=")[1].slice(0,12);
+        for (var i=0; i < seed.length; i++) {
+            if (seedCharacters.indexOf(seed[i]) < 0) {
+                seed = seed.replace(seed[i], "?");
+            }
+        }
+    }
+    if (seed.length > 0) { return seed; }
+
+    // Generate seed
+    for (var i=0; i < 12; i++) {
+        seed += seedCharacters[Math.floor(Math.random() * seedCharacters.length)];
+    }
+    return seed;
+}
+
+function shuffleNpcs() {
+}
+
+function randomise() {
+    seed = getSeed();
+    Math.seedrandom(seed);
+
+    shuffleNpcs();
 }
 
 </script>
