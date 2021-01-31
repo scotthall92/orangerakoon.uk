@@ -1727,6 +1727,12 @@ function getSeed() {
     return seed;
 }
 
+function modifyMap() {
+    outsideMap["12"] = outsideMap["12"].substring(0,42) + "54" + outsideMap["12"].substring(44);    // Block kennel world
+    outsideMap["20"] = outsideMap["20"].substring(0,76) + "60" + outsideMap["20"].substring(78);    // Block big house
+    outsideMap["30"] = outsideMap["30"].substring(0,36) + "63" + outsideMap["30"].substring(38);    // Block shrine
+}
+
 function shuffleNpcs() {
 }
 
@@ -1734,6 +1740,7 @@ function randomise() {
     seed = getSeed();
     Math.seedrandom(seed);
 
+    modifyMap();
     shuffleNpcs();
 }
 
