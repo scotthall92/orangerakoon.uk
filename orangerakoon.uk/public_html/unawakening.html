@@ -879,8 +879,8 @@ var targets = [
 
 // Map X Coord, Map Y Coord, Tile x, Tile y
 var portals = [
-    ["1052", "2033", "2053", "1123", "3124", "3233", "1223", "1243", "2233", "1343", "1422", "4442", "3022", "9931", "1252", "2321"],
-    ["0045", "1045", "2035", "0135", "1145", "2135", "0235", "1245", "2245", "0335", "1345", "2335", "9935", "0132", "1271", "ocarina"],
+    ["1052", "1123", "3124", "1223", "1243", "3233", "2233", "1343", "1422", "4442", "2033", "2053", "3022", "9931", "1252", "2321"],
+    ["0045", "0135", "1145", "0235", "1245", "2135", "2245", "0335", "1345", "2335", "1045", "2035", "9935", "0132", "1271", "ocarina"],
 ];
 var locationEnding = "03435";
 var locationOcarina = "03343";
@@ -1708,6 +1708,13 @@ function modifyMap() {
     outsideMap["30"] = outsideMap["30"].substring(0,36) + "63" + outsideMap["30"].substring(38);    // Block shrine
 }
 
+function shufflePortals() {
+    var insidePortalsToShuffle = portals[1].slice(0, 10);
+    var insidePortalsStatic = portals[1].slice(10);
+    shuffleArray(insidePortalsToShuffle);
+    portals[1] = [...insidePortalsToShuffle, ...insidePortalsStatic];
+}
+
 function shuffleNpcs() {
 }
 
@@ -1716,6 +1723,7 @@ function randomise() {
     Math.seedrandom(seed);
 
     modifyMap();
+    shufflePortals();
     shuffleNpcs();
 }
 
