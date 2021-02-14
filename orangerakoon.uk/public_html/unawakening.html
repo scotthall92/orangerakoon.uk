@@ -863,18 +863,18 @@ var stages = 13;
 var endStage = 20;
 var target = 24; // Bottle
 var targets = [
-    17, // Ghost
-    3,  // Madame
-    15, // Koko
-    8,  // Papa
-    7,  // Mama
-    4,  // Bow Bow Ribbon
-    14, // Croc
-    13, // Grandma
+    23, // Book
     11, // Witch
     1,  // Mushroom Man
     11, // Witch
-    23, // Book
+    13, // Grandma
+    14, // Croc
+    4,  // Bow Bow Ribbon
+    7,  // Mama
+    8,  // Papa
+    15, // Koko
+    3,  // Madame
+    17, // Ghost
 ];
 
 // Map X Coord, Map Y Coord, Tile x, Tile y
@@ -1447,7 +1447,7 @@ function playerStep(collinearAxis, reverse) {
 
 function advanceStage() {
     stage += 1;
-    target = targets.pop();
+    target = targets.shift();
     Object.entries(npcsDiffs[stage]).forEach(
         ([key, value]) => npcs[key] = value
     );
@@ -1755,7 +1755,7 @@ function shuffleNpcs() {
     availableInsideScreens = [...availableInsideScreens.slice(0, grandmaScreenIndex), ...availableInsideScreens.slice(grandmaScreenIndex+1)];
 
     // Witch needs 2 tiles for caldron
-    var witchLocations = ["00062","03061","04022","00161","01313","03153","01261","04212","00363","02362","04312","00413","10023","12132","11233","11253","11352"];
+    var witchLocations = ["00062","03061","04022","00161","01313","03163","01261","04212","00363","02362","04312","00413","10023","12132","11233","11253","11352"];
     shuffleArray(witchLocations);
     var witchLocation;
     for (var i=0; i < witchLocations.length; i++) {
@@ -1772,6 +1772,7 @@ function shuffleNpcs() {
     if (witchScreenIndex >= 0) {
         availableOutsideScreens = [...availableOutsideScreens.slice(0, witchScreenIndex), ...availableOutsideScreens.slice(witchScreenIndex+1)];
     } else {
+        witchScreenIndex = availableInsideScreens.indexOf(witchScreen);
         availableInsideScreens = [...availableInsideScreens.slice(0, witchScreenIndex), ...availableInsideScreens.slice(witchScreenIndex+1)];
     }
 
@@ -1790,7 +1791,7 @@ function shuffleNpcs() {
         "012": ["54", "61"],
         "032": ["14", "54"],
         "042": ["11", "12", "13", "21", "22", "32"],
-        "003": ["13", "23", "24", "31", "33", "51", "53", "54", "61", "63", "64"],
+        "003": ["13", "31", "33", "51", "53", "54", "61", "63", "64"],
         "013": ["13", "23", "61", "62", "63"],
         "023": ["61", "62", "63"],
         "033": ["24", "34", "61", "62"],
@@ -1810,10 +1811,10 @@ function shuffleNpcs() {
         "113": ["52"],
         "123": ["12", "32", "53", "63"],
     };
-    var validNpcs = [1,3,4,6,7,8,14,15,16,17,18,19,20];
+    var validNpcs = [1,3,4,6,7,8,14,15,16,17,18];
     for (var i=0; i < validNpcs.length; i++) {
         var npcScreen;
-        if (i < availableInsideScreens.length) {
+        if (i < availableInsideScreens.length-3) {
             npcScreen = availableInsideScreens[i];
         } else {
             npcScreen = availableOutsideScreens[i];
@@ -1825,12 +1826,272 @@ function shuffleNpcs() {
     // Dreamer
     npcs[0] = [0, 3, 4, 4, 4];
 
-    npcsDiffs = [{},{},{},{},{},{}]; // No NPC movement
+    npcsDiffs = [{},{},{},{},{},{},{},{},{}]; // No NPC movement
 }
 
 function generateQuest() {
+    var targetableNpcs = [1,3,4,6,7,8,11,13,14,15,16,17,18];
+    shuffleArray(targetableNpcs);
+
     stages = 5;
-    endStage = 6;
+    endStage = 8;
+
+    target = targetableNpcs[0];
+    targets = [];
+    for (var i=1; i < stages; i++) { targets.push(targetableNpcs[i]); }
+}
+
+function formatDialogueForTrade(dialogue, toTrade="", forTrade="") {
+    for (var i=0; i < dialogue.length; i++) {
+        dialogue[i] = dialogue[i].replace("2TRADE", toTrade);
+        dialogue[i] = dialogue[i].replace("4TRADE", forTrade);
+    }
+    return dialogue.slice();
+}
+
+function generateDialogue() {
+    var npcDialoguePoolDefault = [
+        // 0 Dreamer
+        [
+            ["", "on my dream:", "as you tread", "Tread softly"],
+            ["", "Save me:!", "", "up:", "I can't wake", "", "Wake me up:"],
+            ["", "hypnotic:", "The song is", "", "La le lo!", "La li lu!"],
+        ],
+        // 1 Mushroom Man
+        [
+            ["", "just great!", "I'm doin'", "ya again!", "Good ta see"],
+            ["", "own grampa?", "make me ma", "does this", "thinkin',", "I got ta"],
+            ["", "I sure do!", "Brooklyn?", "brother in", "I got a baby", "tell ya that", "Did I ever"],
+        ],
+        // 2 Sleeping Mushroom Man
+        [["", ""]],
+        // 3 Madame
+        [
+            ["", "type:", "the jealous", "job I'm not", "It's a good", "you dear!", "very fond of", "Bow Bow is", "My darling"],
+            ["", "dognapped!", "hasn't been", "I hope she", "Bow Bow?!", "seen my", "Have you"],
+            ["", "intensely?!", "at you quite", "is looking", "Madame Meow", "", "new perfume:", "noticed my", "I'm sure you"],
+        ],
+        // 4 Bow Bow Ribbon
+        [
+            ["", "fashion!", "Follow the", "Stripes!", "Polka-dots!"],
+            ["", "physicist!", "about a bio-", "Oh, oh, how", "influencer?", "Or maybe an", "be a model!", "I want to"],
+            ["", "have fleas:", "Plus I might", "staying put!", "My ribbon is", "have it!", "You can't"],
+        ],
+        // 5 Bow Bow
+        [["", ""]],
+        // 6 Trendy Man
+        [
+            ["", "too now?", "randomisers", "you're into", ":Huh? Oh,"],
+            ["", ":cool huh?", "", "^^__<><>BA", "", "code out!", "check this", ":Huh? Oh,"],
+            ["", "dreamworld?", "bloom in the", "love could", "do you think", ":Huh? Oh,"],
+        ],
+        // 7 Mama
+        [
+            ["", "this time!", "husband is", "where my", "I wonder"],
+            ["", "aren't you:", "curious one", "Uh: you're a", "boys called?", "What are our", "What's that?"],
+        ],
+        // 8 Papa
+        [
+            ["", "life for me!", "This is the", "*munch*", "*munch*"],
+        ],
+        // 9 Old Man
+        [["", ""]],
+        // 10 Shopkeeper
+        [["", ""]],
+        // 11 Witch
+        [
+            ["", "recipe!", "rest of my", "to get the", "never going", "and: you're", "Eye of newt", "Caldron boil", "Double toil"],
+        ],
+        // 12 Caldron
+        [["", ""]],
+        // 13 Grandma
+        [
+            ["", "can sleep!", "Grandma sure", "", "*SNORE*"],
+            ["", "dream!", "What an odd", "", "scissors:", ":I need"],
+            ["", ":polochus:", "dreamer:", ":the bubble", ":wind fish:"],
+        ],
+        // 14 Croc
+        [
+            ["", "salesman!", "a travelling", "I've become"],
+            ["", "late!", "It's running", "for a train:", "I'm waiting"],
+        ],
+        // 15 Koko
+        [
+            ["", "again!", "to see you", "Koko happy", "Ook! Ook!"],
+        ],
+        // 16 Rabbit
+        [
+            ["", "is a hit!", "catchphrase", "My fun new", "Hoppity hi!"],
+            ["", "part rabbit!", "I'm part cat", "", "Magya!", "Rupurudu!", "Wahoo!"],
+        ],
+        // 17 Ghost
+        [
+            ["", ":unchanged:", ":nostalgia:"],
+        ],
+        // 18 Fox
+        [
+            ["", "there, slip!", "Get out of", "", "Yip! Yip!"],
+            ["", "a new one!", ":yap? That's", "", "Yip! Yap!"],
+            ["", "DIALOGUE", "ERROR? MISSING"],
+        ],
+        // 19 Raccoon
+        [["", ""]],
+        // 20 Owl
+        [["", ""]],
+        // 21 Mushroom
+        [["", ""]],
+        // 22 Signpost
+        [["", ""]],
+        // 23 Book
+        [["", ""]],
+        // 24 Bottle
+        [["", ""]],
+        // 25 Carl
+        [["", ""]],
+    ];
+
+    var randNpcDialogueDefault = [];
+    for (var i=0; i < npcDialoguePoolDefault.length; i++) {
+        randNpcDialogueDefault[i] = npcDialoguePoolDefault[i][Math.floor(Math.random() * npcDialoguePoolDefault[i].length)];
+    }
+    dialoguesNPCs = [];
+    for (var i=0; i <= endStage; i++) { dialoguesNPCs[i] = randNpcDialogueDefault.slice(); }
+
+    var npcDialoguesUpcomingTrade = [
+        ["", ""],    // 0 Dreamer
+        ["", "ya?", "2TRADE would", "if ya find a", "Let me know"],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", "anywhere!", "get a 2TRADE", "but I can't", "my Bow Bow,", "anything for", "I would do"],    // 3 Madame
+        ["", "new fashion!", "It's the hot", "a 2TRADE!", "wish I had", "Oh how I"],    // 4 Bow Bow Ribbon
+        ["", ""],    // 5 Bow Bow
+        ["", "right now.", "for a 2TRADE", "I'm looking", "random but", "it's a bit", ":Huh? Oh,"],    // 6 Trendy Man
+        ["", "ordered:", "a 2TRADE I", "postman with", "you were the", "I was hoping", "To be honest", "Ah, a guest!"],    // 7 Mama
+        ["", "a 2TRADE!", "when you get", "see me later", "Hullo! Come"],    // 8 Papa
+        ["", ""],    // 9 Old Man
+        ["", ""],    // 10 Shopkeeper
+        ["", "be quick!", "2TRADE, and", "Bring me a", ":hmm: :aha!", "Caldron boil", "Double toil"],    // 11 Witch
+        ["", ""],    // 12 Caldron
+        ["", "2TRADE?", "fetch me my", "a dear and", "Would you be"],    // 13 Grandma
+        ["", "lined up!", "have a buyer", "me know - I", "a 2TRADE let", "If you find"],    // 14 Croc
+        ["", "2TRADE!", "Koko want", "Ook! Ook!"],    // 15 Koko
+        ["", "small ears!", "Hop to it,", "want it NOW!", "2TRADE and I", "I want me a"],    // 16 Rabbit
+        ["", ":my 2TRADE:", ":find me:"],    // 17 Ghost
+        ["", "a 2TRADE?!", "to want:", "They seem", "", "Yip! Yip!"],    // 18 Fox
+        ["", ""],    // 19 Raccoon
+        ["", ""],    // 20 Owl
+        ["", ""],    // 21 Mushroom
+        ["", ""],    // 22 Signpost
+        ["", ""],    // 23 Book
+        ["", ""],    // 24 Bottle
+        ["", ""],    // 25 Carl
+    ];
+
+    var npcDialoguesTakeItem = [
+        ["", ""],    // 0 Dreamer
+        ["", "have it!", "gotta let me", "Please, ya", "like that?!", "get a 2TRADE", "Where d'ya"],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", "my Bow Bow!", "have it for", "must let me", "You simply", "a 2TRADE?", "that really", "Oh my, is"],    // 3 Madame
+        ["", "me, please!", "Give it to", "you have!", "that 2TRADE", "Ah! What is"],    // 4 Bow Bow Ribbon
+        ["", ""],    // 5 Bow Bow
+        ["", "from you!", "that 2TRADE", "I'll take", ":Huh? Oh,"],    // 6 Trendy Man
+        ["", "kind of you!", "That's very", "is for me?", "that 2TRADE", "Did you say"],    // 7 Mama
+        ["", "from here!", "I'll take it", "the 2TRADE?", "you bring me", "Hullo! Did"],    // 8 Papa
+        ["", ""],    // 9 Old Man
+        ["", ""],    // 10 Shopkeeper
+        ["", "one, kehe!", "just wanted", "a spell, I", "It's not for", "a 2TRADE!", "Ah, it has"],    // 11 Witch
+        ["", ""],    // 12 Caldron
+        ["", "ordered!", "the doctor", "is just what", "That 2TRADE", "Yahey!"],    // 13 Grandma
+        ["", "over!", "Now hand it", "out of here!", "is my ticket", "This 2TRADE", "Oh SNAP!"],    // 14 Croc
+        ["", "to Koko?", "Give 2TRADE", "Ook! Ook!"],    // 15 Koko
+        ["", "impressed!", "I'm actually", "me a 2TRADE?", "actually got", "Woah, you"],    // 16 Rabbit
+        ["", ":thank you:", ":for me?", ":2TRADE?"],    // 17 Ghost
+        ["", "that 2TRADE!", "hand over", "You should", "excited?", "They seem:", "", "Yip! Yip!"],    // 18 Fox
+        ["", ""],    // 19 Raccoon
+        ["", ""],    // 20 Owl
+        ["", ""],    // 21 Mushroom
+        ["", ""],    // 22 Signpost
+        ["", ""],    // 23 Book
+        ["", ""],    // 24 Bottle
+        ["", ""],    // 25 Carl
+    ];
+
+    var npcDialoguesGiveItem = [
+        ["", ""],    // 0 Dreamer
+        ["", "it no more!", "don't need", "4TRADE, I", "Take ma old"],    // 1 Mushroom Man
+        ["", ""],    // 2 Sleeping Mushroom Man
+        ["", "expensive!", "It was very", "this 4TRADE.", "Here, take"],    // 3 Madame
+        ["", "you have it?", "Why don't", "other day!", "4TRADE the", "I dug up a"],    // 4 Bow Bow Ribbon
+        ["", ""],    // 5 Bow Bow
+        ["", "gen fun?", "Isn't proc-", "this 4TRADE.", "You can have"],    // 6 Trendy Man
+        ["", "use for it?", "could find a", "so maybe you", "need for one", "I haven't a", "in the post.", "this 4TRADE", "boys sent me", "One of our"],    // 7 Mama
+        ["", "can have it.", "why but you", "Don't ask me", "lunchbox!", "was in my", "This 4TRADE"],    // 8 Papa
+        ["", ""],    // 9 Old Man
+        ["", ""],    // 10 Shopkeeper
+        ["", "or anything!", "isn't cursed", "I promise it", "this 4TRADE!", "Quick, take"],    // 11 Witch
+        ["", ""],    // 12 Caldron
+        ["", "it anymore!", "I don't need", "my 4TRADE -", "You can take"],    // 13 Grandma
+        ["", "and begone!", "this 4TRADE", "Oh OK, take"],    // 14 Croc
+        ["", "found!", "that Koko", "Take 4TRADE"],    // 15 Koko
+        ["", "you out!", "never help", "Don't say I", "4TRADE!", "has a spare", "feet always", "worth his", "Any rabbit"],    // 16 Rabbit
+        ["", ":take it:", ":my 4TRADE:"],    // 17 Ghost
+        ["", "from them!", "got a 4TRADE", "Somehow you", ":Huh? Woah!"],    // 18 Fox
+        ["", ""],    // 19 Raccoon
+        ["", ""],    // 20 Owl
+        ["", ""],    // 21 Mushroom
+        ["", ""],    // 22 Signpost
+        ["", ""],    // 23 Book
+        ["", ""],    // 24 Bottle
+        ["", ""],    // 25 Carl
+    ];
+
+    var tradeables = ["ribbon", "banana", "bottle", "flower", "shovel", "shield", "letter", "amulet", "brooch", "cuckoo", "potion", "papaya", "violin", "candle", "Y.Doll"];
+    shuffleArray(tradeables);
+
+    var newDialogue;
+    newDialogue = npcDialoguesGiveItem[target].slice();
+    dialoguesNPCs[0][target] = formatDialogueForTrade(newDialogue, "", tradeables[0]);
+    for (var j=0; j < stages-1; j++) {
+        newDialogue = npcDialoguesUpcomingTrade[targets[j]].slice();
+        dialoguesNPCs[0][targets[j]] = formatDialogueForTrade(newDialogue, tradeables[j], "");
+    }
+
+    for (var i=0; i < stages-2; i++) {
+        newDialogue = [...npcDialoguesGiveItem[targets[i]].slice(), ...npcDialoguesTakeItem[targets[i]].slice()];
+        dialoguesNPCs[i+1][targets[i]] = formatDialogueForTrade(newDialogue, tradeables[i], tradeables[i+1]);
+        for (var j=i+1; j < stages-1; j++) {
+            newDialogue = npcDialoguesUpcomingTrade[targets[j]].slice();
+            dialoguesNPCs[i+1][targets[j]] = formatDialogueForTrade(newDialogue, tradeables[j], "");
+        }
+    }
+
+    // FIXME final trade (stage-1) needs completion dialogue on end
+    newDialogue = npcDialoguesTakeItem[targets[stages-2]].slice();
+    dialoguesNPCs[stages-1][targets[stages-2]] = formatDialogueForTrade(newDialogue, tradeables[stages-2], "");
+
+    // Ending dialogue
+    dialoguesNPCs[stages][0] = ["", "sea with me:", "Look out to"];
+    for (var i=stages+1; i <= endStage; i++) { dialoguesNPCs[i][0] = ["", ""]; }
+    var endingDialoguesPool = [
+        [
+            ["", "a seagull.", "dreamt I was", "One night I"],
+            ["", "dream?", "Perchance to", "To sleep:", "To die:"],
+            ["", "horizon?", "beyond the", "What lies"],
+        ],
+        [
+            ["", "it seemed.", "now from how", "So different"],
+            ["", "a bubble.", "suspended in", "This world:"],
+            ["", "a dreamer?", "A ballad of", "song:", "A distant"],
+        ],
+        [
+            ["", ":together!!", "Let us awake"],
+            ["", "noble egg:", "Now cracks a"],
+            ["", "COWBOY:", "SEE YOU"],
+        ],
+    ];
+    dialoguesEnding = [];
+    for (var i=0; i < endingDialoguesPool.length; i++) {
+        dialoguesEnding[i] = endingDialoguesPool[i][Math.floor(Math.random() * endingDialoguesPool[i].length)];
+    }
 }
 
 function randomise() {
@@ -1841,6 +2102,7 @@ function randomise() {
     shufflePortals();
     shuffleNpcs();
     generateQuest();
+    generateDialogue();
 }
 
 </script>
