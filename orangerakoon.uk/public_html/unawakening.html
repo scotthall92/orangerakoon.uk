@@ -1731,6 +1731,40 @@ function modifyMap() {
     replaceTile(1, "20", 0, 5, "02");
 }
 
+function modifyStaticDialogues() {
+    dialoguesStatic = {
+        "00323": ["", "", "    ???"],
+        "02132": ["", "", "Cock-a-doo!"],
+        "00241": ["", "", "    ???"],
+        "04121": ["", "", "    ???"],
+        "04330": ["", "", "    ???"],
+        "04311": ["", "", "    ???"],
+        "04351": ["", "", "    ???"],
+        "04333": ["", "", "    ???"],
+        "04353": ["", "", "    ???"],
+    };
+
+    var bookDialogues = [
+        ["", "useful!", "all really", "These are", "Runners'", "for Speed", "Techniques", "'Advanced"],
+        ["", "the author!", "signed by", "It's been", "Dealer'", "an Antiques", "'The Art of"],
+        ["", "trade quest!", "part of the", "No, it's not", "on the side:", "library card", "left their", "Someone has"],
+        ["", "of the book?", "on the cover", "this Bow Bow", "Wait, isn't", "grooming'", "guide to dog", "'A practical"],
+        ["", "me hungry!", "are making", "The pictures", "mushrooms'", "to cook with", "'1001 ways"],
+        ["", "fan-fiction?", "wrote some", "Madame Meow", "Looks like", "and tender:'", "passionate", "locked lips,", "':the lovers"],
+        ["", "Pretty cool!", "comic books.", "stacked with", "The shelf is"],
+        ["", "Heavy stuff!", "of poetry.", "It's a book"],
+        ["", "put it back!", "better just", "I think I", "around it:", "with chains", "book here", "frightening", "There's a"],
+        ["", "domain baby!", "It's public", "and the Egg'", "'Sherlock"],
+        ["", "this?", "peer review", ":Did anyone", "Dreams'", "pretation of", "'The Inter-"],
+        ["", "Very meta!", "the Island'.", "Return to", "'Unawakening", "game called", "book for a", "It's a guide"],
+    ];
+    shuffleArray(bookDialogues);
+
+    for (var i=1; i < 7; i++) {
+        dialoguesStatic["100" + i + "0"] = bookDialogues[i].slice();
+    }
+}
+
 function shufflePortals() {
     var insidePortalsToShuffle = portals[1].slice(0, 12);
     var insidePortalsStatic = portals[1].slice(12);
@@ -1860,8 +1894,8 @@ function generateDialogue() {
         // 1 Mushroom Man
         [
             ["", "just great!", "I'm doin'", "ya again!", "Good ta see"],
-            ["", "own grampa?", "make me ma", "does this", "thinkin',", "I got ta"],
-            ["", "I sure do!", "Brooklyn?", "brother in", "I got a baby", "tell ya that", "Did I ever"],
+            ["", "out ma girl!", "fer helpin'", "Thanks again"],
+            ["", "brother?", "I got a baby", "tell ya that", "Did I ever"],
         ],
         // 2 Sleeping Mushroom Man
         [["", ""]],
@@ -1887,12 +1921,15 @@ function generateDialogue() {
         ],
         // 7 Mama
         [
-            ["", "this time!", "husband is", "where my", "I wonder"],
-            ["", "aren't you:", "curious one", "Uh: you're a", "boys called?", "What are our", "What's that?"],
+            ["", "this time?", "himself lost", "gone and got", "my husband", "Where has"],
+            ["", "I've bought?", "all the food", "keeps eating", "I wonder who"],
+            ["", "to eat!", "out for them", "leave dinner", "I sometimes", "the village?", "hangs around", "that fox who", "Have you met"],
         ],
         // 8 Papa
         [
-            ["", "life for me!", "This is the", "*munch*", "*munch*"],
+            ["", "life for me!", "This is the", "", "*munch*", "*munch*"],
+            ["", "village.", "the animal", "rabbit from", "with the", "play cards", "Sometimes I"],
+            ["", "got here!", "idea how I", "I have no", "", "*munch*", "*munch*"],
         ],
         // 9 Old Man
         [["", ""]],
@@ -1901,28 +1938,34 @@ function generateDialogue() {
         // 11 Witch
         [
             ["", "recipe!", "rest of my", "to get the", "never going", "and: you're", "Eye of newt", "Caldron boil", "Double toil"],
+            ["", "mushrooms!", "to add the", "don't forget", "garlic, and", "one clove of", "Two onions,"],
+            ["", "fella!", "the little", "rat. I miss", "have a pet", "I used to"],
         ],
         // 12 Caldron
         [["", ""]],
         // 13 Grandma
         [
-            ["", "can sleep!", "Grandma sure", "", "*SNORE*"],
+            ["", "sleep, huh?", "does like to", "Grandma sure", "", "*SNORE*"],
             ["", "dream!", "What an odd", "", "scissors:", ":I need"],
             ["", ":polochus:", "dreamer:", ":the bubble", ":wind fish:"],
         ],
         // 14 Croc
         [
-            ["", "salesman!", "a travelling", "I've become"],
+            ["", "salesman!", "travelling", "becoming a", "trade and", "old antiques", "out of the", "I'm getting"],
             ["", "late!", "It's running", "for a train:", "I'm waiting"],
+            ["", "dog food!", "fine can of", "aged like a", "the pixels -", "Just look at"],
         ],
         // 15 Koko
         [
             ["", "again!", "to see you", "Koko happy", "Ook! Ook!"],
+            ["", "the west!", "journey to", "Koko on a", "Ook! Ook!"],
+            ["", "linguistics.", "professor of", "accomplished", "actually an", "In truth I'm"],
         ],
         // 16 Rabbit
         [
             ["", "is a hit!", "catchphrase", "My fun new", "Hoppity hi!"],
             ["", "part rabbit!", "I'm part cat", "", "Magya!", "Rupurudu!", "Wahoo!"],
+            ["", "card shark!", "more of a", "I'm really", "rabbit, but", "like a cute", "I might look"],
         ],
         // 17 Ghost
         [
@@ -1932,7 +1975,7 @@ function generateDialogue() {
         [
             ["", "there, slip!", "Get out of", "", "Yip! Yip!"],
             ["", "a new one!", ":yap? That's", "", "Yip! Yap!"],
-            ["", "DIALOGUE", "ERROR? MISSING"],
+            ["", "6ZY5NYW4TGK", "HGMK3WCYURM", "FMXT79TPV4U8"],
         ],
         // 19 Raccoon
         [["", ""]],
@@ -2044,7 +2087,7 @@ function generateDialogue() {
         ["", ""],    // 25 Carl
     ];
 
-    var tradeables = ["ribbon", "banana", "bottle", "flower", "shovel", "shield", "letter", "amulet", "brooch", "cuckoo", "potion", "papaya", "violin", "candle", "Y.Doll"];
+    var tradeables = ["ribbon", "banana", "bottle", "flower", "shovel", "shield", "letter", "wallet", "brooch", "cuckoo", "potion", "papaya", "violin", "candle", "Y.Doll"];
     shuffleArray(tradeables);
 
     var newDialogue;
@@ -2064,9 +2107,9 @@ function generateDialogue() {
         }
     }
 
-    // FIXME final trade (stage-1) needs completion dialogue on end
+    var tradingCompleteDialogue = ["", "draws near:", "The morning", "final trade!", "That was the"];
     newDialogue = npcDialoguesTakeItem[targets[stages-2]].slice();
-    dialoguesNPCs[stages-1][targets[stages-2]] = formatDialogueForTrade(newDialogue, tradeables[stages-2], "");
+    dialoguesNPCs[stages-1][targets[stages-2]] = [...tradingCompleteDialogue, ...formatDialogueForTrade(newDialogue, tradeables[stages-2], "")];
 
     // Ending dialogue
     dialoguesNPCs[stages][0] = ["", "sea with me:", "Look out to"];
@@ -2099,6 +2142,7 @@ function randomise() {
     Math.seedrandom(seed);
 
     modifyMap();
+    modifyStaticDialogues();
     shufflePortals();
     shuffleNpcs();
     generateQuest();
