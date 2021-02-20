@@ -906,7 +906,7 @@ function init() {
     dialogueFirstLine = dialogueBuffer.pop();
     dialogueSecondLine = dialogueBuffer.pop();
 
-    if (location.hash.startsWith("#randomiser")) { randomise(); }
+    if (location.search.startsWith("?randomiser")) { randomise(); }
 
     update();
 }
@@ -1670,7 +1670,7 @@ function processKeys() {
 }
 
 // ////////////////////////////////////////////////////////////
-// #RANDOMISER=SEED                                          //
+// ?RANDOMISER=SEED                                          //
 // ////////////////////////////////////////////////////////////
 
 function shuffleArray(array) {
@@ -1685,8 +1685,8 @@ function shuffleArray(array) {
 function getSeed() {
     var seedCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     var seed = "";
-    if (location.hash.indexOf("#randomiser=") >= 0) {
-        seed = location.hash.split("#randomiser=")[1].slice(0,12);
+    if (location.search.indexOf("?randomiser=") >= 0) {
+        seed = location.search.split("?randomiser=")[1].slice(0,12);
         for (var i=0; i < seed.length; i++) {
             if (seedCharacters.indexOf(seed[i]) < 0) {
                 seed = seed.replace(seed[i], "?");
