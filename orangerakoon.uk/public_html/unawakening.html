@@ -28,7 +28,45 @@
 
 <div>
 <button onclick="resizeCanvas(1)">+</button>
+<button onclick="showHelp()">?</button>
 <button onclick="resizeCanvas(-1)">-</button>
+</div>
+
+<div id="helpModal" class="modal">
+    <div class="modal-content">
+    <span onclick="hideHelp()" class="close">&times;</span>
+    <h1>Unawakening: Return to the Island</h1>
+
+    <p>A nostalgic single-sitting adventure game.</p>
+
+    <h2>Controls</h2>
+
+    <p>Use the "WASD" keys to move. Press the "J" key to interact. Click the "+" and "-" buttons to zoom in and out.</p>
+
+    <h2>Randomiser</h2>
+
+    <p>Randomly generated trading quests await in randomiser mode! Featuring mixed up house interiors, randomly shuffled character locations, and brand new dialogue.</p>
+
+    <p>To play a random seed:</p>
+
+    <a href='/unawakening?randomiser'>/unawakening?randomiser</a>
+
+    <p>You can also play a specific seed:</p>
+
+    <a href='/unawakening?randomiser'>/unawakening?randomiser=seed</a>
+
+    <p>Seeds should be no longer than 12 characters and made up of alphanumeric characters only.</p>
+
+    <h2>About</h2>
+
+    <p>Unawakening is a tribute to my favourite game of all time, <i>The Legend of Zelda: Link's Awakening</i>. It is my first graphical game. Thanks to everyone from the GRcade forums for your feedback and support!</p>
+
+    <p><b>Thanks for playing!</b></p>
+
+    <img src="unawakening_assets/screenshot_1.png">
+    <img src="unawakening_assets/screenshot_2.png">
+    <img src="unawakening_assets/screenshot_3.png">
+    </div>
 </div>
 
 <p><canvas id="screenCanvas" width="192" height="144">Unsupported by browser</canvas></p>
@@ -44,6 +82,15 @@
 
 <script src="seedrandom.js"></script>
 <script type="text/javascript">
+function showHelp() {
+    var modal = document.getElementById("helpModal");
+    modal.style.display = "block";
+}
+
+function hideHelp() {
+    var modal = document.getElementById("helpModal");
+    modal.style.display = "none";
+}
 
 var c = document.getElementById("screenCanvas");
 var ctx = c.getContext("2d");
