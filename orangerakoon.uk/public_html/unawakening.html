@@ -105,6 +105,7 @@ var timerEnd;
 var seed = "";
 
 var frameCount3 = 1;
+var frameCount15 = 1;
 
 var tilesets = [document.getElementById("tileset1"), document.getElementById("tileset2")];
 var tsize = 12;
@@ -198,6 +199,39 @@ function blur(event) {
 document.onkeydown = keydown;
 document.onkeyup = keyup;
 document.body.onblur = blur;
+
+var clickPosX;
+var clickPosY;
+var clickToLeft = false;
+var clickToTop = false;
+var clickMapIndex;
+var clickMapXCoord;
+var clickMapYCoord;
+var clickRecentPosX = [0,1];
+var clickRecentPosY = [0,1];
+
+c.addEventListener('click', function(event) {
+    clickPosX = Math.floor((event.pageX - (c.offsetLeft + c.clientLeft)) / scale);
+    clickPosY = Math.floor((event.pageY - (c.offsetTop + c.clientTop)) / scale);
+
+    // Correct for overscan - this is brittle and should be refactored
+    // to be calculated on overscan/tsize rather than absolute values
+    if (clickPosX == 4) { clickPosX += 2; }
+    if (clickPosX == 5) { clickPosX += 1; }
+    if (clickPosX == screenTileWidth*tsize-4) { clickPosX -= 2; }
+    if (clickPosX == screenTileWidth*tsize-5) { clickPosX -= 1; }
+    if (clickPosY == 4) { clickPosY += 2; }
+    if (clickPosY == 5) { clickPosY += 1; }
+    if (clickPosY == screenTileHeight*tsize-4) { clickPosY -= 2; }
+    if (clickPosY == screenTileHeight*tsize-5) { clickPosY -= 1; }
+
+    clickToLeft = clickPosX < (playerPosX + tsize/2);
+    clickToTop = clickPosY < (playerPosY + tsize/2);
+
+    clickMapIndex = mapIndex;
+    clickMapXCoord = mapXCoord;
+    clickMapYCoord = mapYCoord;
+});
 
 var passableTiles = [
     ["OOB","22","03","23","04","14","24","34","25","35","45","55","46","07","17","27","67","77","08","18","28","68","78","09","19","29","69","79","21","43","53"],
@@ -963,7 +997,10 @@ function update() {
 
     // Do stuff
     frameCount3 += 1;
+    frameCount15 += 1;
     if (frameCount3 > 3) { frameCount3 = 1; }
+    if (frameCount15 > 30) { frameCount15 = 1; }
+    processClickControls();
     processKeys();
     drawScreen();
 
@@ -1713,6 +1750,76 @@ function processKeys() {
     // Screen warp
     if ((transitionXBuffer == 0) && (transitionYBuffer == 0)) {
         keyMap["-"] = false;
+    }
+}
+
+function resetClickControlLogic() {
+    clickPosX = null;
+    clickPosY = null;
+    clickRecentPosX = [0,1];
+    clickRecentPosY = [0,1];
+}
+
+function processClickControls() {
+    if (clickPosX != null) {
+        keyMap["w"] = false;
+        keyMap["a"] = false;
+        keyMap["s"] = false;
+        keyMap["d"] = false;
+        keyMap["j"] = false;
+
+        if (dialogueBuffer.length > 0) {
+            keyMap["j"] = true;
+            resetClickControlLogic();
+            return;
+        }
+
+        if (clickMapIndex != mapIndex || clickMapXCoord != mapXCoord || clickMapYCoord != mapYCoord) {
+            resetClickControlLogic();
+            return;
+        }
+
+        if (playerPosX == clickRecentPosX[0] && playerPosX == clickRecentPosX[1] && playerPosY == clickRecentPosY[0] && playerPosY == clickRecentPosY[1]) {
+            resetClickControlLogic();
+            keyMap["j"] = true;
+            return;
+        }
+
+        if (frameCount15 == 1 && !inputDelayBuffer) {
+            clickRecentPosX[0] = playerPosX;
+            clickRecentPosY[0] = playerPosY;
+        }
+        if (frameCount15 == 8 && !inputDelayBuffer) {
+            clickRecentPosX[1] = playerPosX;
+            clickRecentPosY[1] = playerPosY;
+        }
+
+        var offsetX = clickPosX - (playerPosX + tsize/2);
+        var offsetY = clickPosY - (playerPosY + tsize/2);
+
+        if (clickToLeft) {
+            if (offsetX < 0) {
+                keyMap["a"] = true;
+            }
+        } else {
+            if (offsetX > 0) {
+                keyMap["d"] = true;
+            }
+        }
+
+        if (clickToTop) {
+            if (offsetY < 0) {
+                keyMap["w"] = true;
+            }
+        } else {
+            if (offsetY > 0) {
+                keyMap["s"] = true;
+            }
+        }
+
+        if (!(keyMap["w"] || keyMap["a"] || keyMap["s"] || keyMap["d"])) {
+            resetClickControlLogic();
+        }
     }
 }
 
