@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Videogame Remaster Title Generator</title>
+    <link rel="stylesheet" type="text/css" href="common.css">
+    <link rel="stylesheet" type="text/css" href="aznable.css">
+
+    <!--
+      ____                             _____       _
+     / __ \                           |  __ \     | |
+    | |  | |_ __ __ _ _ __   __ _  ___| |__) |__ _| | _____   ___  _ __
+    | |  | | '__/ _` | '_ \ / _` |/ _ \  _  // _` | |/ / _ \ / _ \| '_ \
+    | |__| | | | (_| | | | | (_| |  __/ | \ \ (_| |   < (_) | (_) | | | |
+     \____/|_|  \__,_|_| |_|\__, |\___|_|  \_\__,_|_|\_\___/ \___/|_| |_|.uk
+    =========================__/ |==========================================
+                            |___/  Author: Scott Hall   github: scotthall92
+    -->
+
+</head>
+<body>
+
+<div class="main">
+<noscript><h2>* This page requires JavaScript *</h2></noscript>
+<h1>Videogame Remaster Title Generator</h1>
+
+<p>Automating marketing departments since 2022.</p>
+
+<br>
+
+<h2 id="generatedName"></h2>
+
+<br><br>
+
+<form onsubmit="return remaster();">
+<span class="center"><input type="text" placeholder="Game Title" id="input"> <input type="submit" value="Remaster!"></span>
+</form>
+
+<p class="attribution"><a href="/"><<< back to orkn.uk</a></p>
+
+<script type="text/javascript">
+
+function getRandomChoice(choices) {
+    return choices[Math.floor(Math.random() * choices.length)]
+}
+
+modifiersSingle = ["3D","Anniversary","Collection","Deluxe","Director's Cut","DX","Enhanced","EX","Extended","Extra","Extreme","Final","Gold","HD","Kiwami","Rebirth","Redux","Reloaded","Remake","Remastered","Trilogy","Ultimate"];
+modifiersPairFirst = ["3D","Anniversary","Complete","Definitive","Deluxe","DX","Enhanced","EX","Extended","Extra","Extreme","Final","Full","Gold","HD","Kiwami","Rebirth","Redux","Reloaded","Remake","Remastered","Special","Trilogy","Ultimate"];
+modifiersPairSecond = ["3D","Anniversary","Collection","Cut","Deluxe","DX","Edition","Enhanced","EX","Extended","Extra","Extreme","Final","Gold","HD","Kiwami","Mix","Rebirth","Redux","Reloaded","Remake","Remastered","Special","Trilogy","Ultimate"];
+
+function remaster() {
+    let input = document.getElementById("input").value;
+
+    if (Math.random() > 0.5) {
+        document.getElementById("generatedName").innerText = input + " " + getRandomChoice(modifiersSingle);
+        return false
+    }
+
+    let first = getRandomChoice(modifiersPairFirst);
+    let reduced = [...modifiersPairSecond];
+    let index = reduced.indexOf(first);
+    if (index > -1) {
+        reduced.splice(index, 1);
+    }
+    let second = getRandomChoice(reduced);
+
+    document.getElementById("generatedName").innerText = input + " " + first + " " + second;
+
+    return false
+}
+
+</script>
+</div>
+
+</body>
+</html>
